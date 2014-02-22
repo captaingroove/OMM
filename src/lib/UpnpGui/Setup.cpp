@@ -386,6 +386,7 @@ class ServerConfView : public Gui::ScrollAreaView
     friend class ServerListController;
     friend class ServerDoneButton;
     friend class ServerNewButton;
+    friend class ServerScanButton;
     friend class ServerPluginSelector;
 
     ServerConfView(GuiSetup* pGuiSetup, bool newServer, View* pParent = 0);
@@ -610,7 +611,7 @@ class ServerConfModel : public Gui::Model
         _pGuiSetup->_pApp->getFileConfiguration()->setBool("server." + _id + ".enable", _pConfView->_pServerEnableSwitch->getStateOn());
         _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".friendlyName", _pConfView->_pServerFriendlyNameText->getTextLine());
         _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".uuid", _uuid);
-        _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".plugin", _pConfView->_pServerPluginSelector->getTextLine());
+//        _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".plugin", _pConfView->_pServerPluginSelector->getTextLine());
         _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".basePath", _pConfView->_pServerBasePathText->getTextLine());
 //        _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".pollUpdateId", _pConfView->_pServerPollText->getTextLine());
         switch(_pConfView->_pServerLayoutSelector->getCurrentIndex()) {
@@ -663,7 +664,7 @@ void
 ServerScanNotification::itemScanned(const std::string& path)
 {
     _pServerConfModel->_serverScanitemCount++;
-    _pServerConfModel->syncViews();
+//    _pServerConfModel->syncViews();
 }
 
 
@@ -684,6 +685,10 @@ class ServerScanButton : Gui::Button
         ServerConfModel* pServerConfModel = static_cast<ServerConfModel*>(_pServerConfView->getModel());
         Av::MediaServer* pServer = _pApp->getLocalMediaServer(pServerConfModel->_uuid);
         if (pServer) {
+            std::string basePath = _pServerConfView->_pServerBasePathText->getTextLine();
+            pServer->getRoot()->setBasePath(basePath);
+            _pApp->getFileConfiguration()->setString("server." + pServerConfModel->_id + ".basePath", basePath);
+//            pServerConfModel->writeConf();
             Av::AbstractDataModel* pDataModel = pServer->getRoot()->getDataModel();
             if (pDataModel) {
                 pDataModel->checkSystemUpdateId(true);

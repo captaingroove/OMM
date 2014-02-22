@@ -99,6 +99,7 @@ private:
     void displayHelp();
     void printConfig();
     void printForm(const Poco::Net::HTMLForm& form);
+    void defaultConfig();
     void loadConfig();
     void initConfig();
     void saveConfig();

@@ -497,7 +497,7 @@ public:
     Poco::TextConverter* getTextConverter();
 
 protected:
-    void readIndexMap();
+    bool readIndexMap();
     void writeIndexMap();
 
     ui4 getPublicSystemUpdateId();

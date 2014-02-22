@@ -33,6 +33,7 @@
 #include "UpnpGui/UpnpApplication.h"
 #include "UpnpGui/Setup.h"
 #include "UpnpGui/GuiVisual.h"
+#include "Sys/Path.h"
 
 #include "Util.h"
 #include "Gui/GuiLogger.h"
@@ -431,6 +432,38 @@ UpnpApplication::printForm(const Poco::Net::HTMLForm& form)
 
 
 void
+UpnpApplication::defaultConfig()
+{
+    LOGNS(Av, upnpav, information, "creating default config");
+    _pConf->setBool("renderer.enable", true);
+    _pConf->setString("renderer.friendlyName", "OMM Media Player");
+    _pConf->setString("renderer.plugin", "engine-vlc");
+    _pConf->setString("renderer.uuid", "rra123bc-de45-6789-ffff-gg1234hhh56i");
+
+//    _pConf->setString("server.0.basePath", Sys::SysPath::getPath(Sys::SysPath::Home) + "/tmp/music");
+    _pConf->setString("server.0.basePath", Sys::SysPath::getPath(Sys::SysPath::Home));
+    _pConf->setBool("server.0.checkMod", false);
+    _pConf->setBool("server.0.enable", true);
+    _pConf->setString("server.0.friendlyName", "OMM Media Home");
+    _pConf->setString("server.0.layout", Av::ServerContainer::LAYOUT_FLAT);
+    _pConf->setString("server.0.plugin", "model-file");
+    _pConf->setInt("server.0.pollUpdateId", 0);
+    _pConf->setString("server.0.uuid", "00a123bc-de45-6789-ffff-gg1234hhh56i");
+
+    _pConf->setString("server.new.basePath", "");
+    _pConf->setBool("server.new.checkMod", false);
+    _pConf->setBool("server.new.enable", false);
+    _pConf->setString("server.new.friendlyName", "");
+    _pConf->setString("server.new.layout", Av::ServerContainer::LAYOUT_FLAT);
+    _pConf->setString("server.new.plugin", "");
+    _pConf->setInt("server.new.pollUpdateId", 0);
+    _pConf->setString("server.new.uuid", "xxa123bc-de45-6789-ffff-gg1234hhh56i");
+
+    _pConf->setString("servers", "0");
+}
+
+
+void
 UpnpApplication::loadConfig()
 {
     if (!_ignoreConfig) {
@@ -443,7 +476,8 @@ UpnpApplication::loadConfig()
             LOGNS(Av, upnpav, information, "reading config file done.");
         }
         catch (Poco::Exception& e) {
-            LOGNS(Av, upnpav, error, "could not read config file: " + e.displayText());
+            LOGNS(Av, upnpav, warning, "could not read config file: " + e.displayText());
+            defaultConfig();
         }
     //        config().addWriteable(_pConf, -200);
         config().addWriteable(_pConf, 0);
@@ -700,7 +734,7 @@ UpnpApplication::addLocalServer(const std::string& id)
         path = Omm::Util::Home::instance()->getConfigDirPath("/") + basePath;
     }
     pContainer->setBasePath(path);
-    pContainer->setLayout(config().getString("server." + id + ".layout", "Flat"));
+    pContainer->setLayout(config().getString("server." + id + ".layout", Av::ServerContainer::LAYOUT_FLAT));
 
     pMediaServer->setRoot(pContainer);
     pMediaServer->setFriendlyName(name);

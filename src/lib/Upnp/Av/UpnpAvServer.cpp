@@ -2214,8 +2214,9 @@ AbstractDataModel::setBasePath(const std::string& path)
     // without loosing information. Indices must be persistant information, because object ids
     // are derived from them (playlists must be removed also, if index map is rebuild entirely)
     _indexFilePath = Poco::Path(getMetaDirPath() + getModelClass() + "/" + path, "index");
-    readIndexMap();
-    checkSystemUpdateId();
+    if (readIndexMap()) {
+        checkSystemUpdateId();
+    }
 }
 
 
@@ -2501,12 +2502,12 @@ AbstractDataModel::getTextConverter()
 }
 
 
-void
+bool
 AbstractDataModel::readIndexMap()
 {
     if (!Poco::File(_indexFilePath).exists()) {
         LOG(upnpav, debug, "index map not present, not reading it");
-        return;
+        return false;
     }
     LOG(upnpav, debug, "index map present, reading ...");
     std::ifstream indexMap(_indexFilePath.toString().c_str());
@@ -2540,6 +2541,7 @@ AbstractDataModel::readIndexMap()
     }
     // TODO: read resource map
     LOG(upnpav, debug, "index map read finished.");
+    return true;
 }
 
 

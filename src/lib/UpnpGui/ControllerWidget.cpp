@@ -163,7 +163,8 @@ _pApplication(pApplication)
     if (!Poco::Util::Application::instance().config().getBool("application.fullscreen", false)) {
 //        setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "col [0,0] Media,Player,Setup,Video {800;480} {1,00} {1,00}"));
 //        setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "col [0,0] Media [1,0] Player [1,1] Setup,Video {800;480} {0,5;0,5} {1,00} {0,34;0,65}"));
-        setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "col [0,0] Media [1,0] Player {800;480} {0,5;0,5} {1,00} {1,00}"));
+//        setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "col [0,0] Media [1,0] Player {800;480} {0,5;0,5} {1,00} {1,00}"));
+        setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "col [0,0] Media [1,0] Player [1,1] Setup,Video {800;480} {0,56;0,43} {1,00} {0,59;0,40}"));
     }
     else {
         setConfiguration("[0,0] Media,Video {800;480} {1,00} {1,00}");
