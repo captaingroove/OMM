@@ -47,15 +47,14 @@ DvbModel::init()
     LOGNS(Omm::Dvb, dvb, debug, "dvb model init ...");
 
     Poco::NotificationCenter::defaultCenter().addObserver(Poco::Observer<DvbModel, Omm::Dvb::ScanNotification>(*this, &DvbModel::onScanNotification));
+    Poco::File xmlDeviceFile(getBasePath());
 
-//    _channels.setConfFilePath(getBasePath());
-//    _channels.scanChannels();
-//    Omm::Dvb::Device::instance()->init();
     Omm::Dvb::Device::instance()->detectAdapters();
-
-    std::ifstream xmlDevice(getBasePath().c_str());
-    Omm::Dvb::Device::instance()->readXml(xmlDevice);
-    Omm::Dvb::Device::instance()->open();
+    if (xmlDeviceFile.exists()) {
+        std::ifstream xmlDevice(getBasePath().c_str());
+        Omm::Dvb::Device::instance()->readXml(xmlDevice);
+        Omm::Dvb::Device::instance()->open();
+    }
 
     LOGNS(Omm::Dvb, dvb, debug, "dvb model init finished.");
 }
@@ -79,49 +78,20 @@ DvbModel::getModelClass()
 }
 
 
-Omm::ui4
-DvbModel::getSystemUpdateId(bool checkMod)
-{
-    return Poco::File(getBasePath()).getLastModified().epochTime();
-}
-
-
 void
 DvbModel::scan()
 {
     LOGNS(Omm::Dvb, dvb, debug, "dvb model scan ...");
-//    std::ifstream xmlDevice(getBasePath().c_str());
-//    Omm::Dvb::Device::instance()->readXml(xmlDevice);
 
+    Omm::Dvb::Device::instance()->open();
     Omm::Dvb::Device::instance()->scan();
 
-//    for (Omm::Dvb::Device::ServiceIterator it = Omm::Dvb::Device::instance()->serviceBegin(); it != Omm::Dvb::Device::instance()->serviceEnd(); ++it) {
-////        LOGNS(Omm::Dvb, trace, debug, "add service " + it->first + " to dvb model");
-////        LOGNS(Omm::Dvb, trace, debug, "transponder count: " + Poco::NumberFormatter::format(it->second.size()));
-////        LOGNS(Omm::Dvb, trace, debug, "first transponder has freq: " + Poco::NumberFormatter::format(it->second[0]->getFrequency()));
-//
-//        // NOTE: iterator for transponder vector doesn't work ... (?!)
-//        for (int i = 0; i < it->second.size(); i++) {
-////            LOGNS(Omm::Dvb, trace, debug, "add transponder with freq: " + Poco::NumberFormatter::format(it->second[i]->getFrequency()));
-//            Omm::Dvb::Service* pService = it->second[i]->getService(it->first);
-//            if (pService && pService->getStatus() == Omm::Dvb::Service::StatusRunning
-//                    && !pService->getScrambled()
-//                    && (pService->isAudio() || pService->isSdVideo())) {
-//                // there is one transponder that can receive the service unscrambled
-//                addPath(it->first);
-//                break;
-//            }
-//        }
-////        for (std::vector<Omm::Dvb::Transponder*>::iterator tit = it->second.begin(); tit != it->second.end(); ++it) {
-////            LOGNS(Omm::Dvb, dvb, debug, "add transponder with freq: " + Poco::NumberFormatter::format((*tit)->getFrequency()));
-////            Omm::Dvb::Service* pService = (*tit)->getService(it->first);
-////            if (pService && pService->getStatus() == Omm::Dvb::Service::StatusRunning && !pService->getScrambled()) {
-////                // there is one transponder that can receive the service unscrambled
-////                addPath(it->first);
-////                break;
-////            }
-////        }
-//    }
+    for (Omm::Dvb::Device::ServiceIterator it = Omm::Dvb::Device::instance()->serviceBegin(); it != Omm::Dvb::Device::instance()->serviceEnd(); ++it) {
+        addPath(it->first);
+    }
+    std::ofstream xmlDevice(getBasePath().c_str());
+    Omm::Dvb::Device::instance()->writeXml(xmlDevice);
+
     LOGNS(Omm::Dvb, dvb, debug, "dvb model scan finished.");
 }
 

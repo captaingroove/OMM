@@ -42,6 +42,7 @@
 #include <Poco/TextConverter.h>
 #include <Poco/URI.h>
 #include <Poco/UUIDGenerator.h>
+#include <Poco/Path.h>
 
 #include "UpnpAvServer.h"
 #include "UpnpInternal.h"
@@ -858,7 +859,8 @@ _pUserObjectCache(0),
 _layout(Flat),
 //_groupPropertyName(AvProperty::CLASS),
 _groupPropertyName(AvProperty::ARTIST),
-_childrenPlaylistSize(0)
+_childrenPlaylistSize(0),
+_pScanNotification(0)
 {
     setIsContainer(true);
     setIsRestricted(false);
@@ -1073,8 +1075,11 @@ void
 ServerContainer::setBasePath(const std::string& basePath)
 {
     LOG(upnpav, debug, "server container, set base path to: " + basePath);
+    // get rid of windows drive letters in basePath ... does not really work
+//    std::string basePathClean = basePath.substr(Poco::Path(basePath).getDevice().length());
+    std::string basePathClean = basePath;
     if (_pObjectCache) {
-        std::string cacheFileDir = getDataModel()->getCacheDirPath() + _pDataModel->getModelClass() + "/" + basePath;
+        std::string cacheFileDir = getDataModel()->getCacheDirPath() + _pDataModel->getModelClass() + "/" + basePathClean;
         try {
             Poco::File(cacheFileDir).createDirectories();
         }
@@ -1086,7 +1091,7 @@ ServerContainer::setBasePath(const std::string& basePath)
         _pVirtualContainerCache->setCacheFilePath(cacheFilePath);
 //        updateCache();
     }
-    std::string metaFileDir = getDataModel()->getMetaDirPath() + _pDataModel->getModelClass() + "/" + basePath;
+    std::string metaFileDir = getDataModel()->getMetaDirPath() + _pDataModel->getModelClass() + "/" + basePathClean;
     try {
             Poco::File(metaFileDir).createDirectories();
         }
@@ -1105,6 +1110,9 @@ ServerContainer::updateCache()
 {
     LOG(upnpav, debug, "server container, update cache started ...");
     if (_pObjectCache) {
+        if (_pScanNotification) {
+            _pScanNotification->reset();
+        }
         // removed objects
         for (AbstractDataModel::IndexIterator it = _pDataModel->beginRemovedIndex(); it != _pDataModel->endRemovedIndex(); ++it) {
             LOG(upnpav, debug, "remove object from cache with index: " + Poco::NumberFormatter::format(*it));
@@ -1117,6 +1125,9 @@ ServerContainer::updateCache()
             if (pObject) {
                 pObject->setIndex(*it);
                 _pObjectCache->insertMediaObject(pObject);
+                if (_pScanNotification) {
+                    _pScanNotification->itemScanned(pObject->getTitle());
+                }
             }
             else {
                 LOG(upnpav, error, "could not retrieve media object from data model");
@@ -1137,6 +1148,9 @@ ServerContainer::updateCache()
                 if (pObject) {
                     pObject->setIndex(*it);
                     _pObjectCache->updateMediaObject(pObject);
+                    if (_pScanNotification) {
+                        _pScanNotification->itemScanned(pObject->getTitle());
+                    }
                 }
             }
         }
@@ -1446,6 +1460,13 @@ ServerContainer::generateChildrenPlaylist()
 //    }
 
     return pChildrenPlaylist;
+}
+
+
+void
+ServerContainer::setScanNotification(ServerContainerScanNotification* pScanNotification)
+{
+    _pScanNotification = pScanNotification;
 }
 
 
@@ -2153,8 +2174,7 @@ _pTextConverter(0),
 _publicSystemUpdateId(0),
 _cacheSystemUpdateId(0),
 _cacheSystemModId(0),
-_checkMod(false),
-_pScanNotification(0)
+_checkMod(false)
 {
 }
 
@@ -2266,13 +2286,6 @@ AbstractDataModel::checkSystemUpdateId(bool forceUpdate)
         setCacheSystemUpdateId(id, _checkMod);
         _updateThread.start(_updateThreadRunnable);
     }
-}
-
-
-void
-AbstractDataModel::setScanNotification(DataModelScanNotification* pScanNotification)
-{
-    _pScanNotification = pScanNotification;
 }
 
 
@@ -2405,8 +2418,8 @@ AbstractDataModel::addPath(const std::string& path, const std::string& resourceP
     else {
         _commonIndices.push_back((*it).second);
     }
-    if (_pScanNotification) {
-        _pScanNotification->itemScanned(path);
+    if (_pServerContainer->_pScanNotification) {
+        _pServerContainer->_pScanNotification->itemScanned(path);
     }
 }
 
@@ -2634,7 +2647,7 @@ AbstractDataModel::updateThread()
     _updateThreadRunning = true;
     _updateThreadLock.unlock();
 
-    LOG(upnpav, debug, "update thread start ...");
+    LOG(upnpav, debug, "update thread start on base path " + _basePath.toString() + "...");
     // clear temporary index lists
     _lastIndices.clear();
     _commonIndices.clear();
@@ -2676,10 +2689,17 @@ AbstractDataModel::updateThread()
     writeIndexMap();
 
     // update database cache (if available)
-    _pServerContainer->updateCache();
+    try {
+        if (useObjectCache()) {
+            _pServerContainer->updateCache();
+        }
 
     // trigger evented state variable SystemUpdateID
     _pServerContainer->getServer()->setSystemUpdateId(getPublicSystemUpdateId());
+    }
+    catch (Poco::Exception &e) {
+        LOG(upnpav, error, "server container update cache failed: " + e.displayText())
+    }
 
     LOG(upnpav, debug, "update thread finished.");
 
@@ -2693,7 +2713,7 @@ bool
 AbstractDataModel::updateThreadIsRunning()
 {
     Poco::ScopedLock<Poco::FastMutex> lock(_updateThreadLock);
-    LOG(upnpav, debug, "update thread is running: " + std::string(_updateThreadRunning ? "yes" : "no"));
+    LOG(upnpav, debug, "update thread on base path " + _basePath.toString() + " is running: " + std::string(_updateThreadRunning ? "yes" : "no"));
     return _updateThreadRunning;
 }
 

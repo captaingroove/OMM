@@ -34,7 +34,7 @@ ${MediaImages_CPP}
 set(DEFAULT_ENGINE
 )
 set(EXTRA_LIBS
-ommdvb
+${OMM_DVB}
 )
 
 if(IPHONE)

@@ -82,6 +82,7 @@ Table::read(Demux* pDemux, Stream* pStream)
         LOG(dvb, trace, "table read all sections");
     }
     else {
+        // TODO: through exception here, which is handled in Demux::readTable(Table* pTable) ?
         LOG(dvb, trace, "table max read attempt reached");
     }
 }

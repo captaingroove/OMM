@@ -235,6 +235,20 @@ public:
 };
 
 
+class ServerContainerScanNotification
+{
+    // Don't use a Poco::Notification here to avoid creation of Notification objects for each item scanned
+public:
+    ServerContainerScanNotification() : _serverScanitemCount(0) {}
+
+    virtual void itemScanned(const std::string& path) = 0;
+    void reset() { _serverScanitemCount = 0; }
+
+protected:
+    ui4                _serverScanitemCount;
+};
+
+
 class ServerContainer : public ServerObject //, public Util::ConfigurablePlugin
 {
     friend class DatabaseCache;
@@ -292,6 +306,8 @@ public:
 
     std::stringstream* generateChildrenPlaylist();
 
+    void setScanNotification(ServerContainerScanNotification* pScanNotification);
+
 private:
     virtual ServerObject* initChild(ServerObject* pObject, ui4 index, bool fullInit = true);
 
@@ -307,6 +323,8 @@ private:
     Poco::FastMutex                                     _serverLock;
     CsvList                                             _searchCaps;
     CsvList                                             _sortCaps;
+
+    ServerContainerScanNotification*                    _pScanNotification;
 };
 
 
@@ -402,14 +420,6 @@ private:
 };
 
 
-class DataModelScanNotification
-{
-    // Don't use a Poco::Notification here to avoid creation of Notification objects for each item scanned
-public:
-    virtual void itemScanned(const std::string& path) = 0;
-};
-
-
 class AbstractDataModel
 {
 public:
@@ -438,7 +448,6 @@ public:
     /// if not implemented by data model, one single update id for the whole model is assumed
     void setCheckObjectModifications(bool check = true);
     void checkSystemUpdateId(bool forceUpdate = false);
-    void setScanNotification(DataModelScanNotification* pScanNotification);
 
     // data model cares only about one media object at a time
     // buffering / caching / optimized access is done internally at next layers
@@ -528,7 +537,6 @@ private:
     ui4                                         _cacheSystemUpdateId;
     ui4                                         _cacheSystemModId;
     bool                                        _checkMod;
-    DataModelScanNotification*                  _pScanNotification;
 
     std::vector<ui4>                            _lastIndices;
     std::vector<ui4>                            _commonIndices;

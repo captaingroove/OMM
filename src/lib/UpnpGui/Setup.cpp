@@ -35,12 +35,14 @@
 #include "Gui/Button.h"
 #include "Gui/TextLine.h"
 
+#include "Util.h"
 #include "UpnpGui/UpnpApplication.h"
 #include "UpnpGui/ControllerWidget.h"
 #include "UpnpGui/Setup.h"
 
 // TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
-#ifndef __IPHONE__
+#define __DVB_SUPPORT__
+#ifdef __DVB_SUPPORT__
 #include "Omm/Dvb/Device.h"
 #include "Omm/Dvb/Frontend.h"
 #endif
@@ -378,6 +380,21 @@ class ServerLayoutSelector : Gui::Selector
     }
 };
 
+
+class ServerConfView;
+
+class ServerScanNotification : public Av::ServerContainerScanNotification
+{
+    friend class ServerConfView;
+
+    ServerScanNotification(ServerConfView* pServerConfView) : _pServerConfView(pServerConfView) {}
+
+    virtual void itemScanned(const std::string& path);
+
+    ServerConfView*    _pServerConfView;
+};
+
+
 class ServerConfView : public Gui::ScrollAreaView
 {
     friend class GuiSetup;
@@ -387,10 +404,13 @@ class ServerConfView : public Gui::ScrollAreaView
     friend class ServerDoneButton;
     friend class ServerNewButton;
     friend class ServerScanButton;
+    friend class ServerScanNotification;
     friend class ServerPluginSelector;
 
     ServerConfView(GuiSetup* pGuiSetup, bool newServer, View* pParent = 0);
     virtual void syncViewImpl();
+    void syncScanProgress(ui4 itemCount);
+    std::string getBasePath();
 //    void writeConf();
 
     GuiSetup*               _pGuiSetup;
@@ -407,6 +427,8 @@ class ServerConfView : public Gui::ScrollAreaView
     Gui::Button*            _pServerScanButton;
     Gui::Label*             _pServerScanProgressLabel;
     Gui::View*              _pServerBasePathView;
+    ServerScanNotification* _pServerScanNotification;
+    Gui::SelectorView*      _pServerDvbFrontendKeySelector;
 };
 
 
@@ -475,22 +497,8 @@ class ServerPluginSelector : Gui::Selector
 };
 
 
-class ServerConfModel;
-
-class ServerScanNotification : public Av::DataModelScanNotification
-{
-    friend class ServerConfModel;
-
-    ServerScanNotification(ServerConfModel* pServerConfModel) : _pServerConfModel(pServerConfModel) {}
-
-    virtual void itemScanned(const std::string& path);
-
-    ServerConfModel*    _pServerConfModel;
-};
-
-
 // TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
-#ifndef __IPHONE__
+#ifdef __DVB_SUPPORT__
 class DvbFrontendKeySelectorModel : public Gui::SelectorModel
 {
 //    friend class ServerConfModel;
@@ -525,19 +533,17 @@ class ServerConfModel : public Gui::Model
     friend class ServerNewButton;
     friend class ServerScanButton;
     friend class ServerConfView;
-    friend class ServerScanNotification;
     friend class DvbFrontendKeySelectorController;
 
-    ServerConfModel(GuiSetup* pGuiSetup, ServerConfView* pConfView, const std::string& id) : _pGuiSetup(pGuiSetup), _pConfView(pConfView), _id(id), _serverScanitemCount(0)
+    ServerConfModel(GuiSetup* pGuiSetup, ServerConfView* pConfView, const std::string& id) : _pGuiSetup(pGuiSetup), _pConfView(pConfView), _id(id)
     // TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
-#ifndef __IPHONE__
+#ifdef __DVB_SUPPORT__
     , _pDvbDevice(0)
 #endif
     {
         _uuid = _pGuiSetup->_pApp->getFileConfiguration()->getString("server." + _id + ".uuid", Poco::UUIDGenerator().createRandom().toString());
-        _pServerScanNotification = new ServerScanNotification(this);
 // TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
-#ifndef __IPHONE__
+#ifdef __DVB_SUPPORT__
         if (getPlugin() == "model-dvb") {
             _pDvbDevice = Omm::Dvb::Device::instance();
             for (Omm::Dvb::Device::AdapterIterator it = _pDvbDevice->adapterBegin(); it != _pDvbDevice->adapterEnd(); ++it) {
@@ -597,7 +603,7 @@ class ServerConfModel : public Gui::Model
     }
 
 // TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
-#ifndef __IPHONE__
+#ifdef __DVB_SUPPORT__
     void setDvbFrontendKey(const std::string& frontendType, int index)
     {
         std::string key = _dvbFrontendKeys[frontendType].getItemLabel(index);
@@ -631,10 +637,8 @@ class ServerConfModel : public Gui::Model
     std::string                                         _uuid;
     GuiSetup*                                           _pGuiSetup;
     ServerConfView*                                     _pConfView;
-    ServerScanNotification*                             _pServerScanNotification;
-    ui4                                                 _serverScanitemCount;
 // TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
-#ifndef __IPHONE__
+#ifdef __DVB_SUPPORT__
     Omm::Dvb::Device*                                   _pDvbDevice;
     std::map<std::string, DvbFrontendKeySelectorModel>  _dvbFrontendKeys;
     std::map<std::string, std::string>                  _dvbSelectedKeys;
@@ -643,7 +647,7 @@ class ServerConfModel : public Gui::Model
 
 
 // TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
-#ifndef __IPHONE__
+#ifdef __DVB_SUPPORT__
 class DvbFrontendKeySelectorController : public Gui::SelectorController
 {
     friend class ServerConfView;
@@ -663,8 +667,11 @@ class DvbFrontendKeySelectorController : public Gui::SelectorController
 void
 ServerScanNotification::itemScanned(const std::string& path)
 {
-    _pServerConfModel->_serverScanitemCount++;
+    _serverScanitemCount++;
+//    _pServerConfModel->_serverScanitemCount++;
+    // TODO: sync the scan field in conf view
 //    _pServerConfModel->syncViews();
+    _pServerConfView->syncScanProgress(_serverScanitemCount);
 }
 
 
@@ -685,7 +692,8 @@ class ServerScanButton : Gui::Button
         ServerConfModel* pServerConfModel = static_cast<ServerConfModel*>(_pServerConfView->getModel());
         Av::MediaServer* pServer = _pApp->getLocalMediaServer(pServerConfModel->_uuid);
         if (pServer) {
-            std::string basePath = _pServerConfView->_pServerBasePathText->getTextLine();
+//            std::string basePath = _pServerConfView->_pServerBasePathText->getTextLine();
+            std::string basePath = _pServerConfView->getBasePath();
             pServer->getRoot()->setBasePath(basePath);
             _pApp->getFileConfiguration()->setString("server." + pServerConfModel->_id + ".basePath", basePath);
 //            pServerConfModel->writeConf();
@@ -886,21 +894,25 @@ _newServer(newServer)
     new ServerCancelButton(_pGuiSetup, pDoneCancelView);
 
     getAreaView()->setSizeConstraint(300, 7 * 20, Gui::View::Min);
+
+    _pServerScanNotification = new ServerScanNotification(this);
 }
 
 
-void ServerConfView::syncViewImpl()
+void
+ServerConfView::syncViewImpl()
 {
     if (static_cast<ServerConfModel*>(_pModel)->getPlugin() == "model-dvb") {
 // TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
-#ifndef __IPHONE__
+#ifdef __DVB_SUPPORT__
+        LOGNS(Gui, gui, debug, "server conf view show dvb frontend key selector");
         for (std::map<std::string, DvbFrontendKeySelectorModel>::iterator fit = static_cast<ServerConfModel*>(_pModel)->_dvbFrontendKeys.begin(); fit != static_cast<ServerConfModel*>(_pModel)->_dvbFrontendKeys.end(); ++fit) {
             Gui::Label* pServerDvbFrontendNameLabel = new Gui::Label(_pServerBasePathView);
             pServerDvbFrontendNameLabel->setLabel(fit->first);
             pServerDvbFrontendNameLabel->setStretchFactor(-1.0);
-            Gui::SelectorView* pServerDvbFrontendKeySelector = new Gui::Selector(_pServerBasePathView);
-            pServerDvbFrontendKeySelector->setModel(&fit->second);
-            pServerDvbFrontendKeySelector->attachController(new DvbFrontendKeySelectorController(fit->first, static_cast<ServerConfModel*>(_pModel)));
+            _pServerDvbFrontendKeySelector = new Gui::Selector(_pServerBasePathView);
+            _pServerDvbFrontendKeySelector->setModel(&fit->second);
+            _pServerDvbFrontendKeySelector->attachController(new DvbFrontendKeySelectorController(fit->first, static_cast<ServerConfModel*>(_pModel)));
     //        for (int keyIndex = 0; keyIndex < fit->second.totalItemCount(); keyIndex++) {
     //            LOGNS(Gui, gui, debug, "dvb frontend key: " + fit->first + "/" + fit->second.getItemLabel(keyIndex));
     //        }
@@ -947,13 +959,36 @@ void ServerConfView::syncViewImpl()
     try {
         Av::MediaServer* pMediaServer = _pGuiSetup->_pApp->getLocalMediaServer(static_cast<ServerConfModel*>(_pModel)->_uuid);
         if (pMediaServer) {
-            pMediaServer->getRoot()->getDataModel()->setScanNotification(static_cast<ServerConfModel*>(_pModel)->_pServerScanNotification);
-            _pServerScanProgressLabel->setLabel(Poco::NumberFormatter::format(static_cast<ServerConfModel*>(_pModel)->_serverScanitemCount));
+//            pMediaServer->getRoot()->setScanNotification(static_cast<ServerConfModel*>(_pModel)->_pServerScanNotification);
+            pMediaServer->getRoot()->setScanNotification(_pServerScanNotification);
+//            _pServerScanProgressLabel->setLabel(Poco::NumberFormatter::format(static_cast<ServerConfModel*>(_pModel)->_serverScanitemCount));
         }
     }
     catch (Poco::Exception& e) {
         LOGNS(Gui, gui, debug, "scan notification server not found: " + e.displayText());
     }
+}
+
+
+void
+ServerConfView::syncScanProgress(ui4 itemCount)
+{
+    _pServerScanProgressLabel->setLabel(Poco::NumberFormatter::format(itemCount));
+}
+
+
+std::string
+ServerConfView::getBasePath()
+{
+#ifdef __DVB_SUPPORT__
+    if (static_cast<ServerConfModel*>(_pModel)->getPlugin() == "model-dvb") {
+        static_cast<ServerConfModel*>(_pModel)->setDvbFrontendKey("dvb-t", _pServerDvbFrontendKeySelector->getCurrentIndex());
+//        DvbFrontendKeySelectorModel* pSelectorModel = static_cast<DvbFrontendKeySelectorModel*>(_pServerDvbFrontendKeySelector->getModel());
+//        return pSelectorModel->getItemLabel(_pServerDvbFrontendKeySelector->getCurrentIndex());
+        return Omm::Util::Home::instance()->getConfigDirPath("/") + "dvb.xml";
+    }
+#endif
+    return _pServerBasePathText->getTextLine();
 }
 
 

@@ -27,6 +27,7 @@
 #include <Poco/StreamCopier.h>
 #include <Poco/NamedMutex.h>
 #include <Poco/Util/Application.h>
+#include <Poco/NumberFormatter.h>
 
 
 #include "Util.h"
@@ -164,10 +165,13 @@ _pApplication(pApplication)
 //        setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "col [0,0] Media,Player,Setup,Video {800;480} {1,00} {1,00}"));
 //        setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "col [0,0] Media [1,0] Player [1,1] Setup,Video {800;480} {0,5;0,5} {1,00} {0,34;0,65}"));
 //        setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "col [0,0] Media [1,0] Player {800;480} {0,5;0,5} {1,00} {1,00}"));
-        setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "col [0,0] Media [1,0] Player [1,1] Setup,Video {800;480} {0,56;0,43} {1,00} {0,59;0,40}"));
+//        setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "col [0,0] Media [1,0] Player [1,1] Setup,Video {800;480} {0,56;0,43} {1,00} {0,59;0,40}"));
+        setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "col [0,0] Media [1,0] Player [1,1] Setup,Video {800;480} {" +\
+                Poco::NumberFormatter::format(0.56) + ";" + Poco::NumberFormatter::format(0.43) + "} {" + Poco::NumberFormatter::format(1.00) + "} {" +\
+                Poco::NumberFormatter::format(0.60) + ";" + Poco::NumberFormatter::format(0.40) + "}"));
     }
     else {
-        setConfiguration("[0,0] Media,Video {800;480} {1,00} {1,00}");
+        setConfiguration("[0,0] Media,Video {800;480} {" + Poco::NumberFormatter::format(1.00) + "} {" + Poco::NumberFormatter::format(1.00) + "}");
     }
 
     Poco::NotificationCenter::defaultCenter().addObserver(Poco::Observer<ControllerWidget, Av::StreamTypeNotification>(*this, &ControllerWidget::newStreamType));

@@ -34,7 +34,7 @@
 #include "UpnpGui/Setup.h"
 #include "UpnpGui/GuiVisual.h"
 #include "Sys/Path.h"
-
+#include "Sys/System.h"
 #include "Util.h"
 #include "Gui/GuiLogger.h"
 #include "UpnpAv.h"
@@ -440,15 +440,42 @@ UpnpApplication::defaultConfig()
     _pConf->setString("renderer.plugin", "engine-vlc");
     _pConf->setString("renderer.uuid", "rra123bc-de45-6789-ffff-gg1234hhh56i");
 
-//    _pConf->setString("server.0.basePath", Sys::SysPath::getPath(Sys::SysPath::Home) + "/tmp/music");
-    _pConf->setString("server.0.basePath", Sys::SysPath::getPath(Sys::SysPath::Home));
-    _pConf->setBool("server.0.checkMod", false);
-    _pConf->setBool("server.0.enable", true);
-    _pConf->setString("server.0.friendlyName", "OMM Media Home");
-    _pConf->setString("server.0.layout", Av::ServerContainer::LAYOUT_FLAT);
-    _pConf->setString("server.0.plugin", "model-file");
-    _pConf->setInt("server.0.pollUpdateId", 0);
-    _pConf->setString("server.0.uuid", "00a123bc-de45-6789-ffff-gg1234hhh56i");
+    int serverCount = 0;
+    std::string serverString;
+
+//    _pConf->setString("server.0.basePath", Sys::SysPath::getPath(Sys::SysPath::Home));
+//    _pConf->setBool("server.0.checkMod", false);
+//    _pConf->setBool("server.0.enable", true);
+//    _pConf->setString("server.0.friendlyName", "OMM Media Files");
+//    _pConf->setString("server.0.layout", Av::ServerContainer::LAYOUT_FLAT);
+//    _pConf->setString("server.0.plugin", "model-file");
+//    _pConf->setInt("server.0.pollUpdateId", 0);
+//    _pConf->setString("server.0.uuid", "00a123bc-de45-6789-ffff-gg1234hhh56i");
+//    serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount++);
+
+    _pConf->setString("server.1.basePath", "webradio.conf");
+    _pConf->setBool("server.1.checkMod", false);
+    _pConf->setBool("server.1.enable", true);
+    _pConf->setString("server.1.friendlyName", "OMM Webradio");
+    _pConf->setString("server.1.layout", Av::ServerContainer::LAYOUT_FLAT);
+    _pConf->setString("server.1.plugin", "model-webradio");
+    _pConf->setInt("server.1.pollUpdateId", 0);
+    _pConf->setString("server.1.uuid", "01a123bc-de45-6789-ffff-gg1234hhh56i");
+    serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount++);
+
+    std::vector<Sys::Device*> dvbDevices;
+    Sys::System::instance()->getDevicesForType(dvbDevices, Sys::System::DeviceTypeDvb);
+    if(dvbDevices.size() > 0) {
+        _pConf->setString("server.2.basePath", "dvb.xml");
+        _pConf->setBool("server.2.checkMod", false);
+        _pConf->setBool("server.2.enable", true);
+        _pConf->setString("server.2.friendlyName", "OMM Digital TV");
+        _pConf->setString("server.2.layout", Av::ServerContainer::LAYOUT_FLAT);
+        _pConf->setString("server.2.plugin", "model-dvb");
+        _pConf->setInt("server.2.pollUpdateId", 0);
+        _pConf->setString("server.2.uuid", "02a123bc-de45-6789-ffff-gg1234hhh56i");
+        serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount++);
+    }
 
     _pConf->setString("server.new.basePath", "");
     _pConf->setBool("server.new.checkMod", false);
@@ -459,7 +486,7 @@ UpnpApplication::defaultConfig()
     _pConf->setInt("server.new.pollUpdateId", 0);
     _pConf->setString("server.new.uuid", "xxa123bc-de45-6789-ffff-gg1234hhh56i");
 
-    _pConf->setString("servers", "0");
+    _pConf->setString("servers", serverString);
 }
 
 

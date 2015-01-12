@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6.2)
 
 project(omm)
+#set(CMAKE_AR "arm-apple-darwin11-ar")
+#set(CMAKE_RANLIB "arm-apple-darwin11-ranlib")
 
 set(OMM_VERSION_MAJOR 0)
 set(OMM_VERSION_MINOR 1)
@@ -44,6 +46,8 @@ set(DARWIN 1)
 set(IPHONE 1)
 add_definitions(-D__DARWIN__)
 add_definitions(-D__IPHONE__)
+#set(CMAKE_AR "arm-apple-darwin11-ar")
+#set(CMAKE_RANLIB "arm-apple-darwin11-ranlib")
 endif("${BUILD_TARGET}" MATCHES "iphone")
 
 message(STATUS "Build target is: " ${BUILD_TARGET})
@@ -54,7 +58,7 @@ if("${BUILD_TARGET}" STREQUAL iphone)
 add_definitions(-msoft-float)
 endif("${BUILD_TARGET}" STREQUAL iphone)
 
-add_definitions(-Wno-unused-parameter)
+add_compile_options(-Wno-unused-parameter)
 get_property(BUILD_SHARED_LIBS
 GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS)
 set(CMAKE_MODULE_PATH

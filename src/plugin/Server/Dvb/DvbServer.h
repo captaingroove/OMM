@@ -38,7 +38,7 @@ public:
     virtual void init();
     virtual void deInit();
     virtual std::string getModelClass();
-    virtual Omm::ui4 getSystemUpdateId(bool checkMod);
+    // do scans only manually and forced, so no getSystemUpdateId() is implemented
     virtual void scan();
 
     virtual std::string getClass(const std::string& path);

@@ -22,6 +22,7 @@
 #ifndef DvbUtil_INCLUDED
 #define DvbUtil_INCLUDED
 
+#include <unistd.h>
 #include <cstring>
 
 #include <Poco/BufferedStreamBuf.h>
@@ -249,7 +250,7 @@ public:
 
     virtual int readFromDevice(char_type* buffer, std::streamsize length)
     {
-        return read(_fileDesc, buffer, length);
+        return ::read(_fileDesc, buffer, length);
     }
 
 private:

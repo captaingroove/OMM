@@ -192,7 +192,7 @@
 
     // add control panel
     if (Omm::Gui::ApplicationImpl::_controlPanels.size()) {
-        _pControlPanel = [[ControlPanel alloc] initWithFrame:CGRectMake(0.0, _pMainView->height(), _pMainView->width(), Omm::Gui::ApplicationImpl::_controlPanelHeight)];
+        _pControlPanel = [[SlideView alloc] initWithFrame:CGRectMake(0.0, _pMainView->height(), _pMainView->width(), Omm::Gui::ApplicationImpl::_controlPanelHeight)];
         _controlPanelVisible = false;
         int i = 0;
         for (std::vector<Omm::Gui::View*>::iterator it = Omm::Gui::ApplicationImpl::_controlPanels.begin(); it != Omm::Gui::ApplicationImpl::_controlPanels.end(); ++i, ++it) {

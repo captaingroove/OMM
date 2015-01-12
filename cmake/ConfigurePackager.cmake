@@ -30,13 +30,13 @@ set(CPACK_PACKAGE_FILE_NAME # provides the name of the final compressed disk ima
 "Omm"
 )
 set(CPACK_PACKAGE_ICON # provides the icon for the mounted disk image (appears after the user mounts the disk image).
-${CMAKE_CURRENT_SOURCE_DIR}/src/lib/img/omm.png
+${CMAKE_CURRENT_SOURCE_DIR}/src/lib/UpnpGui/img/omm.png
 )
 set(CPACK_BUNDLE_NAME # provides the bundle name (displayed in the finder underneath the bundle icon).
 "Omm"
 )
 set(CPACK_BUNDLE_ICON # provides the bundle icon (displayed in the /Applications folder, on the dock, etc).
-${CMAKE_CURRENT_SOURCE_DIR}/src/lib/img/omm.png
+${CMAKE_CURRENT_SOURCE_DIR}/src/lib/UpnpGui/img/omm.png
 )
 set(CPACK_BUNDLE_PLIST # path to a file that will become the bundle plist.
 "${CMAKE_CURRENT_BINARY_DIR}/src/app/omm/info.plist"
@@ -64,11 +64,11 @@ set(CPACK_PACKAGE_NAME
 )
 
 set(CPACK_PACKAGE_VENDOR
-"open-multimedia.org"
+"openmultimedia.org"
 )
 
 set(CPACK_PACKAGE_CONTACT
-"jb@open-multimedia.org"
+"jb@openmultimedia.org"
 )
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
@@ -94,23 +94,23 @@ ${OMM_VERSION_PATCH}
 # probably only NSIS specific
 
 set(CPACK_PACKAGE_EXECUTABLES
-"newomm;OMM"
+"omm;OMM"
 )
 
 set(CPACK_PACKAGE_ICON
-${CMAKE_CURRENT_SOURCE_DIR}/src/lib/img/omm.bmp
+${CMAKE_CURRENT_SOURCE_DIR}/src/lib/UpnpGui/img/omm.bmp
 )
 
 set(CPACK_NSIS_MUI_ICON
-${CMAKE_CURRENT_SOURCE_DIR}/src/lib/img/omm.ico
+${CMAKE_CURRENT_SOURCE_DIR}/src/lib/UpnpGui/img/omm.ico
 )
 
 set(CPACK_NSIS_MUI_UNIICON
-${CMAKE_CURRENT_SOURCE_DIR}/src/lib/img/omm.ico
+${CMAKE_CURRENT_SOURCE_DIR}/src/lib/UpnpGui/img/omm.ico
 )
 
 set(CPACK_NSIS_INSTALLED_ICON_NAME
-${CMAKE_CURRENT_SOURCE_DIR}/src/lib/img/omm.ico
+${CMAKE_CURRENT_SOURCE_DIR}/src/lib/UpnpGui/img/omm.ico
 )
 
 # Debian specific configuration
