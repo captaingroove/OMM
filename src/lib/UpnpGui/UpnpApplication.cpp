@@ -741,8 +741,8 @@ UpnpApplication::addLocalServer(const std::string& id)
     LOGNS(Av, upnpav, information, "container plugin: " + pluginName + " loaded successfully");
 #endif
 
-    pDataModel->setCacheDirPath(Util::Home::instance()->getCacheDirPath());
-    pDataModel->setMetaDirPath(Util::Home::instance()->getMetaDirPath());
+    pDataModel->setCacheDirPath(Util::Home::instance()->getCacheDirPath(), id);
+    pDataModel->setMetaDirPath(Util::Home::instance()->getMetaDirPath(), id);
     pDataModel->setTextEncoding(config().getString("server." + id + ".textEncoding", "UTF8"));
     pDataModel->setCheckObjectModifications(config().getBool("server." + id + ".checkMod", false));
 

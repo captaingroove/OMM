@@ -434,8 +434,8 @@ public:
     std::string getCacheDirPath();
     std::string getMetaDirPath();
     void setBasePath(const std::string& path);
-    void setCacheDirPath(const std::string& path);
-    void setMetaDirPath(const std::string& path);
+    void setCacheDirPath(const std::string& basePath, const std::string& serverPath);
+    void setMetaDirPath(const std::string& basePath, const std::string& serverPath);
 
     virtual void init() {}
     virtual void deInit() {}
