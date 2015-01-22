@@ -57,6 +57,7 @@ ommsys
 ommutil
 ommupnp
 ommupnpav
+ommdvb
 ommgui
 ${DEFAULT_ENGINE}
 ${EXTRA_LIBS}

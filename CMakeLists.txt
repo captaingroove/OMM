@@ -58,7 +58,10 @@ if("${BUILD_TARGET}" STREQUAL iphone)
 add_definitions(-msoft-float)
 endif("${BUILD_TARGET}" STREQUAL iphone)
 
-add_compile_options(-Wno-unused-parameter)
+if(${CMAKE_VERSION} VERSION_GREATER "2.8.11")
+add_compile_options(-Wno-unused-parameter) # introduced in cmake 2.8.12
+endif(${CMAKE_VERSION} VERSION_GREATER "2.8.11")
+
 get_property(BUILD_SHARED_LIBS
 GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS)
 set(CMAKE_MODULE_PATH
