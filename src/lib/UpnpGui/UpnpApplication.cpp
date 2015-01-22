@@ -654,6 +654,8 @@ UpnpApplication::setLocalRenderer()
 
     pEngine->createPlayer();
     pEngine->setVisual(_pControllerWidget->getLocalRendererVisual());
+    // set default soft volume of engine (TODO: introduce config entry)
+    pEngine->setVolume(Omm::Av::AvChannel::MASTER, 25);
 
     Av::MediaRenderer* pMediaRenderer = new Av::MediaRenderer;
     _pLocalMediaRenderer = pMediaRenderer;

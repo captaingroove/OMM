@@ -22,6 +22,8 @@
 #ifndef EngineVlc_INCLUDED
 #define EngineVlc_INCLUDED
 
+#include <Poco/Timer.h>
+
 #include <Omm/UpnpAvRenderer.h>
 #include <Omm/Sys/Visual.h>
 
@@ -85,6 +87,13 @@ public:
     virtual bool getMute(const std::string& channel);
 
 private:
+    /** next two volume methods only needed to make vlc preset the volume
+     * at beginning of media play (before doesn't work with vlc:
+     * "no active audio output"
+     */
+    void startSetCurrentVolume();
+    void setCurrentVolume(Poco::Timer& timer);
+
     void handleException();
 
     static void eventHandler(const struct libvlc_event_t* pEvent, void* pUserData);
@@ -100,6 +109,10 @@ private:
     Omm::Av::Mime           _mime;
 //     int                     _fd;
     const int               _maxMediaConnect;
+    // vlc engine cannot get/set volume when no audio output is active (i.e. media is playing)
+    float                   _currentVolume;
+    Poco::Timer*            _pCurrentVolumeTimer;
+    Poco::TimerCallback<VlcEngine>  _currentVolumeTimerCallback;
 };
 
 

@@ -23,6 +23,7 @@
 #include "Omm/UpnpAv.h"
 
 #include <vlc/vlc.h>
+#include <Poco/Thread.h>
 #ifdef LIBVLC_VERSION_HEADER_FOUND
 #include <vlc/libvlc_version.h>
 #endif
@@ -30,7 +31,10 @@
 // EnginePlugin::VlcEngine(int argc, char **argv) :
 VlcEngine::VlcEngine() :
 _pVlcMedia(0),
-_maxMediaConnect(5)
+_maxMediaConnect(5),
+_currentVolume(0.0),
+_pCurrentVolumeTimer(0),
+_currentVolumeTimerCallback(*this, &VlcEngine::setCurrentVolume)
 {
     _engineId = "VLC engine " + Omm::OMM_VERSION + ", vlc version " + libvlc_get_version();
 }
@@ -161,7 +165,7 @@ VlcEngine::play()
         _pVisual->renderImage(image.getBuffer());
     }
     else {
-        LOGNS(Omm::Av, upnpav, debug, "vlc engine, play ...");
+        LOGNS(Omm::Av, upnpav, debug, "vlc engine, play media initiation ...");
 
         LOGNS(Omm::Av, upnpav, debug, "vlc engine, create new media with uri: " + _uri + " ...");
 #if LIBVLC_VERSION_INT < 0x110
@@ -185,7 +189,7 @@ VlcEngine::play()
         LOGNS(Omm::Av, upnpav, debug, "vlc engine, release media ...");
         libvlc_media_release(_pVlcMedia);
 
-        LOGNS(Omm::Av, upnpav, debug, "vlc engine, play media ...");
+        LOGNS(Omm::Av, upnpav, debug, "vlc engine, start playing media ...");
 #if LIBVLC_VERSION_INT < 0x110
         libvlc_media_player_play(_pVlcPlayer, _pException);
 #else
@@ -194,7 +198,7 @@ VlcEngine::play()
         handleException();
     }
 
-    LOGNS(Omm::Av, upnpav, debug, "vlc engine, play media finished.");
+    LOGNS(Omm::Av, upnpav, debug, "vlc engine, play media initiation finished.");
 }
 
 
@@ -202,6 +206,15 @@ void
 VlcEngine::eventHandler(const struct libvlc_event_t* pEvent, void* pUserData)
 {
     static_cast<VlcEngine*>(pUserData)->transportStateChanged();
+
+    // audio output is still not active directly after start playing, so we
+    // need to wait for media to play
+    if (pEvent->type == libvlc_MediaPlayerPlaying) {
+        // start asynchronously, otherwise vlc playback will wait for this
+        // handler to be finished and volume can't be set, because media
+        // is not playing
+        static_cast<VlcEngine*>(pUserData)->startSetCurrentVolume();
+    }
 }
 
 
@@ -426,13 +439,15 @@ VlcEngine::getTransportState()
 void
 VlcEngine::setVolume(const std::string& channel, float vol)
 {
+    _currentVolume = vol;
+    LOGNS(Omm::Av, upnpav, debug, "vlc engine set volume: " + Poco::NumberFormatter::format(vol));
 #if LIBVLC_VERSION_INT < 0x110
     if (channel == Omm::Av::AvChannel::MASTER) {
-        libvlc_audio_set_volume(_pVlcInstance, vol, _pException);
+        libvlc_audio_set_volume(_pVlcInstance, _currentVolume, _pException);
     }
 #else
     if (channel == Omm::Av::AvChannel::MASTER) {
-        libvlc_audio_set_volume(_pVlcPlayer, vol);
+        libvlc_audio_set_volume(_pVlcPlayer, _currentVolume);
     }
 #endif
     handleException();
@@ -442,14 +457,17 @@ VlcEngine::setVolume(const std::string& channel, float vol)
 float
 VlcEngine::getVolume(const std::string& channel)
 {
-    float res;
-#if LIBVLC_VERSION_INT < 0x110
-    res = libvlc_audio_get_volume(_pVlcInstance, _pException);
-#else
-    res = libvlc_audio_get_volume(_pVlcPlayer);
-#endif
-    handleException();
-    return res;
+//    float res;
+//#if LIBVLC_VERSION_INT < 0x110
+//    res = libvlc_audio_get_volume(_pVlcInstance, _pException);
+//#else
+//    res = libvlc_audio_get_volume(_pVlcPlayer);
+//#endif
+//    LOGNS(Omm::Av, upnpav, debug, "vlc engine get volume: " + Poco::NumberFormatter::format(res));
+//    handleException();
+//    return (res < 0 ? 0.0 : res);
+
+    return _currentVolume;
 }
 
 
@@ -482,6 +500,29 @@ VlcEngine::getMute(const std::string& channel)
     }
 #endif
     handleException();
+}
+
+
+void
+VlcEngine::startSetCurrentVolume()
+{
+    if (_pCurrentVolumeTimer) {
+        delete _pCurrentVolumeTimer;
+    }
+    _pCurrentVolumeTimer = new Poco::Timer;
+    // waiting for media play and setting volume asynchronously isn't enough!
+    // we also need 100ms delay ... someone should fix vlc
+    // (this appeared around vlc 2.0)
+    _pCurrentVolumeTimer->setStartInterval(100);
+    _pCurrentVolumeTimer->start(_currentVolumeTimerCallback);
+}
+
+
+void
+VlcEngine::setCurrentVolume(Poco::Timer& timer)
+{
+    LOGNS(Omm::Av, upnpav, debug, "vlc engine, set current volume");
+    setVolume(Omm::Av::AvChannel::MASTER, _currentVolume);
 }
 
 
