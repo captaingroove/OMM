@@ -152,6 +152,7 @@ _pControllerWidget(0),
 _pLocalDeviceServer(new DeviceServer),
 _pLocalDeviceContainer(new DeviceContainer),
 _pLocalMediaRenderer(0),
+_defaultRendererVolume(50),
 _pConf(0),
 _mode(ModeFull),
 _instanceMutexName("OmmApplicationMutex"),
@@ -534,6 +535,8 @@ UpnpApplication::saveConfig()
         if (!config().getBool("application.fullscreen", false)) {
             _pConf->setString("application.cluster", _pControllerWidget->getConfiguration());
         }
+        _pConf->setInt("renderer.volume", _pLocalMediaRenderer->getEngine()->getVolume(Omm::Av::AvChannel::MASTER));
+
         try {
             _pConf->save(_confFilePath);
             LOGNS(Av, upnpav, information, "saving config file done.");
@@ -655,7 +658,8 @@ UpnpApplication::setLocalRenderer()
     pEngine->createPlayer();
     pEngine->setVisual(_pControllerWidget->getLocalRendererVisual());
     // set default soft volume of engine (TODO: introduce config entry)
-    pEngine->setVolume(Omm::Av::AvChannel::MASTER, 25);
+    ui2 volume = config().getInt("renderer.volume", _defaultRendererVolume);
+    pEngine->setVolume(Omm::Av::AvChannel::MASTER, volume);
 
     Av::MediaRenderer* pMediaRenderer = new Av::MediaRenderer;
     _pLocalMediaRenderer = pMediaRenderer;

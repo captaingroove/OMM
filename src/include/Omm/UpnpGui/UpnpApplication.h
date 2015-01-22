@@ -137,6 +137,7 @@ private:
     std::string                                 _rendererName;
     std::string                                 _rendererUuid;
     std::string                                 _rendererPlugin;
+    ui2                                         _defaultRendererVolume;
     bool                                        _showRendererVisualOnly;
     bool                                        _enableServer;
     std::string                                 _instanceMutexName;
