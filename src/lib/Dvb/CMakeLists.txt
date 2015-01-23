@@ -1,9 +1,6 @@
-find_path(LINUXDVB_INCLUDE_DIR
-linux/dvb/frontend.h
-PATHS ${CMAKE_INCLUDE_PATH}
-)
+find_package(LinuxDVB)
 
-if(LINUXDVB_INCLUDE_DIR)
+if(LINUXDVB_FOUND)
 message(STATUS "linux DVB headers found in " ${LINUXDVB_INCLUDE_DIR})
 
 include_directories(
@@ -58,6 +55,6 @@ LIBRARY DESTINATION lib
 ARCHIVE DESTINATION lib
 )
 
-else(LINUXDVB_INCLUDE_DIR)
+else(LINUXDVB_FOUND)
 message(STATUS "linux DVB headers not found")
-endif(LINUXDVB_INCLUDE_DIR)
+endif(LINUXDVB_FOUND)

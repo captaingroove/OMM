@@ -40,8 +40,6 @@
 #include "UpnpGui/ControllerWidget.h"
 #include "UpnpGui/Setup.h"
 
-// TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
-#define __DVB_SUPPORT__
 #ifdef __DVB_SUPPORT__
 #include "Omm/Dvb/Device.h"
 #include "Omm/Dvb/Frontend.h"
@@ -497,7 +495,6 @@ class ServerPluginSelector : Gui::Selector
 };
 
 
-// TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
 #ifdef __DVB_SUPPORT__
 class DvbFrontendKeySelectorModel : public Gui::SelectorModel
 {
@@ -536,13 +533,11 @@ class ServerConfModel : public Gui::Model
     friend class DvbFrontendKeySelectorController;
 
     ServerConfModel(GuiSetup* pGuiSetup, ServerConfView* pConfView, const std::string& id) : _pGuiSetup(pGuiSetup), _pConfView(pConfView), _id(id)
-    // TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
 #ifdef __DVB_SUPPORT__
     , _pDvbDevice(0)
 #endif
     {
         _uuid = _pGuiSetup->_pApp->getFileConfiguration()->getString("server." + _id + ".uuid", Poco::UUIDGenerator().createRandom().toString());
-// TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
 #ifdef __DVB_SUPPORT__
         if (getPlugin() == "model-dvb") {
             _pDvbDevice = Omm::Dvb::Device::instance();
@@ -602,7 +597,6 @@ class ServerConfModel : public Gui::Model
         return _pGuiSetup->_pApp->getFileConfiguration()->getString("server." + _id + ".layout", "");
     }
 
-// TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
 #ifdef __DVB_SUPPORT__
     void setDvbFrontendKey(const std::string& frontendType, int index)
     {
@@ -637,7 +631,6 @@ class ServerConfModel : public Gui::Model
     std::string                                         _uuid;
     GuiSetup*                                           _pGuiSetup;
     ServerConfView*                                     _pConfView;
-// TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
 #ifdef __DVB_SUPPORT__
     Omm::Dvb::Device*                                   _pDvbDevice;
     std::map<std::string, DvbFrontendKeySelectorModel>  _dvbFrontendKeys;
@@ -646,7 +639,6 @@ class ServerConfModel : public Gui::Model
 };
 
 
-// TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
 #ifdef __DVB_SUPPORT__
 class DvbFrontendKeySelectorController : public Gui::SelectorController
 {
@@ -903,7 +895,6 @@ void
 ServerConfView::syncViewImpl()
 {
     if (static_cast<ServerConfModel*>(_pModel)->getPlugin() == "model-dvb") {
-// TODO: find a better solution to handle dvb includes e.g. on smartphones (where not needed)
 #ifdef __DVB_SUPPORT__
         LOGNS(Gui, gui, debug, "server conf view show dvb frontend key selector");
         for (std::map<std::string, DvbFrontendKeySelectorModel>::iterator fit = static_cast<ServerConfModel*>(_pModel)->_dvbFrontendKeys.begin(); fit != static_cast<ServerConfModel*>(_pModel)->_dvbFrontendKeys.end(); ++fit) {

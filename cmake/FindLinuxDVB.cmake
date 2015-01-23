@@ -9,6 +9,7 @@ ${LinuxDVB_INCLUDE_DIR}
 
 if(LinuxDVB_INCLUDE_DIR)
 message(STATUS "Found LinuxDVB headers in: " ${LinuxDVB_INCLUDE_DIR})
+add_definitions(-D__DVB_SUPPORT__)
 else(LinuxDVB_INCLUDE_DIR)
 message(STATUS "LinuxDVB headers not found")
 endif(LinuxDVB_INCLUDE_DIR)

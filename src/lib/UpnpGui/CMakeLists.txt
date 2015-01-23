@@ -1,3 +1,5 @@
+find_package(LinuxDVB) # needed for DVB specific setup dialogs
+
 include(AddResources)
 
 add_resources(MediaImages
@@ -52,17 +54,26 @@ ommx-engine-vlc
 )
 endif(IPHONE)
 
-target_link_libraries(ommupnpgui
+set(OMMUPNPGUI_LINK_LIBS
 ommsys
 ommutil
 ommupnp
 ommupnpav
-ommdvb
 ommgui
 ${DEFAULT_ENGINE}
 ${EXTRA_LIBS}
 )
 
+if(LINUXDVB_FOUND)
+set(OMMUPNPGUI_LINK_LIBS
+${OMMUPNPGUI_LINK_LIBS}
+ommdvb
+)
+endif(LINUXDVB_FOUND)
+
+target_link_libraries(ommupnpgui
+${OMMUPNPGUI_LINK_LIBS}
+)
 
 set(OMM_UPNPGUI
 ommupnpgui
