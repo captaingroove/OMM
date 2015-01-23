@@ -330,7 +330,7 @@ public:
 
     static const Poco::Int64 invalidPts;
 
-    virtual Frame* readFrame() {}
+    virtual Frame* readFrame() { return 0; }
     // FIXME: this should be generic code, using the tags determined by Tagger::tag() and stored in Meta
     virtual void print(bool isOutFormat = false) {}
     virtual bool isStillImage() { return false; }
@@ -627,9 +627,9 @@ public:
     class EndOfStream : public Poco::Notification {};
 
 protected:
-    virtual bool checkInStream() {}
-    virtual bool initDevice() {}
-    virtual bool closeDevice() {}
+    virtual bool checkInStream() { return false; }
+    virtual bool initDevice() { return false; }
+    virtual bool closeDevice() { return false; }
     virtual void writeDecodedFrame(Frame* pDecodedFrame) {}
     virtual void stopSinkPresentation() {}
 

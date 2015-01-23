@@ -5132,7 +5132,8 @@ SsdpMessage::getDate()
         return Poco::DateTimeParser::parse(Poco::DateTimeFormat::HTTP_FORMAT, value, timeZoneDifferentail);
     }
     catch (Poco::SyntaxException) {
-        LOG(ssdp, error, "wrong date format of DATE in SSDP header");
+        LOG(ssdp, error, "wrong date format of DATE in SSDP header, replacing by current date");
+        return Poco::DateTime();
     }
 }
 

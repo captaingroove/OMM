@@ -1,18 +1,21 @@
+# clang and arm-apple-darwin11-* backend are installed in /usr/bin
+
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS FALSE)
 
-
 set(SDKVER "5.0")
 set(XCHAIN_ROOT $ENV{XCHAIN_ROOT})
 set(SDKROOT "${XCHAIN_ROOT}/cc/iphone/share/iPhoneOS${SDKVER}.sdk")
+set(TARGET_TRIPLE "arm-apple-darwin11")
 
-#set(CMAKE_AR "arm-apple-darwin11-ar")
+find_program(CMAKE_AR NAMES ${TARGET_TRIPLE}-ar)
+find_program(CMAKE_RANLIB NAMES ${TARGET_TRIPLE}-ranlib)
 set(CMAKE_C_COMPILER "clang")
 set(CMAKE_CXX_COMPILER "clang++")
 
-set(CMAKE_C_FLAGS "-target arm-apple-darwin11 -arch armv7 --sysroot ${SDKROOT} -isysroot ${SDKROOT} -g0 -O2 -miphoneos-version-min=${SDKVER} -mlinker-version=134.9 -objc-arc -fblocks" CACHE STRING "additional cross compiling c flags" FORCE)
-set(CMAKE_CXX_FLAGS "-target arm-apple-darwin11 -arch armv7 --sysroot ${SDKROOT} -isysroot ${SDKROOT} -g0 -O2 -miphoneos-version-min=${SDKVER} -mlinker-version=134.9 -objc-arc -fblocks" CACHE STRING "additional cross compiling cxx flags" FORCE)
+set(CMAKE_C_FLAGS "-target ${TARGET_TRIPLE} -arch armv7 --sysroot ${SDKROOT} -isysroot ${SDKROOT} -g0 -O2 -miphoneos-version-min=${SDKVER} -mlinker-version=134.9 -objc-arc -fblocks" CACHE STRING "additional cross compiling c flags" FORCE)
+set(CMAKE_CXX_FLAGS "-target ${TARGET_TRIPLE} -arch armv7 --sysroot ${SDKROOT} -isysroot ${SDKROOT} -g0 -O2 -miphoneos-version-min=${SDKVER} -mlinker-version=134.9 -objc-arc -fblocks" CACHE STRING "additional cross compiling cxx flags" FORCE)
 
 set(CMAKE_FIND_ROOT_PATH "${SDKROOT}" "${CMAKE_INSTALL_PREFIX}")
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH)

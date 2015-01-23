@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.6.2)
 
 project(omm)
-#set(CMAKE_AR "arm-apple-darwin11-ar")
-#set(CMAKE_RANLIB "arm-apple-darwin11-ranlib")
 
 set(OMM_VERSION_MAJOR 0)
 set(OMM_VERSION_MINOR 1)

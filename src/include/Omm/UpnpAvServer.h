@@ -210,7 +210,7 @@ public:
     void destroy();
 
 protected:
-    virtual std::istream* getIconStream() {}
+    virtual std::istream* getIconStream() { return 0; }
 
     ui4                         _index;
     ui4                         _parentIndex;
