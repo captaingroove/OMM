@@ -71,14 +71,14 @@ Log::Log()
     _pHttpLogger = &Poco::Logger::create("UPNP.HTTP", pChannel, Poco::Message::PRIO_DEBUG);
 //    _pDescriptionLogger = &Poco::Logger::create("UPNP.DESC", pChannel, Poco::Message::PRIO_DEBUG);
     _pControlLogger = &Poco::Logger::create("UPNP.CONTROL", pChannel, Poco::Message::PRIO_DEBUG);
-//    _pEventLogger = &Poco::Logger::create("UPNP.EVENT", pChannel, Poco::Message::PRIO_DEBUG);
+    _pEventLogger = &Poco::Logger::create("UPNP.EVENT", pChannel, Poco::Message::PRIO_DEBUG);
 
 //    _pUpnpLogger = &Poco::Logger::create("UPNP.GENERAL", pChannel, Poco::Message::PRIO_ERROR);
     _pSsdpLogger = &Poco::Logger::create("UPNP.SSDP", pChannel, Poco::Message::PRIO_ERROR);
 //    _pHttpLogger = &Poco::Logger::create("UPNP.HTTP", pChannel, Poco::Message::PRIO_ERROR);
     _pDescriptionLogger = &Poco::Logger::create("UPNP.DESC", pChannel, Poco::Message::PRIO_ERROR);
 //    _pControlLogger = &Poco::Logger::create("UPNP.CONTROL", pChannel, Poco::Message::PRIO_ERROR);
-    _pEventLogger = &Poco::Logger::create("UPNP.EVENT", pChannel, Poco::Message::PRIO_ERROR);
+//    _pEventLogger = &Poco::Logger::create("UPNP.EVENT", pChannel, Poco::Message::PRIO_ERROR);
 }
 
 
@@ -1563,7 +1563,7 @@ _pService(pService),
 _pSession(0),
 _pSessionUri(0),
 _pQueueThread(0),
-_queueThreadRunnable(*this, &Subscription::queueThread),
+_queueThreadRunnable(*this, &Subscription::eventMessageQueueThread),
 _queueThreadRunning(true),
 _expireCallback(*this, &Subscription::expire),
 _expireControllerCallback(*this, &Subscription::expireController),
@@ -1590,6 +1590,13 @@ Subscription::initDevice()
     _uuid = Poco::UUIDGenerator().createRandom().toString();
     LOG(event, debug, "creating subscription with SID: " + _uuid);
     _eventKey = 0;
+    startEventMessageQueueThread();
+}
+
+
+void
+Subscription::startEventMessageQueueThread()
+{
     _pQueueThread = new Poco::Thread;
     LOG(event, debug, "starting subscription queue thread ...");
     _pQueueThread->start(_queueThreadRunnable);
@@ -1597,8 +1604,9 @@ Subscription::initDevice()
 
 
 void
-Subscription::deInitDevice()
+Subscription::stopEventMessageQueueThread()
 {
+    LOG(event, debug, "stopping subscription queue thread ...");
     _queueLock.lock();
     _queueThreadRunning = false;
     _messageQueue.push("");
@@ -1606,6 +1614,9 @@ Subscription::deInitDevice()
     _queueLock.unlock();
     if (_pQueueThread->isRunning() && !_pQueueThread->tryJoin(1000)) {
         LOG(event, error, "failed to join subscription queue thread");
+    }
+    else {
+        LOG(event, debug, "subscription queue thread finished.");
     }
 }
 
@@ -1757,12 +1768,14 @@ void
 Subscription::stopExpirationTimer()
 {
     if (_pTimer) {
-        LOG(event, debug, "controller subscription timer stopping ...");
+        LOG(event, debug, "subscription expiration timer stopping ...");
         _pTimer->stop();
-        LOG(event, debug, "controller subscription timer stopped.");
+        delete _pTimer;
+        _pTimer = 0;
+        LOG(event, debug, "subscription expiration timer stopped.");
     }
     else {
-        LOG(event, debug, "controller subscription timer not active, no need to stop.");
+        LOG(event, debug, "subscription expiration timer not active, no need to stop.");
     }
 }
 
@@ -1772,6 +1785,8 @@ Subscription::deliverEventMessage(const std::string& eventMessage)
 {
     // FIXME: timeout should be 30 sec for event notifications (see 4.2.1 Eventing: Event messages: NOTIFY)
     if (!eventMessage.size()) {
+        // empty message means "end of messages" and event message delivery thread should be stopped
+        LOG(event, debug, "empty event message queued, end of messages.")
         return;
     }
     Poco::Net::HTTPRequest request("NOTIFY", _pSessionUri->getPath(), "HTTP/1.1");
@@ -1812,10 +1827,10 @@ Subscription::deliverEventMessage(const std::string& eventMessage)
 
 
 void
-Subscription::queueThread()
+Subscription::eventMessageQueueThread()
 {
-    LOG(event, debug, "subscription queue thread running.");
-    while (queueThreadRunning()) {
+    LOG(event, debug, "subscription event message queue thread running.");
+    while (eventMessageQueueThreadRunning()) {
         _queueLock.lock();
         if (_messageQueue.size() == 0) {
             _queueCondition.wait<Poco::FastMutex>(_queueLock);
@@ -1824,12 +1839,12 @@ Subscription::queueThread()
         _messageQueue.pop();
         _queueLock.unlock();
     }
-    LOG(event, debug, "subscription queue thread finished.");
+    LOG(event, debug, "subscription event message queue thread finished.");
 }
 
 
 bool
-Subscription::queueThreadRunning()
+Subscription::eventMessageQueueThreadRunning()
 {
     Poco::ScopedLock<Poco::FastMutex> lock(_queueLock);
     return _queueThreadRunning;
@@ -2528,10 +2543,12 @@ Service::unregisterSubscription(Subscription* pSubscription)
 {
     Poco::ScopedLock<Poco::FastMutex> lock(_serviceLock);
     std::string sid = pSubscription->getUuid();
-    LOG(event, debug, "unregister subscription with SID: " + sid);
+    LOG(event, debug, "unregister subscription with SID: " + sid + " ...");
     _eventSubscriptions.remove(sid);
     pSubscription->stopExpirationTimer();
+    pSubscription->stopEventMessageQueueThread();
     delete pSubscription;
+    LOG(event, debug, "unregister subscription with SID: " + sid + " finished");
 }
 
 
@@ -2856,7 +2873,10 @@ EventSubscriptionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& req
         LOG(event, debug, "cancel subscription request from: " + request.clientAddress().toString() + Poco::LineEnding::NEWLINE_DEFAULT + header.str());
         sid = request.get("SID").substr(5);
         try {
-            _pService->unregisterSubscription(_pService->getSubscription(sid));
+            Subscription* pSubscription = _pService->getSubscription(sid);
+            if (pSubscription) {
+                _pService->unregisterSubscription(pSubscription);
+            }
         }
         catch (...) {
             // TODO: forward error in response to request

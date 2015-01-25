@@ -656,8 +656,9 @@ UpnpApplication::setLocalRenderer()
 #endif
 
     pEngine->createPlayer();
+    // TODO: connecting renderer visual to X causes crash in ommrenderer standalone app
     pEngine->setVisual(_pControllerWidget->getLocalRendererVisual());
-    // set default soft volume of engine (TODO: introduce config entry)
+    // set default soft volume of engine
     ui2 volume = config().getInt("renderer.volume", _defaultRendererVolume);
     pEngine->setVolume(Omm::Av::AvChannel::MASTER, volume);
 

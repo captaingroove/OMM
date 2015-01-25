@@ -28,7 +28,7 @@ int main(int argc, char** argv)
     app.setLockInstance(false);
     app.setIgnoreConfig(true);
     app.enableController(false);
-    app.showRendererVisualOnly(true);
+//    app.showRendererVisualOnly(true);
     return app.run();
 }
 

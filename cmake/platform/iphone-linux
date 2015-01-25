@@ -5,7 +5,8 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS FALSE)
 
 set(SDKVER "5.0")
-set(XCHAIN_ROOT $ENV{XCHAIN_ROOT})
+#set(XCHAIN_ROOT $ENV{XCHAIN_ROOT})
+set(XCHAIN_ROOT "/home/jb/app/xchain")
 set(SDKROOT "${XCHAIN_ROOT}/cc/iphone/share/iPhoneOS${SDKVER}.sdk")
 set(TARGET_TRIPLE "arm-apple-darwin11")
 
