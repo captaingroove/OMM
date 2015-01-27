@@ -51,7 +51,7 @@ FileModel::getModelClass()
 }
 
 
-Omm::ui4
+Poco::UInt64
 FileModel::getSystemUpdateId(bool checkMod)
 {
     Poco::File baseDir(getBasePath());
@@ -64,7 +64,7 @@ FileModel::getSystemUpdateId(bool checkMod)
 }
 
 
-Omm::ui4
+Poco::UInt64
 FileModel::getUpdateId(const std::string& path)
 {
     Poco::File file(Poco::Path(getBasePath(), path));

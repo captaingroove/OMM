@@ -34,8 +34,8 @@ public:
     ~FileModel();
 
     virtual std::string getModelClass();
-    virtual Omm::ui4 getSystemUpdateId(bool checkMod);
-    virtual Omm::ui4 getUpdateId(const std::string& path);
+    virtual Poco::UInt64 getSystemUpdateId(bool checkMod);
+    virtual Poco::UInt64 getUpdateId(const std::string& path);
     virtual Omm::Av::CsvList getQueryProperties();
     virtual void scan();
     virtual bool useObjectCache() { return true; }

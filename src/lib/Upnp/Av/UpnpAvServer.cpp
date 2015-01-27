@@ -2259,7 +2259,7 @@ AbstractDataModel::checkSystemUpdateId(bool forceUpdate)
         return;
     }
 
-    ui4 id = getSystemUpdateId(_checkMod);
+    Poco::UInt64 id = getSystemUpdateId(_checkMod);
     if (!forceUpdate && getCacheSystemUpdateId(_checkMod) == id) {
         LOG(upnpav, debug, "data model is current, nothing to do.");
     }

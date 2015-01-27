@@ -107,7 +107,7 @@ MPMediaModel::getModelClass()
 }
 
 
-Omm::ui4
+Poco::UInt64
 MPMediaModel::getSystemUpdateId(bool checkMod)
 {
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];

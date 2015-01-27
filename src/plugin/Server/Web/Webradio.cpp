@@ -55,7 +55,7 @@ WebradioModel::getModelClass()
 }
 
 
-Omm::ui4
+Poco::UInt64
 WebradioModel::getSystemUpdateId(bool checkMod)
 {
     Poco::File stationConfigFile(getBasePath());

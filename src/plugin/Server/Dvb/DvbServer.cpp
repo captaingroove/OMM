@@ -78,7 +78,7 @@ DvbModel::getModelClass()
 }
 
 
-Omm::ui4
+Poco::UInt64
 DvbModel::getSystemUpdateId(bool checkMod)
 {
     Poco::File xmlDeviceFile(getBasePath());

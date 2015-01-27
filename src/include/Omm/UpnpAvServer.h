@@ -442,8 +442,8 @@ public:
     virtual std::string getModelClass() { return ""; }
     virtual CsvList getQueryProperties() { return CsvList(""); }
 
-    virtual ui4 getSystemUpdateId(bool checkMod) { return 0; }
-    virtual ui4 getUpdateId(const std::string& path) { return getSystemUpdateId(false); }
+    virtual Poco::UInt64 getSystemUpdateId(bool checkMod) { return 0; }
+    virtual Poco::UInt64 getUpdateId(const std::string& path) { return getSystemUpdateId(false); }
     /// get update id of particular object in data model, identified by path
     /// if not implemented by data model, one single update id for the whole model is assumed
     void setCheckObjectModifications(bool check = true);

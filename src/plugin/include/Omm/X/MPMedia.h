@@ -36,7 +36,7 @@ public:
     ~MPMediaModel();
 
     virtual std::string getModelClass();
-    virtual Omm::ui4 getSystemUpdateId(bool checkMod);
+    virtual Poco::UInt64 getSystemUpdateId(bool checkMod);
     virtual Omm::Av::CsvList getQueryProperties();
     virtual void scan();
     virtual bool useObjectCache() { return true; }
