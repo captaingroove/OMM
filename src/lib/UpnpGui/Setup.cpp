@@ -691,6 +691,7 @@ class ServerScanButton : Gui::Button
 //            pServerConfModel->writeConf();
             Av::AbstractDataModel* pDataModel = pServer->getRoot()->getDataModel();
             if (pDataModel) {
+                pDataModel->scanDeep();
                 pDataModel->checkSystemUpdateId(true);
             }
         }

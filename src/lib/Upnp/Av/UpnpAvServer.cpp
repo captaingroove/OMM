@@ -2219,24 +2219,12 @@ AbstractDataModel::setBasePath(const std::string& path)
 {
     _basePath = path;
     init();
-
-    // TODO: avoid long and hidden paths in meta directory
-//    Poco::Path path(basePath);
-//    if (path.parent().toString() == Poco::Path(Util::Home::instance()->getConfigDirPath()).toString()) {
-//        // if basePath points to a file in omm's config directory, don't repeat the config path
-//        _basePath = path.getFileName();
-//    }
-//    else {
-//        _basePath = basePath;
-//    }
-
     // index map is in meta directory, because var directory should be deletable at any time
     // without loosing information. Indices must be persistant information, because object ids
     // are derived from them (playlists must be removed also, if index map is rebuild entirely)
     _indexFilePath = Poco::Path(getMetaDirPath(), "index");
-    if (readIndexMap()) {
-        checkSystemUpdateId();
-    }
+    readIndexMap();
+    checkSystemUpdateId();
 }
 
 
@@ -2515,12 +2503,12 @@ AbstractDataModel::getTextConverter()
 }
 
 
-bool
+void
 AbstractDataModel::readIndexMap()
 {
     if (!Poco::File(_indexFilePath).exists()) {
         LOG(upnpav, debug, "index map not present, not reading it");
-        return false;
+        return;
     }
     LOG(upnpav, debug, "index map present, reading ...");
     std::ifstream indexMap(_indexFilePath.toString().c_str());
@@ -2554,7 +2542,7 @@ AbstractDataModel::readIndexMap()
     }
     // TODO: read resource map
     LOG(upnpav, debug, "index map read finished.");
-    return true;
+    return;
 }
 
 

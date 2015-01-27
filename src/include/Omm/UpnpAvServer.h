@@ -454,6 +454,9 @@ public:
     // child media object creation / deletion
     // index and path
     virtual void scan() {}
+    // some servers need intermediate xml files (webradio, dvb) and a long and
+    // critical scan to generate them. This can be done in scanDeep()
+    virtual void scanDeep() {}
     virtual bool preserveIndices() { return false; }
     /// keep index of a removed path (in seperate index map)
     /// this can be usefull for a DVD server with resume functionality
@@ -506,7 +509,7 @@ public:
     Poco::TextConverter* getTextConverter();
 
 protected:
-    bool readIndexMap();
+    void readIndexMap();
     void writeIndexMap();
 
     ui4 getPublicSystemUpdateId();

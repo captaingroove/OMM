@@ -58,10 +58,13 @@ WebradioModel::getModelClass()
 Omm::ui4
 WebradioModel::getSystemUpdateId(bool checkMod)
 {
-    // FIXME: if cache is current, xml config file is not parsed
-    // and _stationNames not initialized. When using no database
-    // cache, we get no meta data out of the model.
-    return Poco::File(getBasePath()).getLastModified().epochTime();
+    Poco::File stationConfigFile(getBasePath());
+    if (stationConfigFile.exists()) {
+        return stationConfigFile.getLastModified().epochTime();
+    }
+    else {
+        return 0;
+    }
 }
 
 
@@ -201,6 +204,12 @@ void
 WebradioModel::scanStationConfig(const std::string& stationConfig)
 {
     LOGNS(Omm::Av, upnpav, debug, "web radio, start scanning station config file: " + stationConfig + " ...");
+
+    Poco::File stationConfigFile(stationConfig);
+    if (!stationConfigFile.exists()) {
+        LOGNS(Omm::Av, upnpav, warning, "web radio, no station config file: " + stationConfig + " skip scanning.");
+        return;
+    }
 
     _stationNames.clear();
 

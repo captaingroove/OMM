@@ -78,12 +78,45 @@ DvbModel::getModelClass()
 }
 
 
+Omm::ui4
+DvbModel::getSystemUpdateId(bool checkMod)
+{
+    Poco::File xmlDeviceFile(getBasePath());
+    if (xmlDeviceFile.exists()) {
+        return xmlDeviceFile.getLastModified().epochTime();
+    }
+    else {
+        return 0;
+    }
+}
+
+
 void
 DvbModel::scan()
 {
     LOGNS(Omm::Dvb, dvb, debug, "dvb model scan ...");
 
+    Poco::File xmlDeviceFile(getBasePath());
+    if (xmlDeviceFile.exists()) {
+        std::ifstream xmlDevice(getBasePath().c_str());
+        Omm::Dvb::Device::instance()->readXml(xmlDevice);
+        for (Omm::Dvb::Device::ServiceIterator it = Omm::Dvb::Device::instance()->serviceBegin(); it != Omm::Dvb::Device::instance()->serviceEnd(); ++it) {
+            addPath(it->first);
+        }
+    }
+
+    LOGNS(Omm::Dvb, dvb, debug, "dvb model scan finished.");
+}
+
+
+void
+DvbModel::scanDeep()
+{
+    LOGNS(Omm::Dvb, dvb, debug, "dvb model deep scan ...");
+
     Omm::Dvb::Device::instance()->open();
+
+    // do the big dvb transponder scan
     Omm::Dvb::Device::instance()->scan();
 
     for (Omm::Dvb::Device::ServiceIterator it = Omm::Dvb::Device::instance()->serviceBegin(); it != Omm::Dvb::Device::instance()->serviceEnd(); ++it) {
@@ -92,7 +125,7 @@ DvbModel::scan()
     std::ofstream xmlDevice(getBasePath().c_str());
     Omm::Dvb::Device::instance()->writeXml(xmlDevice);
 
-    LOGNS(Omm::Dvb, dvb, debug, "dvb model scan finished.");
+    LOGNS(Omm::Dvb, dvb, debug, "dvb model deep scan finished.");
 }
 
 

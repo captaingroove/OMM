@@ -96,8 +96,7 @@ Home::getConfigDirPath(const std::string& relPath)
 {
     Poco::Mutex::ScopedLock lock(_lock);
 
-    std::string fullPath = Poco::Environment::get("OMM_CONFIG", getHomeDirPath() + "/config/") + relPath;
-//    LOG(util, debug, "OMM config path: " + fullPath);
+    std::string fullPath = Poco::Environment::get("OMM_CONF", getHomeDirPath() + "/conf/") + relPath;
     LOG(util, debug, "OMM config path: " + fullPath);
     try {
         Poco::File(fullPath).createDirectories();

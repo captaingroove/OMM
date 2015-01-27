@@ -6,7 +6,8 @@ target_link_libraries(ommserver
 ${OMM}
 ${OMM_UTIL}
 ${OMM_AV}
-${OMM_GUI}
+# should get rid of gui dependencies in server
+#${OMM_GUI}
 ${OMM_UPNPGUI}
 ${OMMX_ENGINE_VLC}
 )
