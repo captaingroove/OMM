@@ -19,7 +19,7 @@ add_resources(MediaImages
 "img/activity-on.png"
 )
 
-add_library(ommupnpgui
+set(LIB_OMM_UPNPGUI_SRC
 ActivityIndicator.cpp
 ControllerWidget.cpp
 DeviceGroup.cpp
@@ -31,6 +31,14 @@ Playlist.cpp
 Setup.cpp
 UpnpApplication.cpp
 ${MediaImages_CPP}
+)
+
+add_library(ommupnpgui
+${LIB_OMM_UPNPGUI_SRC}
+)
+
+add_library(ommupnpguiconsole
+${LIB_OMM_UPNPGUI_SRC}
 )
 
 set(DEFAULT_ENGINE
@@ -59,7 +67,7 @@ ommsys
 ommutil
 ommupnp
 ommupnpav
-ommgui
+#ommgui
 ${DEFAULT_ENGINE}
 ${EXTRA_LIBS}
 )
@@ -72,12 +80,23 @@ ommdvb
 endif(LINUXDVB_FOUND)
 
 target_link_libraries(ommupnpgui
+ommgui
+${OMMUPNPGUI_LINK_LIBS}
+)
+
+target_link_libraries(ommupnpguiconsole
+ommguiconsole
 ${OMMUPNPGUI_LINK_LIBS}
 )
 
 set(OMM_UPNPGUI
 ommupnpgui
 CACHE INTERNAL ommupnpgui
+)
+
+set(OMM_UPNPGUI_CONSOLE
+ommupnpguiconsole
+CACHE INTERNAL ommupnpguiconsole
 )
 
 install(TARGETS ommupnpgui

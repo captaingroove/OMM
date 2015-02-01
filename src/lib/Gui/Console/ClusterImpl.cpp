@@ -19,8 +19,6 @@
 |  along with this program.  If not, see <http://www.gnu.org/licenses/>.    |
  ***************************************************************************/
 
-#include <QtGui>
-
 #include "ClusterImpl.h"
 #include "Gui/Cluster.h"
 #include "Gui/GuiLogger.h"
@@ -30,29 +28,8 @@ namespace Omm {
 namespace Gui {
 
 
-class QtClusterWidget : public QTabWidget
-{
-    friend class ClusterViewImpl;
-
-    void setHidden(bool hidden)
-    {
-        tabBar()->setHidden(hidden);
-    }
-
-    int tabHeight()
-    {
-        return tabBar()->height();
-    }
-};
-
-
 ClusterViewImpl::ClusterViewImpl(View* pView)
 {
-//    LOG(gui, debug, "QTab widget implementation ctor");
-
-    QtClusterWidget* pNativeView = new QtClusterWidget;
-
-    initViewImpl(pView, pNativeView);
 }
 
 
@@ -64,20 +41,12 @@ ClusterViewImpl::~ClusterViewImpl()
 void
 ClusterViewImpl::insertView(View* pView, const std::string& label, int index)
 {
-    // TODO: should be replaced with updateWithVisibleViews() with refactor of cluster code
-//    LOG(gui, debug, "QTab widget implementation insert widget");
-    static_cast<QtClusterWidget*>(_pNativeView)->insertTab(index, static_cast<QWidget*>(pView->getNativeView()), label.c_str());
-    _views.insert(_views.begin() + index, pView);
 }
 
 
 void
 ClusterViewImpl::removeView(View* pView)
 {
-    QtClusterWidget* pClusterWidget = static_cast<QtClusterWidget*>(_pNativeView);
-    pClusterWidget->removeTab(pClusterWidget->indexOf(static_cast<QWidget*>(pView->getNativeView())));
-    std::vector<View*>::iterator it = std::find(_views.begin(), _views.end(), pView);
-    _views.erase(it);
 }
 
 
@@ -98,76 +67,60 @@ ClusterViewImpl::hideView(View* pView)
 std::string
 ClusterViewImpl::getConfiguration()
 {
-    // TODO: should be removed with refactor of cluster code
-    std::string res;
-    for (std::vector<View*>::const_iterator it = _views.begin(); it != _views.end(); ++it) {
-        res += (*it)->getName();
-        if (it + 1 != _views.end()) {
-            res += ",";
-        }
-    }
-    return res;
+    return "";
 }
 
 
 void
 ClusterViewImpl::setConfiguration(const std::string& configuration)
 {
-    // TODO: should be removed with refactor of cluster code
 }
 
 
 int
 ClusterViewImpl::getViewCount()
 {
-    // TODO: should be removed with refactor of cluster code
-    return static_cast<QtClusterWidget*>(_pNativeView)->count();
+    return 0;
 }
 
 
 int
 ClusterViewImpl::getCurrentViewIndex()
 {
-    // TODO: should be removed with refactor of cluster code
-    return static_cast<QtClusterWidget*>(_pNativeView)->currentIndex();
+    return 0;
 }
 
 
 void
 ClusterViewImpl::setCurrentViewIndex(int index)
 {
-    // TODO: should be replaced with setCurrentView() with refactor of cluster code
-    static_cast<QtClusterWidget*>(_pNativeView)->setCurrentIndex(index);
 }
 
 
 int
 ClusterViewImpl::getIndexFromView(View* pView)
 {
-    // TODO: should be removed with refactor of cluster code
-    return static_cast<QtClusterWidget*>(_pNativeView)->indexOf(static_cast<QWidget*>(pView->getNativeView()));
+    return 0;
 }
 
 
 View*
 ClusterViewImpl::getViewFromIndex(int index)
 {
-    // TODO: should be removed with refactor of cluster code
-    return _views[index];
+    return 0;
 }
 
 
 void
 ClusterViewImpl::setHandlesHidden(bool hidden)
 {
-    static_cast<QtClusterWidget*>(_pNativeView)->setHidden(hidden);
 }
 
 
 const int
 ClusterViewImpl::getHandleHeight()
 {
-    return static_cast<QtClusterWidget*>(_pNativeView)->tabHeight();
+    return 0;
 }
 
 

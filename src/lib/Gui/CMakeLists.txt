@@ -12,9 +12,10 @@ message(STATUS "Gui implementation for " ${BUILD_TARGET} " is available, linking
 
 include_directories(
 ${LIB_OMMGUI_PLATFORM_DIR}
+${LIB_OMMGUI_CONSOLE_DIR}
 )
 
-add_library(ommgui
+set(LIB_OMMGUI_SRC
 GuiLogger.cpp
 Color.cpp
 View.cpp
@@ -50,6 +51,10 @@ Graphic.cpp
 ${GuiImages_CPP}
 )
 
+add_library(ommgui
+${LIB_OMMGUI_SRC}
+)
+
 target_link_libraries(ommgui
 ${OMM_SYS}
 ${OMM_UTIL}
@@ -62,7 +67,23 @@ ommgui
 CACHE INTERNAL libommgui
 )
 
-install(TARGETS ommgui
+add_library(ommguiconsole
+${LIB_OMMGUI_SRC}
+)
+
+target_link_libraries(ommguiconsole
+${OMM_SYS}
+${OMM_UTIL}
+${LIB_OMMGUI_CONSOLE}
+${POCO_FOUNDATION}
+)
+
+set(OMM_GUI_CONSOLE
+ommguiconsole
+CACHE INTERNAL libommguiconsole
+)
+
+install(TARGETS ommgui ommguiconsole
 RUNTIME DESTINATION bin
 LIBRARY DESTINATION lib
 ARCHIVE DESTINATION lib

@@ -47,7 +47,9 @@ class Application : public Omm::Gui::Application
     {
 //        Omm::Gui::ClusterView* pCluster = new Omm::Gui::ClusterView(0, Omm::Gui::ClusterView::Native);
 //        Omm::Gui::ClusterView* pCluster = new Omm::Gui::ClusterView(0, Omm::Gui::ClusterView::Generic);
-        Omm::Gui::ClusterView* pCluster = new Omm::Gui::ClusterView;
+        Omm::Gui::ClusterView* pCluster = new Omm::Gui::ClusterView(0, Omm::Gui::ClusterView::Column);
+        // FIXME: core dump with default cluster type "" == Column and libommgui-qt
+//        Omm::Gui::ClusterView* pCluster = new Omm::Gui::ClusterView;
         pCluster->attachController(new ButtonClusterController);
 
         const int subviewCount = 5;
