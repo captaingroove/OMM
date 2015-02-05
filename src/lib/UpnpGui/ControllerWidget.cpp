@@ -44,8 +44,8 @@
 #include "UpnpGui/MediaRenderer.h"
 #include "UpnpGui/MediaServer.h"
 #include "UpnpGui/Playlist.h"
-#include "UpnpGui/Setup.h"
-#include "UpnpGui/UpnpApplication.h"
+#include "UpnpGui/GuiSetup.h"
+#include "UpnpGui/GuiUpnpApplication.h"
 #include "UpnpGui/ControllerWidget.h"
 
 #include "MediaImages.h"
@@ -106,7 +106,7 @@ class ControllerWidgetClusterController : public Omm::Gui::ClusterController
 };
 
 
-ControllerWidget::ControllerWidget(UpnpApplication* pApplication) :
+ControllerWidget::ControllerWidget(GuiUpnpApplication* pApplication) :
 //ClusterView(0, Gui::ClusterView::Generic),
 _pApplication(pApplication)
 {

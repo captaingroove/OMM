@@ -19,6 +19,15 @@ add_resources(MediaImages
 "img/activity-on.png"
 )
 
+set(LIB_OMM_UPNPAPP_SRC
+UpnpApplication.cpp
+WebSetup.cpp
+)
+
+add_library(ommupnpapp
+${LIB_OMM_UPNPAPP_SRC}
+)
+
 set(LIB_OMM_UPNPGUI_SRC
 ActivityIndicator.cpp
 ControllerWidget.cpp
@@ -28,8 +37,8 @@ MediaRenderer.cpp
 MediaServer.cpp
 MediaObject.cpp
 Playlist.cpp
-Setup.cpp
-UpnpApplication.cpp
+GuiSetup.cpp
+GuiUpnpApplication.cpp
 ${MediaImages_CPP}
 )
 
@@ -62,31 +71,39 @@ ommx-engine-vlc
 )
 endif(IPHONE)
 
-set(OMMUPNPGUI_LINK_LIBS
+set(OMMUPNPAPP_LINK_LIBS
 ommsys
 ommutil
 ommupnp
 ommupnpav
-#ommgui
 ${DEFAULT_ENGINE}
 ${EXTRA_LIBS}
 )
 
 if(LINUXDVB_FOUND)
-set(OMMUPNPGUI_LINK_LIBS
-${OMMUPNPGUI_LINK_LIBS}
+set(OMMUPNPAPP_LINK_LIBS
+${OMMUPNPAPP_LINK_LIBS}
 ommdvb
 )
 endif(LINUXDVB_FOUND)
 
+target_link_libraries(ommupnpapp
+${OMMUPNPAPP_LINK_LIBS}
+)
+
 target_link_libraries(ommupnpgui
+ommupnpapp
 ommgui
-${OMMUPNPGUI_LINK_LIBS}
 )
 
 target_link_libraries(ommupnpguiconsole
+ommupnpapp
 ommguiconsole
-${OMMUPNPGUI_LINK_LIBS}
+)
+
+set(OMM_UPNPAPP
+ommupnpapp
+CACHE INTERNAL ommupnpapp
 )
 
 set(OMM_UPNPGUI
@@ -99,9 +116,8 @@ ommupnpguiconsole
 CACHE INTERNAL ommupnpguiconsole
 )
 
-install(TARGETS ommupnpgui
+install(TARGETS ommupnpapp ommupnpgui ommupnpguiconsole
 RUNTIME DESTINATION bin
 LIBRARY DESTINATION lib
 ARCHIVE DESTINATION lib
 )
-

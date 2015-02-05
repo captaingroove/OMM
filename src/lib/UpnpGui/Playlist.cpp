@@ -23,7 +23,7 @@
 #include "UpnpAv.h"
 #include "UpnpAvCtlServer.h"
 
-#include "UpnpGui/UpnpApplication.h"
+#include "UpnpGui/GuiUpnpApplication.h"
 #include "UpnpGui/MediaObject.h"
 #include "UpnpGui/ControllerWidget.h"
 #include "UpnpGui/Playlist.h"
@@ -141,14 +141,14 @@ PlaylistEditor::getPlaylistResource()
 std::string
 PlaylistEditor::getPlaylistResourceUri()
 {
-    _pControllerWidget->_pApplication->getAppHttpUri() + UpnpApplication::PLAYLIST_URI;
+    _pControllerWidget->_pApplication->getAppHttpUri() + GuiUpnpApplication::PLAYLIST_URI;
 }
 
 
 void
 PlaylistEditor::writePlaylistResource()
 {
-    _pPlaylistContainer->writeResource(_pControllerWidget->_pApplication->getAppHttpUri() + UpnpApplication::PLAYLIST_URI);
+    _pPlaylistContainer->writeResource(_pControllerWidget->_pApplication->getAppHttpUri() + GuiUpnpApplication::PLAYLIST_URI);
 }
 
 

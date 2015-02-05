@@ -29,17 +29,13 @@
 #include "Poco/ErrorHandler.h"
 #include <Poco/Util/Application.h>
 
-#include "UpnpGui/ControllerWidget.h"
 #include "UpnpGui/UpnpApplication.h"
-#include "UpnpGui/Setup.h"
-#include "UpnpGui/GuiVisual.h"
+#include "UpnpGui/WebSetup.h"
 #include "Sys/Path.h"
 #include "Sys/System.h"
 #include "Util.h"
-#include "Gui/GuiLogger.h"
 #include "UpnpAv.h"
 #include "UpnpAvCtlServer.h"
-#include "MediaImages.h"
 
 
 // FIXME: make engines also loadable, so that ommcontroller executable
@@ -66,7 +62,7 @@ ConfigRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco:
     Poco::URI requestUri(request.getURI());
 
     if (requestUri.getPath() == UpnpApplication::PLAYLIST_URI) {
-        std::stringstream* pPlaylistResource = _pApp->_pControllerWidget->getPlaylistResource();
+        std::stringstream* pPlaylistResource = _pApp->getPlaylistResource();
         if (pPlaylistResource) {
             std::ostream& outStream = response.send();
             Poco::StreamCopier::copyStream(*pPlaylistResource, outStream);
@@ -129,8 +125,6 @@ const std::string UpnpApplication::PLAYLIST_URI = "/Playlist";
 const std::string UpnpApplication::CONFIG_URI = "/Config";
 const std::string UpnpApplication::CONFIG_APP_QUERY = "saveForm=app";
 const std::string UpnpApplication::CONFIG_DEV_QUERY = "saveForm=dev";
-const std::string UpnpApplication::ModeFull = "ModeFull";
-const std::string UpnpApplication::ModeRendererOnly = "ModeRendererOnly";
 
 UpnpApplication::UpnpApplication(int argc, char** argv) :
 //Poco::Util::Application(argc, argv),
@@ -144,19 +138,14 @@ _ignoreConfig(false),
 //#else
 //    _rendererName("OMM Renderer"),
 //#endif
-_enableRenderer(false),
 _enableServer(false),
-_enableController(true),
-_showRendererVisualOnly(false),
-_pControllerWidget(0),
+_enableLocalDeviceServer(false),
 _pLocalDeviceServer(new DeviceServer),
 _pLocalDeviceContainer(new DeviceContainer),
-_pLocalMediaRenderer(0),
-_defaultRendererVolume(50),
 _pConf(0),
-_mode(ModeFull),
 _instanceMutexName("OmmApplicationMutex"),
-_appStandardPort(4009)
+_appStandardPort(4009),
+_pHttpServer(0)
 {
     setUnixOptions(true);
 }
@@ -165,41 +154,31 @@ _appStandardPort(4009)
 UpnpApplication::~UpnpApplication()
 {
     delete _pLocalDeviceServer;
-    delete _pHttpServer;
+    if (_pHttpServer) {
+        delete _pHttpServer;
+    }
+}
+
+
+int
+UpnpApplication::runEventLoop(int argc, char** argv)
+{
+    initLocalDevices();
+    startApp();
+    waitForTerminationRequest();
+    stopApp();
+    return Poco::Util::ServerApplication::EXIT_OK;
 }
 
 
 void
 UpnpApplication::defineOptions(Poco::Util::OptionSet& options)
 {
-    Poco::Util::Application::defineOptions(options);
+    Poco::Util::ServerApplication::defineOptions(options);
 
     options.addOption(Poco::Util::Option("help", "", "display help information on command line arguments")
                       .required(false)
                       .repeatable(false));
-    options.addOption(Poco::Util::Option("width", "w", "width of application window")
-                      .binding("application.width")
-                      .required(false)
-                      .repeatable(false)
-                      .argument("width", true));
-    options.addOption(Poco::Util::Option("height", "h", "height of application window")
-                      .binding("application.height")
-                      .required(false)
-                      .repeatable(false)
-                      .argument("height", true));
-    options.addOption(Poco::Util::Option("fullscreen", "f", "option passed to plugin")
-                      .binding("application.fullscreen")
-                      .required(false)
-                      .repeatable(false));
-    options.addOption(Poco::Util::Option("zoom", "z", "application window scale factor")
-                      .binding("application.scale")
-                      .required(false)
-                      .repeatable(false)
-                      .argument("scale", true));
-    options.addOption(Poco::Util::Option("renderer", "r", "enable renderer  \"name:uuid:engine\"")
-                      .required(false)
-                      .repeatable(false)
-                      .argument("renderername", true));
     options.addOption(Poco::Util::Option("server", "s", "add server \"name:uuid:datamodel:basepath\"")
                       .required(false)
                       .repeatable(true)
@@ -210,27 +189,10 @@ UpnpApplication::defineOptions(Poco::Util::OptionSet& options)
 void
 UpnpApplication::handleOption(const std::string& name, const std::string& value)
 {
-    Poco::Util::Application::handleOption(name, value);
+    Poco::Util::ServerApplication::handleOption(name, value);
 
     if (name == "help") {
         _helpRequested = true;
-    }
-    else if (name == "renderer") {
-        Poco::StringTokenizer rendererSpec(value, ":");
-        if (rendererSpec.count() < 3) {
-            LOGNS(Av, upnpav, information, "renderer spec \"" + value + "\" needs four parameters, \"name:uuid:engine\", ignoring");
-        }
-        else {
-            std::string uuid = rendererSpec[1];
-            // uuid may be a valid uuid or empty, when empty assign a random uuid
-            if (uuid == "") {
-                uuid = Poco::UUIDGenerator().createRandom().toString();
-            }
-            config().setString("renderer.enable", "true");
-            config().setString("renderer.friendlyName", rendererSpec[0]);
-            config().setString("renderer.uuid", uuid);
-            config().setString("renderer.plugin", "engine-" + rendererSpec[2]);
-        }
     }
     else if (name == "server") {
         Poco::StringTokenizer serverSpec(value, ":");
@@ -250,15 +212,14 @@ UpnpApplication::handleOption(const std::string& name, const std::string& value)
             config().setString("server." + uuid + ".basePath", serverSpec[3]);
         }
     }
-    else if (name == "fullscreen") {
-        config().setString("application.fullscreen", "true");
-    }
 }
 
 
 int
 UpnpApplication::main(const std::vector<std::string>& args)
 {
+    int ret = Poco::Util::ServerApplication::EXIT_OK;
+
     if (_helpRequested)
     {
         displayHelp();
@@ -267,7 +228,7 @@ UpnpApplication::main(const std::vector<std::string>& args)
     {
         installGlobalErrorHandler();
 
-        Poco::Util::Application::init(_argc, _argv);
+//        Poco::Util::ServerApplication::init(_argc, _argv);
     // TODO: reenable _feature instance checking (segfaults with mutex)
 //        if (instanceAlreadyRunning()) {
 //            LOG(upnp, information, "omm application instance running, starting in controller mode");
@@ -276,66 +237,33 @@ UpnpApplication::main(const std::vector<std::string>& args)
 //        }
         loadConfig();
         initConfig();
-        Gui::Application::runEventLoop(_argc, _argv);
-    }
-    return Poco::Util::Application::EXIT_OK;
-}
 
-
-Omm::Gui::View*
-UpnpApplication::createMainView()
-{
-    _pControllerWidget = new Omm::ControllerWidget(this);
-    if (!_showRendererVisualOnly) {
-        addControlPanel(_pControllerWidget->getControlPanel());
-        addControlPanel(_pControllerWidget->getStatusBar());
+        ret = runEventLoop(_argc, _argv);
     }
-    return _pControllerWidget;
+    return ret;
 }
 
 
 void
-UpnpApplication::presentedMainView()
-{
-    if (config().getBool("application.fullscreen", false)) {
-        _pControllerWidget->setHandlesHidden(true);
-//        _pControllerWidget->showOnlyBasicDeviceGroups(true);
-    }
-    else if (_showRendererVisualOnly) {
-        _pControllerWidget->showOnlyRendererVisual(true);
-        _pControllerWidget->setHandlesHidden(true);
-    }
-    else {
-        _pControllerWidget->setRendererVisualVisible(false);
-    }
-    _pControllerWidget->init();
-    initLocalDevices();
-}
-
-
-void
-UpnpApplication::start()
+UpnpApplication::startApp()
 {
     LOGNS(Av, upnpav, debug, "omm application starting ...");
     startAppHttpServer();
-    if (_enableController) {
-        LOGNS(Av, upnpav, debug, "omm application starting controller ...");
-        _pControllerWidget->setState(DeviceManager::PublicLocal);
-    }
     LOGNS(Av, upnpav, debug, "omm application starting local device server ...");
-    _pLocalDeviceServer->setState(config().getString("application.devices", DeviceManager::Public));
+    if (_enableLocalDeviceServer) {
+        _pLocalDeviceServer->setState(config().getString("application.devices", DeviceManager::Public));
+    }
     LOGNS(Av, upnpav, debug, "omm application started.");
 }
 
 
 void
-UpnpApplication::stop()
+UpnpApplication::stopApp()
 {
     LOGNS(Av, upnpav, debug, "omm application stopping ...");
-    if (_enableController) {
-        _pControllerWidget->setState(DeviceManager::Stopped);
+    if (_enableLocalDeviceServer) {
+        _pLocalDeviceServer->setState(DeviceManager::Stopped);
     }
-    _pLocalDeviceServer->setState(DeviceManager::Stopped);
     stopAppHttpServer();
     saveConfig();
     Poco::Util::Application::uninitialize();
@@ -435,28 +363,24 @@ UpnpApplication::printForm(const Poco::Net::HTMLForm& form)
 void
 UpnpApplication::defaultConfig()
 {
-    LOGNS(Av, upnpav, information, "creating default config");
-    _pConf->setBool("renderer.enable", true);
-    _pConf->setString("renderer.friendlyName", "OMM Media Player");
-    _pConf->setString("renderer.plugin", "engine-vlc");
-    _pConf->setString("renderer.uuid", "rra123bc-de45-6789-ffff-gg1234hhh56i");
+    LOGNS(Av, upnpav, information, "creating application default config");
 
     int serverCount = 0;
     std::string serverString;
 
-//    _pConf->setString("server.0.basePath", Sys::SysPath::getPath(Sys::SysPath::Home));
-//    _pConf->setBool("server.0.checkMod", false);
-//    _pConf->setBool("server.0.enable", true);
-//    _pConf->setString("server.0.friendlyName", "OMM Media Files");
-//    _pConf->setString("server.0.layout", Av::ServerContainer::LAYOUT_FLAT);
-//    _pConf->setString("server.0.plugin", "model-file");
-//    _pConf->setInt("server.0.pollUpdateId", 0);
-//    _pConf->setString("server.0.uuid", "00a123bc-de45-6789-ffff-gg1234hhh56i");
-//    serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount++);
+    _pConf->setString("server.0.basePath", Sys::SysPath::getPath(Sys::SysPath::Home));
+    _pConf->setBool("server.0.checkMod", false);
+    _pConf->setBool("server.0.enable", false);
+    _pConf->setString("server.0.friendlyName", "OMM Media Files");
+    _pConf->setString("server.0.layout", Av::ServerContainer::LAYOUT_FLAT);
+    _pConf->setString("server.0.plugin", "model-file");
+    _pConf->setInt("server.0.pollUpdateId", 0);
+    _pConf->setString("server.0.uuid", "00a123bc-de45-6789-ffff-gg1234hhh56i");
+    serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount++);
 
     _pConf->setString("server.1.basePath", "webradio.conf");
     _pConf->setBool("server.1.checkMod", false);
-    _pConf->setBool("server.1.enable", true);
+    _pConf->setBool("server.1.enable", false);
     _pConf->setString("server.1.friendlyName", "OMM Webradio");
     _pConf->setString("server.1.layout", Av::ServerContainer::LAYOUT_FLAT);
     _pConf->setString("server.1.plugin", "model-webradio");
@@ -469,7 +393,7 @@ UpnpApplication::defaultConfig()
     if(dvbDevices.size() > 0) {
         _pConf->setString("server.2.basePath", "dvb.xml");
         _pConf->setBool("server.2.checkMod", false);
-        _pConf->setBool("server.2.enable", true);
+        _pConf->setBool("server.2.enable", false);
         _pConf->setString("server.2.friendlyName", "OMM Digital TV");
         _pConf->setString("server.2.layout", Av::ServerContainer::LAYOUT_FLAT);
         _pConf->setString("server.2.plugin", "model-dvb");
@@ -517,11 +441,7 @@ UpnpApplication::loadConfig()
 void
 UpnpApplication::initConfig()
 {
-    setFullscreen(config().getBool("application.fullscreen", false));
-    resizeMainView(config().getInt("application.width", 800), config().getInt("application.height", 480));
-    scaleMainView(config().getDouble("application.scale", 1.0));
-
-    _pWebSetup = new WebSetup(this, _pControllerWidget);
+    _pWebSetup = new WebSetup(this);
 }
 
 
@@ -529,14 +449,6 @@ void
 UpnpApplication::saveConfig()
 {
     if (!_ignoreConfig) {
-        LOGNS(Av, upnpav, information, "saving config file ...");
-        _pConf->setInt("application.width", width());
-        _pConf->setInt("application.height", height());
-        if (!config().getBool("application.fullscreen", false)) {
-            _pConf->setString("application.cluster", _pControllerWidget->getConfiguration());
-        }
-        _pConf->setInt("renderer.volume", _pLocalMediaRenderer->getEngine()->getVolume(Omm::Av::AvChannel::MASTER));
-
         try {
             _pConf->save(_confFilePath);
             LOGNS(Av, upnpav, information, "saving config file done.");
@@ -549,38 +461,8 @@ UpnpApplication::saveConfig()
 
 
 void
-UpnpApplication::enableController(bool enable)
-{
-//    if (_pControllerWidget) {
-//        enable ? _pControllerWidget->start() : _pControllerWidget->stop();
-//    }
-    _enableController = enable;
-}
-
-
-void
-UpnpApplication::showRendererVisualOnly(bool show)
-{
-//    _pControllerWidget->setTabBarHidden(!show);
-//    _pControllerWidget->showOnlyRendererVisual(show);
-    _showRendererVisualOnly = show;
-    _mode = ModeRendererOnly;
-    showControlPanels(false);
-}
-
-
-void
 UpnpApplication::initLocalDevices()
 {
-    // add local renderer
-    _enableRenderer = false;
-    LOGNS(Av, upnpav, debug, "omm application init local devices ...");
-    if (config().getBool("renderer.enable", false)) {
-        setLocalRenderer(config().getString("renderer.friendlyName", "OMM Renderer"),
-                config().getString("renderer.uuid", ""),
-                config().getString("renderer.plugin", ""));
-    }
-
     // add local servers from config file
     std::string serversString;
     if (_pConf) {
@@ -604,88 +486,23 @@ UpnpApplication::initLocalDevices()
             }
         }
     }
+    if (_enableServer) {
+        _enableLocalDeviceServer = true;
+    }
 
-//#ifndef __IPHONE__
-    if (_enableRenderer) {
-        setLocalRenderer();
-    }
-    if (_enableRenderer || _enableServer) {
+    if (_enableLocalDeviceServer) {
         _pLocalDeviceServer->addDeviceContainer(_pLocalDeviceContainer);
+        _pLocalDeviceServer->init();
     }
-//#endif
-    _pLocalDeviceServer->init();
-//#ifndef __IPHONE__
-    if (_enableRenderer && _pLocalMediaRenderer) {
-        // TODO: get default renderer from config file via uuid
-        _pControllerWidget->setDefaultRenderer(_pLocalMediaRenderer);
-    }
-//#endif
+
    LOGNS(Av, upnpav, debug, "omm application init local devices done.");
 }
 
 
-void
-UpnpApplication::setLocalRenderer(const std::string& name, const std::string& uuid, const std::string& pluginName)
+std::stringstream*
+UpnpApplication::getPlaylistResource()
 {
-    _enableRenderer = true;
-    _rendererName = name;
-    _rendererUuid = uuid;
-    _rendererPlugin = pluginName;
-}
-
-
-void
-UpnpApplication::setLocalRenderer()
-{
-    LOGNS(Av, upnpav, debug, "omm application set local renderer ...");
-
-    Omm::Av::Engine* pEngine;
-#ifdef __IPHONE__
-        pEngine = new MPMoviePlayerEngine;
-//        pEngine = new AVFoundationEngine;
-#else
-    Omm::Util::PluginLoader<Omm::Av::Engine> pluginLoader;
-    try {
-        pEngine = pluginLoader.load(_rendererPlugin);
-    }
-    catch(Poco::NotFoundException) {
-        LOGNS(Av, upnpav, error, "could not find engine plugin: " + _rendererPlugin);
-        pEngine = new VlcEngine;
-    }
-    LOGNS(Av, upnpav, information, "engine plugin: " + _rendererPlugin + " loaded successfully");
-#endif
-
-    pEngine->createPlayer();
-    // TODO: connecting renderer visual to X causes crash in ommrenderer standalone app
-    pEngine->setVisual(_pControllerWidget->getLocalRendererVisual());
-    // set default soft volume of engine
-    ui2 volume = config().getInt("renderer.volume", _defaultRendererVolume);
-    pEngine->setVolume(Omm::Av::AvChannel::MASTER, volume);
-
-    Av::MediaRenderer* pMediaRenderer = new Av::MediaRenderer;
-    _pLocalMediaRenderer = pMediaRenderer;
-    pMediaRenderer->addEngine(pEngine);
-    Omm::Icon* pRendererIcon = new Omm::Icon(22, 22, 8, "image/png", "renderer.png");
-    pMediaRenderer->addIcon(pRendererIcon);
-    pMediaRenderer->setFriendlyName(_rendererName);
-    pMediaRenderer->setUuid(_rendererUuid);
-    if (_enableRenderer) {
-        _pLocalDeviceContainer->addDevice(pMediaRenderer);
-        _pLocalDeviceContainer->setRootDevice(pMediaRenderer);
-    }
-    else {
-        if (_pLocalDeviceContainer->getDeviceCount()) {
-            _pLocalDeviceContainer->setRootDevice((*_pLocalDeviceContainer->beginDevice()));
-        }
-    }
-    LOGNS(Av, upnpav, debug, "omm application set local renderer finished.");
-}
-
-
-Av::MediaRenderer*
-UpnpApplication::getLocalRenderer()
-{
-    return _pLocalMediaRenderer;
+    return 0;
 }
 
 
@@ -778,9 +595,7 @@ UpnpApplication::addLocalServer(const std::string& id)
     pMediaServer->setPollSystemUpdateIdTimer(config().getInt("server." + id + ".pollUpdateId", 0));
 
     _pLocalDeviceContainer->addDevice(pMediaServer);
-    if (!_enableRenderer) {
-        _pLocalDeviceContainer->setRootDevice(pMediaServer);
-    }
+    _pLocalDeviceContainer->setRootDevice(pMediaServer);
 
     LOGNS(Av, upnpav, debug, "omm application add local server finished.");
 }
@@ -868,13 +683,6 @@ UpnpApplication::getConfigHttpUri()
     return "http://localhost:" + config().getString("application.configPort", Poco::NumberFormatter::format(_appStandardPort)) + "/Config";
 //    return "http://localhost:" + config().getString("application.configPort", Poco::NumberFormatter::format(_socket.address().port())) + "/Config";
 //    return "http://localhost:" + Poco::NumberFormatter::format(_socket.address().port()) + "/Config";
-}
-
-
-std::string
-UpnpApplication::getMode()
-{
-    return _mode;
 }
 
 

@@ -23,7 +23,7 @@
 #define UpnpApplication_INCLUDED
 
 #include <Poco/Notification.h>
-#include <Poco/Util/Application.h>
+#include <Poco/Util/ServerApplication.h>
 #include <Poco/Util/Option.h>
 #include <Poco/Util/OptionSet.h>
 #include <Poco/Util/HelpFormatter.h>
@@ -43,15 +43,12 @@
 #include "../UpnpAvRenderer.h"
 #include "../UpnpAvServer.h"
 
-#include "../Gui/Application.h"
-
 
 namespace Omm {
 
-class ControllerWidget;
 class WebSetup;
 
-class UpnpApplication :  public Poco::Util::Application, public Gui::Application
+class UpnpApplication :  public Poco::Util::ServerApplication
 {
     friend class ConfigRequestHandler;
 
@@ -61,53 +58,54 @@ public:
     static const std::string CONFIG_APP_QUERY;
     static const std::string CONFIG_DEV_QUERY;
 
-    static const std::string ModeFull;
-    static const std::string ModeRendererOnly;
-
     UpnpApplication(int argc, char** argv);
     ~UpnpApplication();
 
-    // Omm::Gui::Application interface
-    virtual void start();
-    virtual void stop();
+    void startApp();
+    void stopApp();
 
     void setLockInstance(bool lock = true);
     void setIgnoreConfig(bool ignore = true);
     bool getIgnoreConfig();
-    void enableController(bool enable = true);
-    void showRendererVisualOnly(bool show = true);
     std::string getAppHttpUri();
     std::string getConfigHttpUri();
-    std::string getMode();
     Poco::Util::PropertyFileConfiguration* getFileConfiguration();
-    Av::MediaRenderer* getLocalRenderer();
     void restartLocalDeviceContainer();
     void setLocalDeviceContainerState(const std::string& state);
     Av::MediaServer* getLocalMediaServer(const std::string& uuid);
 
-private:
+protected:
     // Poco::Util::Application interface
     virtual void defineOptions(Poco::Util::OptionSet& options);
     virtual void handleOption(const std::string& name, const std::string& value);
-    virtual int main(const std::vector<std::string>& args);
 
-    // Omm::Gui::Application interface
-    virtual Omm::Gui::View* createMainView();
-    virtual void presentedMainView();
+    virtual int runEventLoop(int argc, char** argv);
+    virtual void defaultConfig();
+    virtual void initConfig();
+    virtual void saveConfig();
+
+    // local devices
+    virtual void initLocalDevices();
+
+    virtual std::stringstream* getPlaylistResource();
+
+    bool                                        _helpRequested;
+    bool                                        _ignoreConfig;
+    Poco::Util::PropertyFileConfiguration*      _pConf;
+    DeviceContainer*                            _pLocalDeviceContainer;
+    bool                                        _enableLocalDeviceServer;
+
+private:
+    // Poco::Util::Application interface
+    virtual int main(const std::vector<std::string>& args);
 
     // application configuration
     void displayHelp();
     void printConfig();
     void printForm(const Poco::Net::HTMLForm& form);
-    void defaultConfig();
     void loadConfig();
-    void initConfig();
-    void saveConfig();
 
     // local devices
-    void initLocalDevices();
-    void setLocalRenderer(const std::string& name, const std::string& uuid, const std::string& pluginName);
-    void setLocalRenderer();
     void addLocalServer(const std::string& id);
 
     // other stuff
@@ -118,27 +116,12 @@ private:
 
     int                                         _argc;
     char**                                      _argv;
-    bool                                        _helpRequested;
     bool                                        _lockInstance;
 
-    bool                                        _ignoreConfig;
-    Poco::Util::PropertyFileConfiguration*      _pConf;
     std::string                                 _confFilePath;
-    std::string                                 _mode;
     WebSetup*                                   _pWebSetup;
 
-    ControllerWidget*                           _pControllerWidget;
-    bool                                        _enableController;
-
     DeviceServer*                               _pLocalDeviceServer;
-    DeviceContainer*                            _pLocalDeviceContainer;
-    Av::MediaRenderer*                          _pLocalMediaRenderer;
-    bool                                        _enableRenderer;
-    std::string                                 _rendererName;
-    std::string                                 _rendererUuid;
-    std::string                                 _rendererPlugin;
-    ui2                                         _defaultRendererVolume;
-    bool                                        _showRendererVisualOnly;
     bool                                        _enableServer;
     std::string                                 _instanceMutexName;
 

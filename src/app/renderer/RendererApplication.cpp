@@ -19,16 +19,16 @@
 |  along with this program.  If not, see <http://www.gnu.org/licenses/>.    |
  ***************************************************************************/
 
-#include <Omm/UpnpGui/UpnpApplication.h>
+#include <Omm/UpnpGui/GuiUpnpApplication.h>
 
 
 int main(int argc, char** argv)
 {
-    Omm::UpnpApplication app(argc, argv);
+    Omm::GuiUpnpApplication app(argc, argv);
     app.setLockInstance(false);
     app.setIgnoreConfig(true);
     app.enableController(false);
 //    app.showRendererVisualOnly(true);
-    return app.run();
+    return app.run(argc, argv);
 }
 

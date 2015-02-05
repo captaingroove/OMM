@@ -6,10 +6,7 @@ target_link_libraries(ommserver
 ${OMM}
 ${OMM_UTIL}
 ${OMM_AV}
-#${OMM_GUI}
-#${OMM_UPNPGUI}
-${OMM_GUI_CONSOLE}
-${OMM_UPNPGUI_CONSOLE}
+${OMM_UPNPAPP}
 ${OMMX_ENGINE_VLC}
 )
 install(TARGETS ommserver

@@ -34,7 +34,7 @@
 
 namespace Omm {
 
-class UpnpApplication;
+class GuiUpnpApplication;
 class GuiVisual;
 class GuiSetup;
 class MediaRendererGroupWidget;
@@ -56,7 +56,7 @@ friend class MediaServerGroupController;
 friend class KeyController;
 
 public:
-    ControllerWidget(UpnpApplication* pApplication);
+    ControllerWidget(GuiUpnpApplication* pApplication);
 
     void setState(State newState);
 
@@ -95,7 +95,7 @@ private:
     MediaRendererView*          _pControlPanel;
     ActivityIndicator*          _pActivityIndicator;
     std::string                 _localRendererUuid;
-    UpnpApplication*            _pApplication;
+    GuiUpnpApplication*         _pApplication;
 };
 
 

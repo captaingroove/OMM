@@ -19,12 +19,12 @@
 |  along with this program.  If not, see <http://www.gnu.org/licenses/>.    |
  ***************************************************************************/
 
-#include <Omm/UpnpGui/UpnpApplication.h>
+#include <Omm/UpnpGui/GuiUpnpApplication.h>
 
 
 int main(int argc, char** argv)
 {
-    Omm::UpnpApplication app(argc, argv);
-    return app.run();
+    Omm::GuiUpnpApplication app(argc, argv);
+    return app.run(argc, argv);
 }
 

@@ -19,62 +19,20 @@
 |  along with this program.  If not, see <http://www.gnu.org/licenses/>.    |
  ***************************************************************************/
 
-#ifndef Setup_INCLUDED
-#define Setup_INCLUDED
+#ifndef WebSetup_INCLUDED
+#define WebSetup_INCLUDED
 
 #include <Poco/Net/HTMLForm.h>
 
-#include "../Gui/Navigator.h"
-#include "../Gui/Selector.h"
-#include "../Gui/List.h"
-#include "../Gui/ScrollArea.h"
-
-
 namespace Omm {
 
-class ServerListModel;
 class UpnpApplication;
-class ControllerWidget;
-
-
-class GuiSetup : public Gui::NavigatorView
-{
-    friend class RendererItemController;
-    friend class RendererDoneButton;
-    friend class RendererConfView;
-    friend class ServerItemController;
-    friend class ServerListController;
-    friend class ServerListModel;
-    friend class ServerDoneButton;
-    friend class ServerNewButton;
-    friend class ServerConfView;
-    friend class ServerConfModel;
-
-public:
-    GuiSetup(UpnpApplication* pApp, Gui::View* pParent = 0);
-    virtual ~GuiSetup();
-
-private:
-//    void writeConf();
-
-    UpnpApplication*    _pApp;
-
-    Gui::ScrollAreaView*    _pSetupArea;
-    Gui::View*              _pSetupView;
-    Gui::Selector*          _pAppStateSelector;
-    Gui::View*              _pRendererConfig;
-    Gui::ListItemModel*     _pRendererItemModel;
-    Gui::ListItemView*      _pRendererItem;
-    Gui::ListItemView*      _pServerItem;
-    ServerListModel*        _pServerListModel;
-    Gui::ListView*          _pServerList;
-};
 
 
 class WebSetup
 {
 public:
-    WebSetup(UpnpApplication* pApp, ControllerWidget* pControllerWidget);
+    WebSetup(UpnpApplication* pApp);
 
     std::stringstream* generateConfigPage();
     void handleAppConfigRequest(const Poco::Net::HTMLForm& form);
@@ -82,7 +40,6 @@ public:
 
 private:
     UpnpApplication*    _pApp;
-    ControllerWidget*   _pControllerWidget;
 };
 
 }  // namespace Omm

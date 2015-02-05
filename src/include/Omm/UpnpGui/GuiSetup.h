@@ -1,7 +1,7 @@
 /***************************************************************************|
 |  OMM - Open Multimedia                                                    |
 |                                                                           |
-|  Copyright (C) 2009, 2010                                                 |
+|  Copyright (C) 2013                                                       |
 |  Jörg Bakker (jb'at'open-multimedia.org)                                  |
 |                                                                           |
 |  This file is part of OMM.                                                |
@@ -19,13 +19,56 @@
 |  along with this program.  If not, see <http://www.gnu.org/licenses/>.    |
  ***************************************************************************/
 
-#include <Omm/UpnpGui/UpnpApplication.h>
+#ifndef GuiSetup_INCLUDED
+#define GuiSetup_INCLUDED
+
+#include "../Gui/Navigator.h"
+#include "../Gui/Selector.h"
+#include "../Gui/List.h"
+#include "../Gui/ScrollArea.h"
+
+namespace Omm {
+
+class ServerListModel;
+class UpnpApplication;
+class ControllerWidget;
 
 
-int main(int argc, char** argv)
+class GuiSetup : public Gui::NavigatorView
 {
-    Omm::UpnpApplication app(argc, argv);
-    app.setLockInstance(false);
-    app.setIgnoreConfig(true);
-    return app.run(argc, argv);
-}
+    friend class RendererItemController;
+    friend class RendererDoneButton;
+    friend class RendererConfView;
+    friend class ServerItemController;
+    friend class ServerListController;
+    friend class ServerListModel;
+    friend class ServerDoneButton;
+    friend class ServerNewButton;
+    friend class ServerConfView;
+    friend class ServerConfModel;
+
+public:
+    GuiSetup(UpnpApplication* pApp, Gui::View* pParent = 0);
+    virtual ~GuiSetup();
+
+private:
+//    void writeConf();
+
+    UpnpApplication*    _pApp;
+
+    Gui::ScrollAreaView*    _pSetupArea;
+    Gui::View*              _pSetupView;
+    Gui::Selector*          _pAppStateSelector;
+    Gui::View*              _pRendererConfig;
+    Gui::ListItemModel*     _pRendererItemModel;
+    Gui::ListItemView*      _pRendererItem;
+    Gui::ListItemView*      _pServerItem;
+    ServerListModel*        _pServerListModel;
+    Gui::ListView*          _pServerList;
+};
+
+
+}  // namespace Omm
+
+
+#endif
