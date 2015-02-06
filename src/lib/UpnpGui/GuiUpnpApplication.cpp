@@ -168,11 +168,13 @@ GuiUpnpApplication::createMainView()
 void
 GuiUpnpApplication::presentedMainView()
 {
-    if (_showRendererVisualOnly && !config().getBool("renderer.enable", false)) {
-        config().setString("renderer.enable", "true");
-        config().setString("renderer.friendlyName", "OMM Player");
-        config().setString("renderer.uuid", "aed5b05a-f7e8-4354-bb24-812996d179a9");
-        config().setString("renderer.plugin", "engine-vlc");
+    if (_showRendererVisualOnly) {
+        if (!config().getBool("renderer.enable", false)) {
+            config().setString("renderer.enable", "true");
+            config().setString("renderer.friendlyName", "OMM Player");
+            config().setString("renderer.uuid", "aed5b05a-f7e8-4354-bb24-812996d179a9");
+            config().setString("renderer.plugin", "engine-vlc");
+        }
     }
     else {
         if (config().getBool("application.fullscreen", false)) {

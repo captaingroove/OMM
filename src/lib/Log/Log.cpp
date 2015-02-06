@@ -19,11 +19,14 @@
 |  along with this program.  If not, see <http://www.gnu.org/licenses/>.    |
  ***************************************************************************/
 
+#include <string>
+
 #include <Poco/FormattingChannel.h>
 #include <Poco/PatternFormatter.h>
 #include <Poco/SplitterChannel.h>
 #include <Poco/ConsoleChannel.h>
 #include <Poco/LineEndingConverter.h>
+#include <Poco/Logger.h>
 
 #include "Log.h"
 
@@ -57,6 +60,7 @@ Log::Log()
 //    _pUtilLogger = &Poco::Logger::create("UTIL", _pChannel, Poco::Message::PRIO_ERROR);
 //    _pPluginLogger = &Poco::Logger::create("PLUGIN", _pChannel, Poco::Message::PRIO_ERROR);
 #endif
+    _pUtilLogger->information("OMM version " + std::string(__OMM_VERSION_STRING__) + " (" + std::string(__OMM_COMMIT_STRING__) + ")");
 }
 
 
