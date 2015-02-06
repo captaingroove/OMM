@@ -29,6 +29,7 @@
 namespace Omm {
 
 class ControllerWidget;
+class GuiVisual;
 
 class GuiUpnpApplication :  public UpnpApplication, public Gui::Application
 {
@@ -47,7 +48,6 @@ public:
 
     void enableController(bool enable = true);
     void showRendererVisualOnly(bool show = true);
-    std::string getMode();
     Av::MediaRenderer* getLocalRenderer();
 
 protected:
@@ -77,8 +77,6 @@ private:
     int                                         _argc;
     char**                                      _argv;
 
-    std::string                                 _mode;
-
     ControllerWidget*                           _pControllerWidget;
     bool                                        _enableController;
 
@@ -89,6 +87,7 @@ private:
     std::string                                 _rendererPlugin;
     ui2                                         _defaultRendererVolume;
     bool                                        _showRendererVisualOnly;
+    GuiVisual*                                  _pRendererVisual;
 };
 
 

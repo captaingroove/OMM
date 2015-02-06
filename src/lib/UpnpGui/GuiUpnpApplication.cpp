@@ -75,8 +75,7 @@ _enableController(true),
 _showRendererVisualOnly(false),
 _pControllerWidget(0),
 _pLocalMediaRenderer(0),
-_defaultRendererVolume(50),
-_mode(ModeFull)
+_defaultRendererVolume(50)
 {
 }
 
@@ -155,11 +154,13 @@ GuiUpnpApplication::runEventLoop(int argc, char** argv)
 Omm::Gui::View*
 GuiUpnpApplication::createMainView()
 {
-    _pControllerWidget = new Omm::ControllerWidget(this);
-    if (!_showRendererVisualOnly) {
-        addControlPanel(_pControllerWidget->getControlPanel());
-        addControlPanel(_pControllerWidget->getStatusBar());
+    if (_showRendererVisualOnly) {
+        _pRendererVisual = new GuiVisual();
+        return _pRendererVisual;
     }
+    _pControllerWidget = new Omm::ControllerWidget(this);
+    addControlPanel(_pControllerWidget->getControlPanel());
+    addControlPanel(_pControllerWidget->getStatusBar());
     return _pControllerWidget;
 }
 
@@ -167,18 +168,22 @@ GuiUpnpApplication::createMainView()
 void
 GuiUpnpApplication::presentedMainView()
 {
-    if (config().getBool("application.fullscreen", false)) {
-        _pControllerWidget->setHandlesHidden(true);
-//        _pControllerWidget->showOnlyBasicDeviceGroups(true);
-    }
-    else if (_showRendererVisualOnly) {
-        _pControllerWidget->showOnlyRendererVisual(true);
-        _pControllerWidget->setHandlesHidden(true);
+    if (_showRendererVisualOnly && !config().getBool("renderer.enable", false)) {
+        config().setString("renderer.enable", "true");
+        config().setString("renderer.friendlyName", "OMM Player");
+        config().setString("renderer.uuid", "aed5b05a-f7e8-4354-bb24-812996d179a9");
+        config().setString("renderer.plugin", "engine-vlc");
     }
     else {
-        _pControllerWidget->setRendererVisualVisible(false);
+        if (config().getBool("application.fullscreen", false)) {
+            _pControllerWidget->setHandlesHidden(true);
+    //        _pControllerWidget->showOnlyBasicDeviceGroups(true);
+        }
+        else {
+            _pControllerWidget->setRendererVisualVisible(false);
+        }
+        _pControllerWidget->init();
     }
-    _pControllerWidget->init();
     initLocalDevices();
 }
 
@@ -264,11 +269,8 @@ GuiUpnpApplication::enableController(bool enable)
 void
 GuiUpnpApplication::showRendererVisualOnly(bool show)
 {
-//    _pControllerWidget->setTabBarHidden(!show);
-//    _pControllerWidget->showOnlyRendererVisual(show);
     _showRendererVisualOnly = show;
-    _mode = ModeRendererOnly;
-    showControlPanels(false);
+    _enableController = false;
 }
 
 
@@ -292,8 +294,7 @@ GuiUpnpApplication::initLocalDevices()
     UpnpApplication::initLocalDevices();
 
 //#ifndef __IPHONE__
-    if (_enableRenderer && _pLocalMediaRenderer) {
-        // TODO: get default renderer from config file via uuid
+    if (_enableRenderer && _pLocalMediaRenderer && !_showRendererVisualOnly) {
         _pControllerWidget->setDefaultRenderer(_pLocalMediaRenderer);
     }
 //#endif
@@ -340,8 +341,12 @@ GuiUpnpApplication::setLocalRenderer()
 #endif
 
     pEngine->createPlayer();
-    // TODO: connecting renderer visual to X causes crash in ommrenderer standalone app
-    pEngine->setVisual(_pControllerWidget->getLocalRendererVisual());
+    if (_showRendererVisualOnly) {
+        pEngine->setVisual(_pRendererVisual);
+    }
+    else {
+        pEngine->setVisual(_pControllerWidget->getLocalRendererVisual());
+    }
     // set default soft volume of engine
     ui2 volume = config().getInt("renderer.volume", _defaultRendererVolume);
     pEngine->setVolume(Omm::Av::AvChannel::MASTER, volume);
@@ -364,13 +369,6 @@ Av::MediaRenderer*
 GuiUpnpApplication::getLocalRenderer()
 {
     return _pLocalMediaRenderer;
-}
-
-
-std::string
-GuiUpnpApplication::getMode()
-{
-    return _mode;
 }
 
 

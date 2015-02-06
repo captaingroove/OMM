@@ -334,23 +334,6 @@ ControllerWidget::showMainMenu()
 
 
 void
-ControllerWidget::showOnlyRendererVisual(bool show)
-{
-    if (show) {
-        insertView(_pMediaRendererGroupWidget, "Player");
-//        insertView(_pMediaRendererGroupWidget, "Video");
-    }
-    else {
-        insertView(_pMediaServerGroupWidget, "Media");
-        insertView(_pMediaRendererGroupWidget, "Player");
-        insertView(_pPlaylistEditor, "List");
-        insertView(_pSetup, "Setup");
-    //    insertView(_pConfigBrowser, "Setup");
-    }
-}
-
-
-void
 ControllerWidget::setRendererVisualVisible(bool show)
 {
     if (show) {

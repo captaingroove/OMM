@@ -27,8 +27,7 @@ int main(int argc, char** argv)
     Omm::GuiUpnpApplication app(argc, argv);
     app.setLockInstance(false);
     app.setIgnoreConfig(true);
-    app.enableController(false);
-//    app.showRendererVisualOnly(true);
+    app.showRendererVisualOnly(true);
     return app.run(argc, argv);
 }
 
