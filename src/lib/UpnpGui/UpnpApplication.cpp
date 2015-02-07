@@ -376,9 +376,9 @@ UpnpApplication::defaultConfig()
     _pConf->setString("server.0.plugin", "model-file");
     _pConf->setInt("server.0.pollUpdateId", 0);
     _pConf->setString("server.0.uuid", "00a123bc-de45-6789-ffff-gg1234hhh56i");
-    serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount++);
+    serverString += Poco::NumberFormatter::format(serverCount++);
 
-    _pConf->setString("server.1.basePath", "webradio.conf");
+    _pConf->setString("server.1.basePath", "webradio.xml");
     _pConf->setBool("server.1.checkMod", false);
     _pConf->setBool("server.1.enable", false);
     _pConf->setString("server.1.friendlyName", "OMM Webradio");
@@ -578,7 +578,7 @@ UpnpApplication::addLocalServer(const std::string& id)
     pContainer->setTitle(name);
     pContainer->setClass(Omm::Av::AvClass::className(Omm::Av::AvClass::CONTAINER));
     pContainer->setDataModel(pDataModel);
-    std::string basePath = config().getString("server." + id + ".basePath", "webradio.conf");
+    std::string basePath = config().getString("server." + id + ".basePath", "webradio.xml");
     std::string path = basePath;
     // if relative path then search file in config directory
     if (basePath[0] != '/') {

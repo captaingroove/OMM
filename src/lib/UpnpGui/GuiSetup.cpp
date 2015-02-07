@@ -426,6 +426,7 @@ class ServerConfView : public Gui::ScrollAreaView
     Gui::Label*             _pServerScanProgressLabel;
     Gui::View*              _pServerBasePathView;
     ServerScanNotification* _pServerScanNotification;
+    Gui::View*              _pServerDvbFrontendSelectorView;
     Gui::SelectorView*      _pServerDvbFrontendKeySelector;
 };
 
@@ -866,6 +867,11 @@ _newServer(newServer)
     _pServerBasePathView->setStretchFactor(-1.0);
     _pServerBasePathView->setSizeConstraint(10, 20, Gui::View::Pref);
 
+    _pServerDvbFrontendSelectorView = new Gui::View(getAreaView());
+    _pServerDvbFrontendSelectorView->setLayout(new Gui::HorizontalLayout);
+    _pServerDvbFrontendSelectorView->setStretchFactor(-1.0);
+    _pServerDvbFrontendSelectorView->setSizeConstraint(10, 20, Gui::View::Pref);
+
 //    _pServerBasePathLabel = new Gui::Label(_pServerBasePathView);
 //    _pServerBasePathLabel->setLabel("Path");
 //    _pServerBasePathLabel->setStretchFactor(-1.0);
@@ -895,36 +901,34 @@ _newServer(newServer)
 void
 ServerConfView::syncViewImpl()
 {
-    if (static_cast<ServerConfModel*>(_pModel)->getPlugin() == "model-dvb") {
 #ifdef __DVB_SUPPORT__
+    if (static_cast<ServerConfModel*>(_pModel)->getPlugin() == "model-dvb") {
         LOGNS(Gui, gui, debug, "server conf view show dvb frontend key selector");
         for (std::map<std::string, DvbFrontendKeySelectorModel>::iterator fit = static_cast<ServerConfModel*>(_pModel)->_dvbFrontendKeys.begin(); fit != static_cast<ServerConfModel*>(_pModel)->_dvbFrontendKeys.end(); ++fit) {
-            Gui::Label* pServerDvbFrontendNameLabel = new Gui::Label(_pServerBasePathView);
+            Gui::Label* pServerDvbFrontendNameLabel = new Gui::Label(_pServerDvbFrontendSelectorView);
             pServerDvbFrontendNameLabel->setLabel(fit->first);
             pServerDvbFrontendNameLabel->setStretchFactor(-1.0);
-            _pServerDvbFrontendKeySelector = new Gui::Selector(_pServerBasePathView);
+            _pServerDvbFrontendKeySelector = new Gui::Selector(_pServerDvbFrontendSelectorView);
             _pServerDvbFrontendKeySelector->setModel(&fit->second);
             _pServerDvbFrontendKeySelector->attachController(new DvbFrontendKeySelectorController(fit->first, static_cast<ServerConfModel*>(_pModel)));
     //        for (int keyIndex = 0; keyIndex < fit->second.totalItemCount(); keyIndex++) {
     //            LOGNS(Gui, gui, debug, "dvb frontend key: " + fit->first + "/" + fit->second.getItemLabel(keyIndex));
     //        }
         };
+    }
 #endif
+    _pServerBasePathLabel = new Gui::Label(_pServerBasePathView);
+    _pServerBasePathLabel->setLabel("Path");
+    _pServerBasePathLabel->setStretchFactor(-1.0);
+    _pServerBasePathText = new Gui::TextLine(_pServerBasePathView);
+    if (_newServer && _pServerPluginSelector->getCurrentIndex()) {
+        _pServerBasePathText->hide();
+        _pServerBasePathLabel->hide();
     }
     else {
-        _pServerBasePathLabel = new Gui::Label(_pServerBasePathView);
-        _pServerBasePathLabel->setLabel("Path");
-        _pServerBasePathLabel->setStretchFactor(-1.0);
-        _pServerBasePathText = new Gui::TextLine(_pServerBasePathView);
-        if (_newServer && _pServerPluginSelector->getCurrentIndex() || !_newServer && static_cast<ServerConfModel*>(_pModel)->getPlugin() != "model-file") {
-            _pServerBasePathText->hide();
-            _pServerBasePathLabel->hide();
-        }
-        else {
-            _pServerBasePathText->setTextLine(static_cast<ServerConfModel*>(_pModel)->getBasePath());
-            _pServerBasePathText->show();
-            _pServerBasePathLabel->show();
-        }
+        _pServerBasePathText->setTextLine(static_cast<ServerConfModel*>(_pModel)->getBasePath());
+        _pServerBasePathText->show();
+        _pServerBasePathLabel->show();
     }
 
     if (_newServer) {
@@ -957,7 +961,7 @@ ServerConfView::syncViewImpl()
         }
     }
     catch (Poco::Exception& e) {
-        LOGNS(Gui, gui, debug, "scan notification server not found: " + e.displayText());
+        LOGNS(Gui, gui, warning, "scan notification server not found: " + e.displayText());
     }
 }
 

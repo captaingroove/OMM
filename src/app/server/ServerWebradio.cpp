@@ -121,7 +121,7 @@ protected:
             std::string home = Poco::Environment::get("HOME");
             _name = "Web Radio";
             if (_basePath == "") {
-                _basePath = home + "/.omm/webradio.conf";
+                _basePath = home + "/.omm/webradio.xml";
             }
             pObject->setBasePath(_basePath);
             pObject->setTitle(_name);
