@@ -491,13 +491,19 @@ KeyController::keyPressed(KeyCode key)
         case Gui::Controller::KeyU:
         case Gui::Controller::KeyVolUp:
             if (pRenderer) {
-                pRenderer->volumeChanged(pRenderer->getVolume() + 5);
+                ui2 vol = pRenderer->getVolume();
+                if (vol + _volStep <= 100) {
+                    pRenderer->volumeChanged(pRenderer->getVolume() + _volStep);
+                }
             }
             break;
         case Gui::Controller::KeyD:
         case Gui::Controller::KeyVolDown:
             if (pRenderer) {
-                pRenderer->volumeChanged(pRenderer->getVolume() - 5);
+                ui2 vol = pRenderer->getVolume();
+                if (vol - _volStep >= 0) {
+                    pRenderer->volumeChanged(vol - _volStep);
+                }
             }
             break;
     }

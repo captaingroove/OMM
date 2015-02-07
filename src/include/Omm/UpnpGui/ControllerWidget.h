@@ -101,13 +101,14 @@ private:
 class KeyController : public Gui::Controller
 {
 public:
-    KeyController(ControllerWidget* pControllerWidget) : _pControllerWidget(pControllerWidget) {}
+    KeyController(ControllerWidget* pControllerWidget) : _pControllerWidget(pControllerWidget), _volStep(5) {}
 
 private:
     virtual void keyPressed(KeyCode key);
     virtual void keyPressedNonFullscreen(KeyCode key, Modifiers mod, bool& propagate);
 
     ControllerWidget*   _pControllerWidget;
+    ui2                 _volStep;
 };
 
 
