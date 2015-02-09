@@ -207,6 +207,8 @@ endif(OMM_GUI AND RESGEN)
 
 add_subdirectory(Dvb)
 
+add_subdirectory(Web)
+
 
 install(TARGETS ommnet ommupnp ommupnpav ommavstream ommsys ommutil
 RUNTIME DESTINATION bin
@@ -226,8 +228,11 @@ ${OMM_UTIL}
 ${OMM_AV}
 ${OMM_AVSTREAM}
 ${OMM_DVB}
+${OMM_WEB}
 ${OMM_SYS}
 ${OMM_GUI}
+${OMM_GUI_CONSOLE}
+${OMM_UPNPAPP}
 ${OMM_UPNPGUI}
 CACHE INTERNAL ommlib
 )

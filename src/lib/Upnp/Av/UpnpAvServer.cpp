@@ -1075,9 +1075,6 @@ void
 ServerContainer::setBasePath(const std::string& basePath)
 {
     LOG(upnpav, debug, "server container, set base path to: " + basePath);
-    // get rid of windows drive letters in basePath ... does not really work
-//    std::string basePathClean = basePath.substr(Poco::Path(basePath).getDevice().length());
-    std::string basePathClean = basePath;
     if (_pObjectCache) {
         std::string cacheFileDir = getDataModel()->getCacheDirPath();
         try {

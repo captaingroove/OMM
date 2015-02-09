@@ -1,7 +1,7 @@
 /***************************************************************************|
 |  OMM - Open Multimedia                                                    |
 |                                                                           |
-|  Copyright (C) 2009, 2010                                                 |
+|  Copyright (C) 2015                                                       |
 |  Jörg Bakker (jb'at'open-multimedia.org)                                  |
 |                                                                           |
 |  This file is part of OMM.                                                |
@@ -19,37 +19,29 @@
 |  along with this program.  If not, see <http://www.gnu.org/licenses/>.    |
  ***************************************************************************/
 
-#ifndef WebRadio_INCLUDED
-#define WebRadio_INCLUDED
+#include <iostream>
 
-#include <Omm/UpnpAvServer.h>
+#include <Poco/StringTokenizer.h>
+
+#include <Omm/Web/WebRadio.h>
 
 
-class WebradioModel : public Omm::Av::SimpleDataModel
+int
+main(int argc, char** argv)
 {
-public:
-    WebradioModel();
+    Omm::Web::DirbleWebRadio webradio;
 
-    virtual void init();
-    virtual std::string getModelClass();
-    virtual Poco::UInt64 getSystemUpdateId(bool checkMod);
-    virtual void scan();
+    webradio.scanStationList();
+    webradio.writeXml(std::cout);
 
-    virtual std::string getClass(const std::string& path);
-    virtual std::string getTitle(const std::string& path);
+//    for (int i = 1; i < argc; ++i) {
+//        Poco::StringTokenizer initialTransponders(argv[i], "/");
+//        if (initialTransponders.count() != 2) {
+//            std::cerr << "usage: scandvb <frontend-type1>/<transponder-list1> <frontend-type2>/<transponder-list2> ... " << std::endl;
+//            return 1;
+//        }
+//        pDevice->addInitialTransponders(initialTransponders[0], initialTransponders[1]);
+//    }
 
-    virtual std::string getMime(const std::string& path);
-    virtual std::string getDlna(const std::string& path);
-    virtual bool isSeekable(const std::string& path, const std::string& resourcePath = "");
-    virtual std::istream* getStream(const std::string& path, const std::string& resourcePath = "");
-    virtual void freeStream(std::istream* pIstream);
-
-private:
-    void scanStationConfig(const std::string& stationConfig);
-    /// parse station config and read in uri (path) and station name into _stationNames map.
-
-    std::map<std::string, std::string>     _stationNames;
-};
-
-
-#endif
+    return 0;
+}

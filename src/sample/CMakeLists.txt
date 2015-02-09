@@ -17,3 +17,7 @@ endif(OMM_DVB)
 add_subdirectory(
 Upnp
 )
+
+add_subdirectory(
+Web
+)

@@ -686,6 +686,7 @@ class ServerScanButton : Gui::Button
         Av::MediaServer* pServer = _pApp->getLocalMediaServer(pServerConfModel->_uuid);
         if (pServer) {
 //            std::string basePath = _pServerConfView->_pServerBasePathText->getTextLine();
+            // FIX: ServerConfView::getBasePath() returns not the contents of the text line.
             std::string basePath = _pServerConfView->getBasePath();
             pServer->getRoot()->setBasePath(basePath);
             _pApp->getFileConfiguration()->setString("server." + pServerConfModel->_id + ".basePath", basePath);
@@ -984,6 +985,9 @@ ServerConfView::getBasePath()
         return Omm::Util::Home::instance()->getConfigDirPath("/") + "dvb.xml";
     }
 #endif
+    if (static_cast<ServerConfModel*>(_pModel)->getPlugin() == "model-webradio") {
+        return Omm::Util::Home::instance()->getConfigDirPath("/") + "webradio.xml";
+    }
     return _pServerBasePathText->getTextLine();
 }
 

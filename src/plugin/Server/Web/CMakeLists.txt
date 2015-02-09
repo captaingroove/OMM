@@ -1,12 +1,13 @@
 if(BUILD_PLUGINS)
 add_library(ommplugin-model-webradio
 SHARED
-Webradio.cpp
+WebradioServer.cpp
 )
 
 target_link_libraries(ommplugin-model-webradio
 ${OMM}
 ${OMM_AV}
+${OMM_WEB}
 )
 
 set_target_properties(ommplugin-model-webradio
