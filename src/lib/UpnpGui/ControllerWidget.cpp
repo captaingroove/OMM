@@ -108,6 +108,7 @@ class ControllerWidgetClusterController : public Omm::Gui::ClusterController
 
 ControllerWidget::ControllerWidget(GuiUpnpApplication* pApplication) :
 //ClusterView(0, Gui::ClusterView::Generic),
+ClusterView(0, Gui::ClusterView::Column),
 _pApplication(pApplication)
 {
     LOGNS(Gui, gui, debug, "controller widget ctor ...");

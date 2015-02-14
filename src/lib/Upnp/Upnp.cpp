@@ -67,16 +67,16 @@ Log::Log()
     Poco::Channel* pChannel = Util::Log::instance()->channel();
 
     _pUpnpLogger = &Poco::Logger::create("UPNP.GENERAL", pChannel, Poco::Message::PRIO_DEBUG);
-//    _pSsdpLogger = &Poco::Logger::create("UPNP.SSDP", pChannel, Poco::Message::PRIO_DEBUG);
+    _pSsdpLogger = &Poco::Logger::create("UPNP.SSDP", pChannel, Poco::Message::PRIO_DEBUG);
     _pHttpLogger = &Poco::Logger::create("UPNP.HTTP", pChannel, Poco::Message::PRIO_DEBUG);
-//    _pDescriptionLogger = &Poco::Logger::create("UPNP.DESC", pChannel, Poco::Message::PRIO_DEBUG);
+    _pDescriptionLogger = &Poco::Logger::create("UPNP.DESC", pChannel, Poco::Message::PRIO_DEBUG);
     _pControlLogger = &Poco::Logger::create("UPNP.CONTROL", pChannel, Poco::Message::PRIO_DEBUG);
     _pEventLogger = &Poco::Logger::create("UPNP.EVENT", pChannel, Poco::Message::PRIO_DEBUG);
 
 //    _pUpnpLogger = &Poco::Logger::create("UPNP.GENERAL", pChannel, Poco::Message::PRIO_ERROR);
-    _pSsdpLogger = &Poco::Logger::create("UPNP.SSDP", pChannel, Poco::Message::PRIO_ERROR);
+//    _pSsdpLogger = &Poco::Logger::create("UPNP.SSDP", pChannel, Poco::Message::PRIO_ERROR);
 //    _pHttpLogger = &Poco::Logger::create("UPNP.HTTP", pChannel, Poco::Message::PRIO_ERROR);
-    _pDescriptionLogger = &Poco::Logger::create("UPNP.DESC", pChannel, Poco::Message::PRIO_ERROR);
+//    _pDescriptionLogger = &Poco::Logger::create("UPNP.DESC", pChannel, Poco::Message::PRIO_ERROR);
 //    _pControlLogger = &Poco::Logger::create("UPNP.CONTROL", pChannel, Poco::Message::PRIO_ERROR);
 //    _pEventLogger = &Poco::Logger::create("UPNP.EVENT", pChannel, Poco::Message::PRIO_ERROR);
 }
@@ -4321,7 +4321,7 @@ CtlDeviceCode::init()
 
 Controller::Controller() :
 DeviceManager(new Socket),
-_featureSubscribeToEvents(true)
+_featureSubscribeToEvents(false)
 {
 }
 
@@ -4422,10 +4422,11 @@ Controller::discoverDeviceContainer(const std::string& location)
 void
 Controller::subscribeAllDevicesInContainer(DeviceContainer* pDeviceContainer)
 {
-    if (_featureSubscribeToEvents) {
-        for(DeviceContainer::DeviceIterator d = pDeviceContainer->beginDevice(); d != pDeviceContainer->endDevice(); ++d) {
-            (*d)->controllerSubscribeEventing();
-        }
+    if (!_featureSubscribeToEvents) {
+        return;
+    }
+    for(DeviceContainer::DeviceIterator d = pDeviceContainer->beginDevice(); d != pDeviceContainer->endDevice(); ++d) {
+        (*d)->controllerSubscribeEventing();
     }
 }
 

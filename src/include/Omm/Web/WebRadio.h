@@ -28,6 +28,9 @@
 #include <map>
 #include <set>
 
+#ifdef POCO_VERSION_HEADER_FOUND
+#include <Poco/Version.h>
+#endif
 #include <Poco/Timestamp.h>
 #include <Poco/Thread.h>
 #include <Poco/RunnableAdapter.h>

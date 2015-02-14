@@ -89,6 +89,11 @@ WebradioModel::scanDeep()
     LOGNS(Omm::Av, upnpav, debug, "webradio model deep scan ...");
 
     _pWebRadio->scanStationList();
+
+    for (Omm::Web::WebRadio::StationIterator it = _pWebRadio->stationBegin(); it != _pWebRadio->stationEnd(); ++it) {
+        addPath(it->second->getName());
+    }
+
     std::ofstream stationList(getBasePath().c_str());
     _pWebRadio->writeXml(stationList);
 

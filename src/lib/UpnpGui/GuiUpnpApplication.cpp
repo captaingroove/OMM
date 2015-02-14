@@ -172,7 +172,7 @@ GuiUpnpApplication::presentedMainView()
         if (!config().getBool("renderer.enable", false)) {
             config().setString("renderer.enable", "true");
             config().setString("renderer.friendlyName", "OMM Player");
-            config().setString("renderer.uuid", "aed5b05a-f7e8-4354-bb24-812996d179a9");
+//            config().setString("renderer.uuid", "aed5b05a-f7e8-4354-bb24-812996d179a9");
             config().setString("renderer.plugin", "engine-vlc");
         }
     }
@@ -226,7 +226,7 @@ GuiUpnpApplication::defaultConfig()
     _pConf->setBool("renderer.enable", true);
     _pConf->setString("renderer.friendlyName", "OMM Media Player");
     _pConf->setString("renderer.plugin", "engine-vlc");
-    _pConf->setString("renderer.uuid", "rra123bc-de45-6789-ffff-gg1234hhh56i");
+//    _pConf->setString("renderer.uuid", "rra123bc-de45-6789-ffff-gg1234hhh56i");
 }
 
 

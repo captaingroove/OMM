@@ -375,7 +375,7 @@ UpnpApplication::defaultConfig()
     _pConf->setString("server.0.layout", Av::ServerContainer::LAYOUT_FLAT);
     _pConf->setString("server.0.plugin", "model-file");
     _pConf->setInt("server.0.pollUpdateId", 0);
-    _pConf->setString("server.0.uuid", "00a123bc-de45-6789-ffff-gg1234hhh56i");
+//    _pConf->setString("server.0.uuid", "00a123bc-de45-6789-ffff-gg1234hhh56i");
     serverString += Poco::NumberFormatter::format(serverCount++);
 
     _pConf->setString("server.1.basePath", "webradio.xml");
@@ -385,7 +385,7 @@ UpnpApplication::defaultConfig()
     _pConf->setString("server.1.layout", Av::ServerContainer::LAYOUT_FLAT);
     _pConf->setString("server.1.plugin", "model-webradio");
     _pConf->setInt("server.1.pollUpdateId", 0);
-    _pConf->setString("server.1.uuid", "01a123bc-de45-6789-ffff-gg1234hhh56i");
+//    _pConf->setString("server.1.uuid", "01a123bc-de45-6789-ffff-gg1234hhh56i");
     serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount++);
 
     std::vector<Sys::Device*> dvbDevices;
@@ -398,7 +398,7 @@ UpnpApplication::defaultConfig()
         _pConf->setString("server.2.layout", Av::ServerContainer::LAYOUT_FLAT);
         _pConf->setString("server.2.plugin", "model-dvb");
         _pConf->setInt("server.2.pollUpdateId", 0);
-        _pConf->setString("server.2.uuid", "02a123bc-de45-6789-ffff-gg1234hhh56i");
+//        _pConf->setString("server.2.uuid", "02a123bc-de45-6789-ffff-gg1234hhh56i");
         serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount++);
     }
 
@@ -409,7 +409,7 @@ UpnpApplication::defaultConfig()
     _pConf->setString("server.new.layout", Av::ServerContainer::LAYOUT_FLAT);
     _pConf->setString("server.new.plugin", "");
     _pConf->setInt("server.new.pollUpdateId", 0);
-    _pConf->setString("server.new.uuid", "xxa123bc-de45-6789-ffff-gg1234hhh56i");
+//    _pConf->setString("server.new.uuid", "xxa123bc-de45-6789-ffff-gg1234hhh56i");
 
     _pConf->setString("servers", serverString);
 }

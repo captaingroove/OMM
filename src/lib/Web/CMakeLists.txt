@@ -17,9 +17,9 @@ CACHE INTERNAL libommweb
 )
 
 target_link_libraries(ommweb
-${POCO_FOUNDATION}
 ${POCO_XML}
 ${POCO_NET}
+${POCO_FOUNDATION}
 ${OMM_LOG}
 )
 

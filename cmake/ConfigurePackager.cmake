@@ -19,7 +19,8 @@ set(CMAKE_INSTALL_DEBUG_LIBRARIES
 )
 include(InstallRequiredSystemLibraries)
 set(CPACK_GENERATOR
-"TGZ;NSIS"
+#"TGZ;NSIS"
+"TGZ"
 )
 elseif(MACOSX)
 set(CPACK_GENERATOR
@@ -95,6 +96,9 @@ ${OMM_VERSION_PATCH}
 
 set(CPACK_PACKAGE_EXECUTABLES
 "omm;OMM"
+"ommrenderer;OMM Renderer"
+"ommcontroller;OMM Controller"
+"qtavcontroller;QTAV Controller"
 )
 
 set(CPACK_PACKAGE_ICON
