@@ -304,6 +304,13 @@ CsvList::remove(const std::string& item)
 }
 
 
+CsvList::Iterator
+CsvList::find(const std::string& item)
+{
+    return std::find(_items.begin(), _items.end(), item);
+}
+
+
 std::string
 CsvList::toString()
 {

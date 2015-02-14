@@ -59,6 +59,9 @@ public:
     virtual void newSystemUpdateId(ui4 id) {}
 
 private:
+    // check for common properties in _sortCaps and _sortText.
+    std::string matchSortText(const std::string& sortText, const std::string& sortCaps);
+
     CtlMediaServerCode*   _pCtlMediaServerCode;
     CtlMediaObject*       _pRoot;
     std::string           _sortText;

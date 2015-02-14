@@ -241,6 +241,7 @@ public:
     std::size_t getSize();
     void append(const std::string& item);
     void remove(const std::string& item);
+    Iterator find(const std::string& item);
 
     virtual std::string toString();
 

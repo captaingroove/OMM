@@ -115,8 +115,7 @@ CtlMediaServer::getSort()
         _pCtlMediaServerCode->ContentDirectory()->GetSortCapabilities(_sortCaps);
     }
     if (_sortCaps != "") {
-        // TODO: check for common properties in _sortCaps and _sortText.
-        return _sortText;
+        return matchSortText(_sortText, _sortCaps);
     }
     else {
         return "";
@@ -168,6 +167,22 @@ CtlMediaServer::selectMediaObject(CtlMediaObject* pObject, CtlMediaObject* pPare
         MediaObjectSelectedNotification* pNotification = new MediaObjectSelectedNotification(pObject, pParentObject, row);
         getDeviceContainer()->getDeviceManager()->postDeviceNotification(pNotification);
     }
+}
+
+
+std::string
+CtlMediaServer::matchSortText(const std::string& sortText, const std::string& sortCaps)
+{
+    CsvList textList(sortText);
+    CsvList capsList(sortCaps);
+    CsvList resList;
+
+    for (CsvList::Iterator it = textList.begin(); it != textList.end(); ++it) {
+        if (capsList.find(it->substr(1)) != capsList.end()) {
+            resList.append(*it);
+        }
+    }
+    return resList.toString();
 }
 
 
