@@ -4842,7 +4842,7 @@ SsdpMessage::SsdpMessage(const std::string& buf, const Poco::Net::SocketAddress&
     while(getline(is, line)) {
         std::string::size_type col = line.find(":");
         if (col != std::string::npos) {
-            _messageHeader[line.substr(0, col)] = Poco::trim(line.substr(col + 1));
+            _messageHeader[Poco::toUpper(line.substr(0, col))] = Poco::trim(line.substr(col + 1));
         }
     }
 
