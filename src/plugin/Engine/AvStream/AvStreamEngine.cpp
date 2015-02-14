@@ -150,7 +150,7 @@ AvStreamEngine::setUri(const std::string& uri, const Omm::Av::ProtocolInfo& prot
 //     if (uri.getScheme() == "http") {
 //         _isFile = false;
 //         _pSession = new Poco::Net::HTTPClientSession(uri.getHost(), uri.getPort());
-//         Poco::Net::HTTPRequest request("GET", uri.getPath());
+//         Poco::Net::HTTPRequest request("GET", uri.getPathEtc());
 //         _pSession->sendRequest(request);
 //         std::stringstream requestHeader;
 //         request.write(requestHeader);

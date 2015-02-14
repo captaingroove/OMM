@@ -277,7 +277,7 @@ WebRadio::getStream(const std::string& uri)
     Poco::URI streamUri(uri);
 
     Poco::Net::HTTPClientSession* pSession = new Poco::Net::HTTPClientSession(streamUri.getHost(), streamUri.getPort());
-    std::string path = streamUri.getPath();
+    std::string path = streamUri.getPathEtc();
     if (path == "") {
         path = "/";
     }
@@ -403,7 +403,7 @@ DirbleWebRadio::scanStationList()
     Poco::URI streamUri(uri);
 
     Poco::Net::HTTPClientSession* pSession = new Poco::Net::HTTPClientSession(streamUri.getHost(), streamUri.getPort());
-    std::string path = streamUri.getPath();
+    std::string path = streamUri.getPathEtc();
     if (path == "") {
         path = "/";
     }

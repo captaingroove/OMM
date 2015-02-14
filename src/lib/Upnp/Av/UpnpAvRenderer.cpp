@@ -83,7 +83,7 @@ Engine::setUriEngine(const std::string& uri, const ProtocolInfo& protInfo)
 
         Poco::Net::HTTPClientSession session(uriParsed.getHost(), uriParsed.getPort());
 
-        Poco::Net::HTTPRequest request("GET", uriParsed.getPath());
+        Poco::Net::HTTPRequest request("GET", uriParsed.getPathEtc());
         session.sendRequest(request);
         std::stringstream requestHeader;
         request.write(requestHeader);
@@ -105,7 +105,7 @@ Engine::setUriEngine(const std::string& uri, const ProtocolInfo& protInfo)
     }
     else if (preferStdStream()) {
         Poco::Net::HTTPClientSession session(uriParsed.getHost(), uriParsed.getPort());
-        Poco::Net::HTTPRequest request("GET", uriParsed.getPath());
+        Poco::Net::HTTPRequest request("GET", uriParsed.getPathEtc());
         session.sendRequest(request);
         std::stringstream requestHeader;
         request.write(requestHeader);

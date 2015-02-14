@@ -910,9 +910,9 @@ UriDescriptionReader::retrieveDescription(const std::string& relativeUri)
         targetUri.resolve(relativeUri);
         LOG(desc, information, "retrieving description from: " + targetUri.toString());
         LOG(desc, information, "downloading description from host: " + targetUri.getHost()\
-             + ", port: " + Poco::NumberFormatter::format(targetUri.getPort()) + ", path: " + targetUri.getPath());
+             + ", port: " + Poco::NumberFormatter::format(targetUri.getPort()) + ", path: " + targetUri.getPathEtc());
         Poco::Net::HTTPClientSession session(targetUri.getHost(), targetUri.getPort());
-        Poco::Net::HTTPRequest request("GET", targetUri.getPath());
+        Poco::Net::HTTPRequest request("GET", targetUri.getPathEtc());
         session.sendRequest(request);
 
         Poco::Net::HTTPResponse response;
@@ -2309,7 +2309,7 @@ Service::sendAction(Action* pAction)
     Poco::URI baseUri(getDevice()->getDeviceContainer()->getDescriptionUri());
     Poco::URI controlUri(baseUri);
     controlUri.resolve(_controlPath);
-    Poco::Net::HTTPRequest request("POST", controlUri.getPath(), "HTTP/1.1");
+    Poco::Net::HTTPRequest request("POST", controlUri.getPathEtc(), "HTTP/1.1");
     request.set("HOST", baseUri.getAuthority());
     request.setContentType("text/xml; charset=\"utf-8\"");
     request.set("SOAPACTION", "\"" + _serviceType + "#" + pAction->getName() + "\"");

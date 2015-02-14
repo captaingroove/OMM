@@ -536,7 +536,7 @@ ServerObjectResource::writeResource(const uri& sourceUri)
 
         LOG(upnpav, debug, "write resource, retrieve source from uri: " + sourceUri.toString());
         Poco::Net::HTTPClientSession session(sourceUri.getHost(), sourceUri.getPort());
-        Poco::Net::HTTPRequest request("GET", sourceUri.getPath());
+        Poco::Net::HTTPRequest request("GET", sourceUri.getPathEtc());
         session.sendRequest(request);
         std::stringstream requestHeader;
         request.write(requestHeader);
