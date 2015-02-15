@@ -278,8 +278,6 @@ class SqlSearchCriteria : public SearchCriteria
 {
     virtual std::string translateAsterisk();
     virtual std::string translateStringExp(const std::string& property, const std::string& op, const std::string& val);
-    // TODO: translateExistsExp is not handled in SqlSearchCriteria
-    virtual std::string translateExistsExp(const std::string& property, const std::string& op, bool val);
 };
 
 

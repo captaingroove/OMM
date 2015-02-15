@@ -414,6 +414,7 @@ public:
 protected:
     virtual std::string translateProperty(const std::string& property);
     virtual std::string translateCompareExp(const std::string& property, const std::string& op, const std::string& val);
+    virtual std::string translateExistsExp(const std::string& property, const std::string& op, bool val);
 
 private:
     DatabaseCache*      _pDatabaseCache;

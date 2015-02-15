@@ -2159,6 +2159,31 @@ DatabaseCacheSearchCriteria::translateCompareExp(const std::string& property, co
 }
 
 
+std::string
+DatabaseCacheSearchCriteria::translateExistsExp(const std::string& property, const std::string& op, bool val)
+{
+    const std::string xmlCol("xml");
+    const std::string ret(xmlCol + (val ? "" : " not"));
+
+    // property/attribute existence is tested by searching for
+    // the corresponding tags in the xml column of the database cache
+    // this should work properly with properties, as they have a leading '<'
+    // which is escaped in the text parts of the xml string
+    // attributes would need a regex search to test for existence,
+    // as the attribute tag preceded by space and followed by '=' could also
+    // appear in the text parts of the xml string.
+    std::string::size_type atIndex = property.find("@");
+    if (atIndex == std::string::npos) {
+        return ret + " like \"%<" +  property + "%\"";
+    }
+    else {
+        std::string attribute = property.substr(atIndex + 1);
+        return ret + " like \"% " + attribute  + "=%\"";
+    }
+//    return "1";
+}
+
+
 const ui4 AbstractDataModel::INVALID_INDEX = 0xffffffff;
 
 AbstractDataModel::AbstractDataModel() :

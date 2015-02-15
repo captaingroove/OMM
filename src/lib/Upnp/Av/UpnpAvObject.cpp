@@ -474,7 +474,10 @@ SearchCriteria::relExp()
         else {
             throw Poco::Exception("search criteria boolean value expected");
         }
-        _translatedString += translateExistsExp(translateProperty(prop), op, boolVal);
+        // no translation of property (e.g. into database column name) because
+        // testing of existence of a property must be handled different than
+        // testing the value of a property
+        _translatedString += translateExistsExp(prop, op, boolVal);
     }
 
 //    LOG(upnpav, debug, "search criteria, relExp finished: " + Poco::NumberFormatter::format(_scanPos));
@@ -661,13 +664,6 @@ SqlSearchCriteria::translateStringExp(const std::string& property, const std::st
     }
 
     return property + space + translatedOp + space + translatedVal;
-}
-
-
-std::string
-SqlSearchCriteria::translateExistsExp(const std::string& property, const std::string& op, bool val)
-{
-    return property + space + op + space + (val ? "true" : "false");
 }
 
 

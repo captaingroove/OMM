@@ -45,6 +45,7 @@ main(int argc, char** argv) {
         searchStrings.push_back("upnp:artist = \"foo\" and (dc:title = \"bar\" or dc:title = \"foobar\")");
         searchStrings.push_back("upnp:artist contains \"foo\" and (dc:title doesNotContain \"bar\" or dc:title derivedfrom \"foobar\")");
         searchStrings.push_back("upnp:artist contains \"foo\" and ((dc:title doesNotContain \"bar\") or (dc:title derivedfrom \"foobar\"))");
+        searchStrings.push_back("upnp:class derivedfrom \"object.item.audioItem\" and @refID exists false");
     }
 
     for (std::vector<std::string>::iterator it = searchStrings.begin(); it != searchStrings.end(); ++it) {
