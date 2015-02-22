@@ -36,7 +36,7 @@ void
 DimmableLight::actionHandler(Action* pAction)
 {
     // the great action dispatcher
-    if (pAction->getService()->getServiceType() == "urn:schemas-upnp-org:service:Dimming:1") {
+    if (pAction->getService()->getServiceTypeFullString() == "urn:schemas-upnp-org:service:Dimming:1") {
         _pDimmingImpl->_pService = pAction->getService();
         std::string actionName = pAction->getName();
 
@@ -55,7 +55,7 @@ DimmableLight::actionHandler(Action* pAction)
             pAction->setArgument<Omm::ui1>("retLoadlevelStatus", retLoadlevelStatus);
         }
     }
-    else if (pAction->getService()->getServiceType() == "urn:schemas-upnp-org:service:SwitchPower:1") {
+    else if (pAction->getService()->getServiceTypeFullString() == "urn:schemas-upnp-org:service:SwitchPower:1") {
         _pSwitchPowerImpl->_pService = pAction->getService();
         std::string actionName = pAction->getName();
 
@@ -80,7 +80,7 @@ DimmableLight::actionHandler(Action* pAction)
 void
 DimmableLight::initStateVars(Service* pThis)
 {
-    std::string serviceType = pThis->getServiceType();
+    std::string serviceType = pThis->getServiceTypeFullString();
     if (serviceType == "urn:schemas-upnp-org:service:Dimming:1") {
         _pDimmingImpl->_pService = pThis;
         _pDimmingImpl->initStateVars();

@@ -54,8 +54,8 @@ namespace Omm {
 static const std::string    SSDP_ADDRESS        = "239.255.255.250";
 static const std::string    SSDP_LOOP_ADDRESS   = "127.255.255.255";
 static const Poco::UInt16   SSDP_PORT           = 1900;
-//static const Poco::UInt16   SSDP_CACHE_DURATION = 1800;
-static const Poco::UInt16   SSDP_CACHE_DURATION = 90;
+static const Poco::UInt16   SSDP_CACHE_DURATION = 1800;
+//static const Poco::UInt16   SSDP_CACHE_DURATION = 90;
 static const Poco::UInt16   SSDP_MIN_WAIT_TIME  = 1;
 static const Poco::UInt16   SSDP_MAX_WAIT_TIME  = 120;
 
@@ -187,15 +187,17 @@ public:
         UPNP_ROOT_DEVICES       = 9
     } TRequestMethod;
 
-    SsdpMessage();
-    // build sceletons for the different types of SSDP messages
+
     SsdpMessage(TRequestMethod requestMethod);
+    /// build sceletons for the different types of SSDP messages
+    /// with all headers that can be filled without knowing context
+    /// information like device uuid, service type, device type etc.
 
     // map the received HTTP header to an SsdpMessage object in memory
     SsdpMessage(const std::string& buf, const Poco::Net::SocketAddress& sender = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
     ~SsdpMessage();
 
-    void setRequestMethod(TRequestMethod requestMethod);
+//    void setRequestMethod(TRequestMethod requestMethod);
     TRequestMethod getRequestMethod();
 
     // HTTP message envelope
@@ -261,7 +263,7 @@ public:
     ~SsdpMessageSet();
 
     void clear();
-    void addMessage(SsdpMessage& message);
+    void addMessage(SsdpMessage* pMessage);
 
 private:
     void send(SsdpSocket& socket, int repeat = 1, long delay = 0, Poco::UInt16 cacheDuration = SSDP_CACHE_DURATION, bool continuous = false, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
@@ -362,31 +364,22 @@ private:
 };
 
 
-class SsdpNotifyAliveWriter
+class SsdpMessageSetWriter
 {
 public:
-    SsdpNotifyAliveWriter(SsdpMessageSet& generatedMessages) : _res(&generatedMessages) {}
+    typedef enum { Alive, ByeBye, SearchAllResponse } MessageSetType;
 
-    void deviceContainer(const DeviceContainer& pDeviceContainer);
-    void device(const Device& pDevice);
-    void service(const Service& pService);
+    SsdpMessageSetWriter(SsdpMessageSet* pGeneratedMessages, MessageSetType type) : _res(pGeneratedMessages), _type(type) {}
 
-private:
-    SsdpMessageSet*            _res;
-};
-
-
-class SsdpNotifyByebyeWriter
-{
-public:
-    SsdpNotifyByebyeWriter(SsdpMessageSet& generatedMessages) : _res(&generatedMessages) {}
-
-    void deviceContainer(const DeviceContainer& pDeviceContainer);
-    void device(const Device& pDevice);
-    void service(const Service& pService);
+    void deviceContainer(const DeviceContainer* pDeviceContainer);
+    void device(const Device* pDevice);
+    void service(const Service* pService);
 
 private:
+    SsdpMessage* createMessage();
+
     SsdpMessageSet*            _res;
+    MessageSetType             _type;
 };
 
 

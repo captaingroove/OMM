@@ -45,7 +45,7 @@ void
 CtlMediaServer::initController()
 {
     for (ServiceIterator it = beginService(); it != endService(); ++it) {
-        if ((*it)->getServiceType() == Av::ServiceType::CD_1) {
+        if ((*it)->getServiceTypeFullString() == Av::ServiceType::CD_1) {
             (*it)->setControllerSubscribeEventing(true);
         }
     }

@@ -62,7 +62,6 @@ static const std::string    SSDP_FULL_ADDRESS   = "239.255.255.250:1900";
 class DescriptionProvider;
 class DeviceManager;
 class Controller;
-class ControllerUserInterface;
 class DeviceContainer;
 class Device;
 class DeviceGroup;
@@ -440,12 +439,20 @@ class Controller : public DeviceManager
     friend class DeviceContainer;
 
 public:
+    static const std::string SearchTargetAll;
+    static const std::string SearchTargetRootDevice;
+    static const std::string SearchTargetUpnpDeviceType;
+    static const std::string SearchTargetUpnpServiceType;
+    static const std::string SearchTargetUuid;
+    static const std::string SearchTargetUrn;
+
     Controller();
     virtual ~Controller();
 
     void setState(State newState);
     void registerDeviceGroup(DeviceGroup* pDeviceGroup);
     DeviceGroup* getDeviceGroup(const std::string& deviceType);
+    void sendMSearch(const std::string& searchTarget = SearchTargetRootDevice);
 
     virtual void signalNetworkActivity(bool on) {}
 
@@ -465,7 +472,6 @@ protected:
 
 private:
     virtual void startSsdp();
-    void sendMSearch();
     void handleSsdpMessage(SsdpMessage* pMessage);
 //    void handleNetworkInterfaceChangedNotification(Net::NetworkInterfaceNotification* pNotification);
     void discoverDeviceContainer(const std::string& location);
@@ -512,10 +518,13 @@ public:
 
     DeviceContainer* getDeviceContainer() const;
     std::string getUuid() const;
-    std::string getDeviceType() const;
-    Service* getService(std::string serviceType);
-    /// Get the service data of a device. If device has no service of type
-    /// serviceType, 0 is returned.
+    std::string getDeviceTypeFullString() const;
+    Service* getServiceForTypeFullString(std::string serviceType);
+    /// Get first Service of a device matching serviceType (including version number).
+    /// If device has no service of type serviceType, 0 is returned.
+    // NOTE: currently, this suffices because we only have services of version 1 and
+    // one service of a certain type per device.
+    // TODO: handle compatible versions and more than one service of a certain type per device.
     const std::string& getFriendlyName();
     const std::string& getProperty(const std::string& name);
 
@@ -589,7 +598,7 @@ class DeviceContainer
     friend class DescriptionReader;
     friend class Service;
     friend class DeviceData;
-    friend class SsdpNotifyAliveWriter;
+    friend class SsdpMessageSetWriter;
 
 public:
     DeviceContainer();
@@ -623,14 +632,14 @@ public:
 private:
     const std::string& getDescriptionUri() const;
     std::string getDescriptionPath() const;
-    Service* getServiceType(const std::string& serviceType);
+//    Service* getServiceType(const std::string& serviceType);
 
     void setDeviceManager(DeviceManager* pDeviceManager);
     void setDeviceDescription(std::string& description);
     void setDescriptionUri(const std::string uri);
     void addServiceType(Service* pService);
 
-    void print();
+//    void print();
 
     void initUuid();
 //    void initStateVars();

@@ -87,7 +87,7 @@ CtlDeviceCode(pDevice),
 _pDevice(pDevice),
 _pSwitchPowerController(pSwitchPowerController)
 {
-    _pSwitchPowerController->_pService = _pDevice->getService("urn:schemas-upnp-org:service:SwitchPower:1");
+    _pSwitchPowerController->_pService = _pDevice->getServiceForTypeFullString("urn:schemas-upnp-org:service:SwitchPower:1");
     
     init();
 }

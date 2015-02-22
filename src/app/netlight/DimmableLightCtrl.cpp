@@ -215,8 +215,8 @@ _pDevice(pDevice),
 _pSwitchPowerController(pSwitchPowerController), 
 _pDimmingController(pDimmingController)
 {
-    _pSwitchPowerController->_pService = _pDevice->getService("urn:schemas-upnp-org:service:SwitchPower:1");
-    _pDimmingController->_pService = _pDevice->getService("urn:schemas-upnp-org:service:Dimming:1");
+    _pSwitchPowerController->_pService = _pDevice->getServiceForTypeFullString("urn:schemas-upnp-org:service:SwitchPower:1");
+    _pDimmingController->_pService = _pDevice->getServiceForTypeFullString("urn:schemas-upnp-org:service:Dimming:1");
 
     init();
 }

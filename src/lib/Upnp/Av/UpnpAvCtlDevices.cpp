@@ -32,9 +32,9 @@ _pCtlRenderingControl(pCtlRenderingControl),
 _pCtlConnectionManager(pCtlConnectionManager),
 _pCtlAVTransport(pCtlAVTransport)
 {
-    _pCtlRenderingControl->_pService = _pDevice->getService("urn:schemas-upnp-org:service:RenderingControl:1");
-    _pCtlConnectionManager->_pService = _pDevice->getService("urn:schemas-upnp-org:service:ConnectionManager:1");
-    _pCtlAVTransport->_pService = _pDevice->getService("urn:schemas-upnp-org:service:AVTransport:1");
+    _pCtlRenderingControl->_pService = _pDevice->getServiceForTypeFullString("urn:schemas-upnp-org:service:RenderingControl:1");
+    _pCtlConnectionManager->_pService = _pDevice->getServiceForTypeFullString("urn:schemas-upnp-org:service:ConnectionManager:1");
+    _pCtlAVTransport->_pService = _pDevice->getServiceForTypeFullString("urn:schemas-upnp-org:service:AVTransport:1");
 
     init();
 }
@@ -51,7 +51,7 @@ CtlMediaRendererCode::~CtlMediaRendererCode()
 void
 CtlMediaRendererCode::eventHandler(StateVar* pStateVar)
 {
-    std::string serviceType = pStateVar->getService()->getServiceType();
+    std::string serviceType = pStateVar->getService()->getServiceTypeFullString();
     std::string varName = pStateVar->getName();
 
     if (serviceType == "urn:schemas-upnp-org:service:AVTransport:1" && varName == "LastChange") {
@@ -88,9 +88,9 @@ _pCtlContentDirectory(pCtlContentDirectory),
 _pCtlConnectionManager(pCtlConnectionManager),
 _pCtlAVTransport(pCtlAVTransport)
 {
-    _pCtlContentDirectory->_pService = _pDevice->getService("urn:schemas-upnp-org:service:ContentDirectory:1");
-    _pCtlConnectionManager->_pService = _pDevice->getService("urn:schemas-upnp-org:service:ConnectionManager:1");
-    _pCtlAVTransport->_pService = _pDevice->getService("urn:schemas-upnp-org:service:AVTransport:1");
+    _pCtlContentDirectory->_pService = _pDevice->getServiceForTypeFullString("urn:schemas-upnp-org:service:ContentDirectory:1");
+    _pCtlConnectionManager->_pService = _pDevice->getServiceForTypeFullString("urn:schemas-upnp-org:service:ConnectionManager:1");
+    _pCtlAVTransport->_pService = _pDevice->getServiceForTypeFullString("urn:schemas-upnp-org:service:AVTransport:1");
 
     init();
 }
@@ -107,7 +107,7 @@ CtlMediaServerCode::~CtlMediaServerCode()
 void
 CtlMediaServerCode::eventHandler(StateVar* pStateVar)
 {
-    std::string serviceType = pStateVar->getService()->getServiceType();
+    std::string serviceType = pStateVar->getService()->getServiceTypeFullString();
     std::string varName = pStateVar->getName();
 
     if (serviceType == "urn:schemas-upnp-org:service:AVTransport:1" && varName == "LastChange") {

@@ -220,7 +220,7 @@ public:
     EventCallbackPathIterator beginEventCallbackPath();
     EventCallbackPathIterator endEventCallbackPath();
 
-    std::string getServiceType() const;
+    std::string getServiceTypeFullString() const;
     std::string getServiceId() const;
     std::string getDescriptionPath() const;
     std::string* getDescription() const;
@@ -236,7 +236,7 @@ public:
     StateVar* getStateVarReference(const std::string& key);
     template<typename T> T getStateVar(const std::string& key);
 
-    void setServiceType(std::string serviceType);
+    void setServiceTypeFullString(std::string serviceType);
     void setServiceId(std::string serviceId);
     void setDescriptionPath(std::string descriptionPath);
     void setServiceDescription(std::string& description);

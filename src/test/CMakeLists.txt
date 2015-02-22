@@ -1,10 +1,10 @@
-SET( OMMTEST_SSDP_SRCS
-ssdp.cpp
-)
-
-SET( OMMTEST_DEVICE_SRCS
-device.cpp
-)
+#SET( OMMTEST_SSDP_SRCS
+#Ssdp.cpp
+#)
+#
+#SET( OMMTEST_DEVICE_SRCS
+#device.cpp
+#)
 
 # SET( OMMTEST_NETWORK_LIGHT_SRCS
 # network_light.cpp
@@ -30,11 +30,10 @@ MediaObjectTest.cpp
 # HttpFileServerTest.cpp
 # )
 
-#list all source files here
-# ADD_EXECUTABLE( ssdp_test
+# ADD_EXECUTABLE( ssdptest
 # ${OMMTEST_SSDP_SRCS}
 # )
-#
+
 # ADD_EXECUTABLE( device_test
 # ${OMMTEST_DEVICE_SRCS}
 # )

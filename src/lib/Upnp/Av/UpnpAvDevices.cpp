@@ -29,7 +29,7 @@ namespace Av {
 void
 DevMediaRenderer::actionHandler(Action* pAction)
 {
-    std::string serviceType = pAction->getService()->getServiceType();
+    std::string serviceType = pAction->getService()->getServiceTypeFullString();
     if (serviceType == "urn:schemas-upnp-org:service:AVTransport:1") {
         _pDevAVTransport->actionHandler(pAction);
     }
@@ -45,7 +45,7 @@ DevMediaRenderer::actionHandler(Action* pAction)
 void
 DevMediaRenderer::initStateVars(Service* pService)
 {
-    std::string serviceType = pService->getServiceType();
+    std::string serviceType = pService->getServiceTypeFullString();
     if (serviceType == "urn:schemas-upnp-org:service:AVTransport:1") {
         _pDevAVTransport->_pService = pService;
         _pDevAVTransport->initStateVars();
@@ -80,7 +80,7 @@ DevMediaRenderer::~DevMediaRenderer()
 void
 DevMediaServer::actionHandler(Action* pAction)
 {
-    std::string serviceType = pAction->getService()->getServiceType();
+    std::string serviceType = pAction->getService()->getServiceTypeFullString();
     if (serviceType == "urn:schemas-upnp-org:service:AVTransport:1") {
         _pDevAVTransport->actionHandler(pAction);
     }
@@ -96,7 +96,7 @@ DevMediaServer::actionHandler(Action* pAction)
 void
 DevMediaServer::initStateVars(Service* pService)
 {
-    std::string serviceType = pService->getServiceType();
+    std::string serviceType = pService->getServiceTypeFullString();
     if (serviceType == "urn:schemas-upnp-org:service:AVTransport:1") {
         _pDevAVTransport->_pService = pService;
         _pDevAVTransport->initStateVars();

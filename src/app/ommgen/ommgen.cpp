@@ -24,7 +24,7 @@
 #include "ommgen.h"
 
 
-std::string StubWriter::preamble = 
+std::string StubWriter::preamble =
 //"\
 ///***************************************************************************|\n\
 //|  OMM - Open Multimedia                                                    |\n\
@@ -72,7 +72,7 @@ _pDeviceContainer(pDeviceContainer),
 _outputPath(outputPath)
 {
     // TODO: honor subdevices, not only root device
-    _deviceType = pDeviceContainer->getRootDevice()->getDeviceType();
+    _deviceType = pDeviceContainer->getRootDevice()->getDeviceTypeFullString();
     Omm::Urn deviceType(_deviceType);
     _deviceName = deviceType.getTypeName();
     _outputPath += "/";
@@ -99,7 +99,7 @@ StubWriter::write()
     for (DeviceContainer::ServiceTypeIterator s = _pDeviceContainer->beginServiceType(); s != _pDeviceContainer->endServiceType(); ++s) {
         Service& rs = *((*s).second);
         serviceType(rs);
-        std::cout << "service: " << rs.getServiceType() << std::endl;
+        std::cout << "service: " << rs.getServiceTypeFullString() << std::endl;
         for (Service::ActionIterator a = rs.beginAction(); a != rs.endAction(); ++a) {
             Action& ra = **a;
             action(ra);
@@ -190,7 +190,7 @@ DevDeviceH::deviceContainerEnd(const DeviceContainer& deviceContainer)
     while (i--) {
         ctorArgs += "Dev" + _serviceNames[i] + "* pDev" + _serviceNames[i] + "Impl" + (i ? ", " : "");
     }
-    
+
     _out << std::endl
         << "class " << "Dev" + _deviceName << " : public DevDevice" << std::endl
         << "{" << std::endl
@@ -222,10 +222,10 @@ DevDeviceH::deviceContainerEnd(const DeviceContainer& deviceContainer)
 void
 DevDeviceH::serviceType(const Service& service)
 {
-    Omm::Urn serviceType(service.getServiceType());
+    Omm::Urn serviceType(service.getServiceTypeFullString());
     std::string serviceName = serviceType.getTypeName();
     _serviceNames.push_back(serviceName);
-    
+
     _out << std::endl
         << "class " << "Dev" + serviceName << std::endl
         << "{" << std::endl
@@ -295,7 +295,7 @@ DevDeviceH::stateVar(const StateVar& stateVar)
     if (stateVar.getName().substr(0, std::string("A_ARG_TYPE_").size()) == "A_ARG_TYPE_") {
         return;
     }
-    
+
     _out
         << indent(1) << "void _set" << stateVar.getName() << "(const "
         << _typeMapper[stateVar.getType()] << "& val);"
@@ -324,15 +324,15 @@ DevDeviceCpp::deviceContainer(const DeviceContainer& deviceContainer)
         << "void" << std::endl
         << "Dev" + _deviceName << "::actionHandler(Action* pAction)" << std::endl
         << "{" << std::endl
-        << indent(1) << "std::string serviceType = pAction->getService()->getServiceType();" << std::endl;
-    
+        << indent(1) << "std::string serviceType = pAction->getService()->getServiceTypeFullString();" << std::endl;
+
     _stateVarInitializer
         << "void" << std::endl
         << "Dev" + _deviceName << "::initStateVars(Service* pService)" << std::endl
         << "{" << std::endl
-        << indent(1) <<  "std::string serviceType = pService->getServiceType();"
+        << indent(1) <<  "std::string serviceType = pService->getServiceTypeFullString();"
         << std::endl;
-    
+
     _firstService = true;
 }
 
@@ -347,7 +347,7 @@ DevDeviceCpp::deviceContainerEnd(const DeviceContainer& deviceContainer)
     while (i--) {
         ctorArgs += "Dev" + _serviceNames[i] + "* p" + _serviceNames[i] + (i ? ", " : "");
     }
-    
+
     _out
         << "}" << std::endl
         << std::endl
@@ -362,14 +362,14 @@ DevDeviceCpp::deviceContainerEnd(const DeviceContainer& deviceContainer)
         << ctorArgs
         << ") :" << std::endl
         ;
-    
+
     i = _serviceNames.size();
     while (i--) {
-        _out 
+        _out
             << "_p" << "Dev" + _serviceNames[i] << "(p" << _serviceNames[i] << ")"
             << (i ? ", " : "") << std::endl;
     }
-    
+
     _out
         << "{" << std::endl
         << "}" << std::endl
@@ -400,21 +400,21 @@ DevDeviceCpp::deviceContainerEnd(const DeviceContainer& deviceContainer)
 void
 DevDeviceCpp::serviceType(const Service& service)
 {
-    _serviceTypes.push_back(service.getServiceType());
-    std::string servicePath = "/" + service.getServiceType() + "/Description.xml";
+    _serviceTypes.push_back(service.getServiceTypeFullString());
+    std::string servicePath = "/" + service.getServiceTypeFullString() + "/Description.xml";
 //    std::string servicePath = service.getDescriptionPath();
 //    service.setDescriptionPath(servicePath);
     _servicePaths.push_back(servicePath);
-    Omm::Urn serviceType(service.getServiceType());
+    Omm::Urn serviceType(service.getServiceTypeFullString());
     std::string serviceName = serviceType.getTypeName();
     _serviceNames.push_back(serviceName);
     _currentService = serviceName;
     _firstAction = true;
-    
+
     _out
         << indent(1) << (_firstService ? "" : "else ")
         << "if (serviceType == \""
-        << service.getServiceType() << "\") {" << std::endl
+        << service.getServiceTypeFullString() << "\") {" << std::endl
 //        << indent(2) << "_p" << serviceName << "Impl->_pService = pAction->getService();" << std::endl
 //        << indent(2) << "std::string actionName = pAction->getName();" << std::endl
         << indent(2) << "_p" << serviceName << "Impl->actionHandler(pAction);"
@@ -425,14 +425,14 @@ DevDeviceCpp::serviceType(const Service& service)
         << "Dev" + _currentService << "::actionHandler(Action* pAction)" << std::endl
         << "{" << std::endl
         << indent(1) << "std::string actionName = pAction->getName();" << std::endl;
-    
+
     _stateVarInitializer
         << indent(1) << (_firstService ? "" : "else ")
-        << "if (serviceType == \"" << service.getServiceType() << "\") {" << std::endl
+        << "if (serviceType == \"" << service.getServiceTypeFullString() << "\") {" << std::endl
         << indent(2) << "_p" << serviceName << "Impl->_pService = pService;" << std::endl
         << indent(2) << "_p" << serviceName << "Impl->initStateVars();" << std::endl
         << indent(1) << "}" << std::endl;
-    
+
     _firstService = false;
 }
 
@@ -443,7 +443,7 @@ DevDeviceCpp::serviceTypeEnd(const Service& service)
     _out
         << indent(1) << "}"
         << std::endl;
-    
+
     _serviceActionDispatcher
         << "}"
         << std::endl
@@ -500,7 +500,7 @@ DevDeviceCpp::argument(const Argument& argument, bool lastArgument)
         _currentOutArgSetter
             << indent(2) << "pAction->setArgument<"
             << argType << ">(\"" << argument.getName()
-            << "\", " << argument.getName() 
+            << "\", " << argument.getName()
             << ");" << std::endl;
     }
 }
@@ -512,7 +512,7 @@ DevDeviceCpp::stateVar(const StateVar& stateVar)
     if (stateVar.getName().substr(0, std::string("A_ARG_TYPE_").size()) == "A_ARG_TYPE_") {
         return;
     }
-    
+
     std::string stateVarType = _typeMapper[stateVar.getType()];
     _getSet
         // StateVar setter method
@@ -520,17 +520,17 @@ DevDeviceCpp::stateVar(const StateVar& stateVar)
         << "Dev" + _currentService << "::_set" << stateVar.getName()
         << "(const " << stateVarType << "& val)" << std::endl
         << "{" << std::endl
-        << indent(1) << "_pService->setStateVar<" << stateVarType 
+        << indent(1) << "_pService->setStateVar<" << stateVarType
         << ">(\"" << stateVar.getName() << "\", val);" << std::endl
         << "}" << std::endl
         << std::endl << std::endl
         << stateVarType << std::endl
-        
+
         // StateVar getter method
         << "Dev" + _currentService << "::_get" << stateVar.getName()
         << "()" << std::endl
         << "{" << std::endl
-        << indent(1) << "return _pService->getStateVar<" << stateVarType 
+        << indent(1) << "return _pService->getStateVar<" << stateVarType
         << ">(\"" << stateVar.getName() << "\");" << std::endl
         << "}" << std::endl
         << std::endl << std::endl;
@@ -570,7 +570,7 @@ DevDeviceImplH::deviceContainerEnd(const DeviceContainer& deviceContainer)
 void
 DevDeviceImplH::serviceType(const Service& service)
 {
-    Omm::Urn serviceType(service.getServiceType());
+    Omm::Urn serviceType(service.getServiceTypeFullString());
     std::string serviceName = serviceType.getTypeName();
 
     _out
@@ -650,7 +650,7 @@ DevDeviceImplCpp::deviceContainer(const DeviceContainer& deviceContainer)
 void
 DevDeviceImplCpp::serviceType(const Service& service)
 {
-    _serviceName = Omm::Urn(service.getServiceType()).getTypeName();
+    _serviceName = Omm::Urn(service.getServiceTypeFullString()).getTypeName();
     _out
         << "void" << std::endl
         << "Dev" + _serviceName << "Impl::initStateVars()" << std::endl
@@ -740,7 +740,7 @@ DeviceDescH::deviceContainer(const DeviceContainer& deviceContainer)
 //void
 //DeviceDescH::serviceType(const Service& service)
 //{
-//    Omm::Urn serviceType(service.getServiceType());
+//    Omm::Urn serviceType(service.getServiceTypeFullString());
 //    std::string serviceName = serviceType.getTypeName();
 //
 //    _out
@@ -826,8 +826,8 @@ DeviceDescCpp::deviceContainerEnd(const DeviceContainer& deviceContainer)
 void
 DeviceDescCpp::serviceType(const Service& service)
 {
-    Omm::Urn serviceType(service.getServiceType());
-    _serviceTypes.push_back(service.getServiceType());
+    Omm::Urn serviceType(service.getServiceTypeFullString());
+    _serviceTypes.push_back(service.getServiceTypeFullString());
     std::string serviceName = serviceType.getTypeName();
     _serviceNames.push_back(serviceName);
 
@@ -902,9 +902,9 @@ CtlDeviceImplH::deviceContainerEnd(const DeviceContainer& deviceContainer)
 void
 CtlDeviceImplH::serviceType(const Service& service)
 {
-    Omm::Urn serviceType(service.getServiceType());
+    Omm::Urn serviceType(service.getServiceTypeFullString());
     std::string serviceName = serviceType.getTypeName();
-    
+
     _out
         << std::endl
         << "class " << "Ctl" + serviceName << "Impl : public " << "Ctl" + serviceName << std::endl
@@ -922,7 +922,7 @@ CtlDeviceImplH::serviceTypeEnd(const Service& service)
         << _eventedStateVars.str()
         << "};" << std::endl
         << std::endl;
-    
+
     _eventedStateVars.str("");
 }
 
@@ -963,11 +963,11 @@ CtlDeviceImplH::stateVar(const StateVar& stateVar)
     if (stateVar.getName().substr(0, std::string("A_ARG_TYPE_").size()) == "A_ARG_TYPE_") {
         return;
     }
-    
+
     if (!stateVar.getSendEvents()) {
         return;
     }
-    
+
     _eventedStateVars
         << indent(1) << "virtual void _changed" << stateVar.getName() << "(const "
         << _typeMapper[stateVar.getType()] << "& val);"
@@ -995,7 +995,7 @@ CtlDeviceImplCpp::deviceContainer(const DeviceContainer& deviceContainer)
 void
 CtlDeviceImplCpp::serviceType(const Service& service)
 {
-    Omm::Urn serviceType(service.getServiceType());
+    Omm::Urn serviceType(service.getServiceTypeFullString());
     _serviceName = serviceType.getTypeName();
 }
 
@@ -1016,7 +1016,7 @@ void
 CtlDeviceImplCpp::action(const Action& action)
 {
     _out
-        << "void" << std::endl 
+        << "void" << std::endl
         << "Ctl" + _serviceName << "Impl::_ans" << action.getName()
         << "(";
 }
@@ -1043,13 +1043,13 @@ CtlDeviceImplCpp::stateVar(const StateVar& stateVar)
     if (stateVar.getName().substr(0, std::string("A_ARG_TYPE_").size()) == "A_ARG_TYPE_") {
         return;
     }
-    
+
     if (!stateVar.getSendEvents()) {
         return;
     }
-    
+
     _out
-        << "void" << std::endl 
+        << "void" << std::endl
         << "Ctl" + _serviceName << "Impl::_changed" << stateVar.getName() << "(const "
         << _typeMapper[stateVar.getType()] << "& val)" << std::endl
         << "{" << std::endl
@@ -1109,7 +1109,7 @@ CtlDeviceH::deviceContainerEnd(const DeviceContainer& deviceContainer)
     while (i--) {
         ctorArgs += "Ctl" + _serviceNames[i] + "* p" + "Ctl" + _serviceNames[i] + (i ? ", " : "");
     }
-    
+
     _out << std::endl
         << "class " << "Ctl" + _deviceName << " : public CtlDevice" << std::endl
         << "{" << std::endl
@@ -1120,7 +1120,7 @@ CtlDeviceH::deviceContainerEnd(const DeviceContainer& deviceContainer)
         << ");" << std::endl
         << indent(1) << "~Ctl" + _deviceName << "();" << std::endl
         << std::endl;
-    
+
     i = _serviceNames.size();
     while (i--) {
         _out << indent(1)
@@ -1128,18 +1128,18 @@ CtlDeviceH::deviceContainerEnd(const DeviceContainer& deviceContainer)
             << "() { return _p" << "Ctl" + _serviceNames[i] << "; }"
             << std::endl;
     }
-    
+
     _out <<  std::endl
         << "private:" << std::endl
         << indent(1) << "virtual void eventHandler(StateVar* pStateVar);" << std::endl
         << std::endl
         ;
-    
+
     i = _serviceNames.size();
     while (i--) {
         _out << indent(1) << "Ctl" + _serviceNames[i] << "* _p" << "Ctl" + _serviceNames[i] << ";" << std::endl;
     }
-    
+
     _out
         << "};" << std::endl
         << std::endl
@@ -1151,10 +1151,10 @@ CtlDeviceH::deviceContainerEnd(const DeviceContainer& deviceContainer)
 void
 CtlDeviceH::serviceType(const Service& service)
 {
-    Omm::Urn serviceType(service.getServiceType());
+    Omm::Urn serviceType(service.getServiceTypeFullString());
     std::string serviceName = serviceType.getTypeName();
     _serviceNames.push_back(serviceName);
-    
+
     _out
         << "class " << "Ctl" + serviceName << std::endl
         << "{" << std::endl
@@ -1185,7 +1185,7 @@ CtlDeviceH::serviceTypeEnd(const Service& service)
         << indent(1) << "Service* _pService;" << std::endl
         << "};" << std::endl
         << std::endl;
-    
+
     _reqAction.str("");
     _ansAction.str("");
     _threadAction.str("");
@@ -1218,7 +1218,7 @@ CtlDeviceH::actionEnd(const Action& action)
     _out
         << ");"
         << std::endl;
-    
+
     std::string reqActionArgs = _reqActionArgs.str();
     std::string::size_type l = reqActionArgs.length();
     if (l >= 2 && reqActionArgs.substr(l - 2) == ", ") {
@@ -1235,7 +1235,7 @@ CtlDeviceH::actionEnd(const Action& action)
     _threadAction
         << "Action* pAction);"
         << std::endl;
-    
+
     _reqActionArgs.str("");
     _ansActionArgs.str("");
 }
@@ -1250,7 +1250,7 @@ CtlDeviceH::argument(const Argument& argument, bool lastArgument)
         << "& " << argument.getName()
         << (lastArgument ? "" : ", ")
         ;
-    
+
     if (argument.getDirection() == "in") {
         _reqActionArgs
             << "const "
@@ -1259,7 +1259,7 @@ CtlDeviceH::argument(const Argument& argument, bool lastArgument)
             << (lastArgument ? "" : ", ")
             ;
     }
-    
+
     _ansActionArgs
         << "const "
         << _typeMapper[argument.getRelatedStateVarReference()->getType()]
@@ -1275,17 +1275,17 @@ CtlDeviceH::stateVar(const StateVar& stateVar)
     if (stateVar.getName().substr(0, std::string("A_ARG_TYPE_").size()) == "A_ARG_TYPE_") {
         return;
     }
-    
+
     if (!stateVar.getSendEvents()) {
         return;
     }
-    
+
     _getEventedStateVars
         << indent(1)
         << _typeMapper[stateVar.getType()] << " "
         << "_get" << stateVar.getName() << "();"
         << std::endl;
-    
+
     _changeEventedStateVars
         << indent(1) << "virtual void _changed" << stateVar.getName() << "(const "
         << _typeMapper[stateVar.getType()] << "& val) = 0;"
@@ -1307,7 +1307,7 @@ CtlDeviceCpp::deviceContainer(const DeviceContainer& deviceContainer)
         << preamble
         << "#include \"" << "Ctl" + _deviceName << ".h\"" << std::endl
         << std::endl;
-    
+
     _firstStateVar = true;
 }
 
@@ -1321,20 +1321,20 @@ CtlDeviceCpp::deviceContainerEnd(const DeviceContainer& deviceContainer)
     while (i--) {
         ctorArgs += "Ctl" + _serviceNames[i] + "* p" + "Ctl" + _serviceNames[i] + (i ? ", " : "");
     }
-    
+
     // Event dispatcher
-    
+
     _out
         << "void" << std::endl
         << "Ctl" + _deviceName << "::eventHandler(StateVar* pStateVar)" << std::endl
         << "{" << std::endl
-        << indent(1) << "std::string serviceType = pStateVar->getService()->getServiceType();" << std::endl
+        << indent(1) << "std::string serviceType = pStateVar->getService()->getServiceTypeFullString();" << std::endl
         << indent(1) << "std::string varName = pStateVar->getName();" << std::endl
         << std::endl
         << _eventDispatcher.str()
         << "}" << std::endl
         << std::endl;
-    
+
     // Constructor
     _out << std::endl
 //         << "class " << _deviceName << "Controller : public CtlDevice" << std::endl
@@ -1346,26 +1346,26 @@ CtlDeviceCpp::deviceContainerEnd(const DeviceContainer& deviceContainer)
         << ") :" << std::endl
         << "CtlDevice(pDevice)," << std::endl
             ;
-    
+
     i = _serviceNames.size();
     while (i--) {
         _out
             << "_p" << "Ctl" + _serviceNames[i] << "(p"
             << "Ctl" + _serviceNames[i] << ")" <<  (i ? ", " : "") << std::endl;
     }
-    
+
     _out
         << "{" << std::endl;
-    
+
     i = _serviceNames.size();
     while (i--) {
         _out
-                    
+
             << indent(1) << "_p" << "Ctl" + _serviceNames[i] << "->_pService = "
             << "_pDevice->getService(\"" << _serviceTypes[i] << "\");"
             << std::endl;
     }
-    
+
     _out
         << std::endl
         << indent(1) << "init();" << std::endl
@@ -1388,23 +1388,23 @@ CtlDeviceCpp::deviceContainerEnd(const DeviceContainer& deviceContainer)
 //     i = _serviceNames.size();
 //     while (i--) {
 //         _out << indent(1)
-//             << _serviceNames[i] << "Controller* " << _serviceNames[i] 
+//             << _serviceNames[i] << "Controller* " << _serviceNames[i]
 //             << "() { return _p" << _serviceNames[i] << "Controller; }"
 //             << std::endl;
 //     }
-//     
+//
 //     _out <<  std::endl
 //         << "private:" << std::endl
 //         << indent(1) << "virtual void eventHandler(StateVar* pStateVar);" << std::endl
 //         << std::endl
 //         << indent(1) << "Device* _pDevice;" << std::endl
 //         ;
-//     
+//
 //     i = _serviceNames.size();
 //     while (i--) {
 //         _out << indent(1) << _serviceNames[i] << "Controller* _p" << _serviceNames[i] << "Controller;" << std::endl;
 //     }
-//     
+//
 //     _out
 //         << "};" << std::endl
 //         << std::endl
@@ -1416,12 +1416,12 @@ CtlDeviceCpp::deviceContainerEnd(const DeviceContainer& deviceContainer)
 void
 CtlDeviceCpp::serviceType(const Service& service)
 {
-    Omm::Urn serviceType(service.getServiceType());
-    _serviceTypes.push_back(service.getServiceType());
+    Omm::Urn serviceType(service.getServiceTypeFullString());
+    _serviceTypes.push_back(service.getServiceTypeFullString());
     std::string serviceName = serviceType.getTypeName();
     _serviceNames.push_back(serviceName);
     _currentService = serviceName;
-    _currentServiceType = service.getServiceType();
+    _currentServiceType = service.getServiceTypeFullString();
 }
 
 
@@ -1445,7 +1445,7 @@ CtlDeviceCpp::serviceTypeEnd(const Service& service)
 //         << indent(1) << "Service* _pService;" << std::endl
 //         << "};" << std::endl
         << std::endl;
-    
+
     _reqAction.str("");
 //     _ansAction.str("");
     _threadAction.str("");
@@ -1479,14 +1479,14 @@ CtlDeviceCpp::actionEnd(const Action& action)
     _out
         << ")" << std::endl
         << "{" << std::endl
-        << indent(1) << "Action* pAction = _pService->getAction(\"" 
+        << indent(1) << "Action* pAction = _pService->getAction(\""
         << action.getName() << "\")->clone();" << std::endl
         << _inArgSetter.str()
         << indent(1) << "_pService->sendAction(pAction);" << std::endl
         << _outArgGetter.str()
         << "}" << std::endl
         << std::endl;
-    
+
     std::string reqActionArgs = _reqActionArgs.str();
     std::string::size_type l = reqActionArgs.length();
     if (l >= 2 && reqActionArgs.substr(l - 2) == ", ") {
@@ -1496,7 +1496,7 @@ CtlDeviceCpp::actionEnd(const Action& action)
         << reqActionArgs
         << ")" << std::endl
         << "{" << std::endl
-        << indent(1) << "Action* pAction = _pService->getAction(\"" 
+        << indent(1) << "Action* pAction = _pService->getAction(\""
         << action.getName() << "\")->clone();" << std::endl
         << _inArgSetter.str()
         << indent(1) << "ActionThread<"
@@ -1515,7 +1515,7 @@ CtlDeviceCpp::actionEnd(const Action& action)
         << indent(1) << "_ans" << action.getName() << "(" << _allArgsCall.str() << ");" << std::endl
         << "}" << std::endl
         << std::endl;
-    
+
     _inArgSetter.str("");
     _inArgGetter.str("");
     _outArgGetter.str("");
@@ -1529,32 +1529,32 @@ void
 CtlDeviceCpp::argument(const Argument& argument, bool lastArgument)
 {
     std::string argType = _typeMapper[argument.getRelatedStateVarReference()->getType()];
-    
+
     _out
         << ((argument.getDirection() == "in") ? "const " : "")
         << argType
         << "& " << argument.getName()
         << (lastArgument ? "" : ", ")
         ;
-    
+
     _allArgsCall
         << argument.getName()
         << (lastArgument ? "" : ", ")
         ;
-    
+
     if (argument.getDirection() == "in") {
         _inArgSetter
             << indent(1) << "pAction->setArgument<" << argType << ">(\""
             << argument.getName() << "\", "
             << argument.getName() << ");"
             << std::endl;
-        
+
         _inArgGetter
             << indent(1) << argType << " " << argument.getName()
             << " = pAction->getArgument<" << argType << ">(\""
             << argument.getName() << "\");"
             << std::endl;
-        
+
         _reqActionArgs
             << "const "
             << argType
@@ -1568,17 +1568,17 @@ CtlDeviceCpp::argument(const Argument& argument, bool lastArgument)
             << " = pAction->getArgument<" << argType << ">(\""
             << argument.getName() << "\");"
             << std::endl;
-        
+
         _outArgGetterLocal
             << indent(1) << argType << " " << argument.getName()
             << " = pAction->getArgument<" << argType << ">(\""
             << argument.getName() << "\");"
             << std::endl;
     }
-    
+
 //     if (argument.getDirection() == "in") {
 //     }
-    
+
 //     _ansActionArgs
 //         << "const "
 //         << argType
@@ -1592,26 +1592,26 @@ void
 CtlDeviceCpp::stateVar(const StateVar& stateVar)
 {
     std::string varType = _typeMapper[stateVar.getType()];
-    
+
     if (stateVar.getName().substr(0, std::string("A_ARG_TYPE_").size()) == "A_ARG_TYPE_") {
         return;
     }
-    
+
     if (!stateVar.getSendEvents()) {
         return;
     }
-    
+
 //     _getEventedStateVars
 //         << indent(1)
 //         << varType << " "
 //         << "_get" << stateVar.getName() << "();"
 //         << std::endl;
-//     
+//
 //     _changeEventedStateVars
 //         << indent(1) << "virtual void _changed" << stateVar.getName() << "(const "
 //         << varType << "& val) = 0;"
 //         << std::endl;
-    
+
     _eventDispatcher
         << indent(1) << (_firstStateVar ? "" : "else ")
         << "if (serviceType == \"" + _currentServiceType + "\" && varName == \"" << stateVar.getName() << "\") {" << std::endl
@@ -1619,7 +1619,7 @@ CtlDeviceCpp::stateVar(const StateVar& stateVar)
         << indent(2) << "pStateVar->getValue(val);" << std::endl
         << indent(2) << "_p" << "Ctl" + _currentService << "->_changed" << stateVar.getName() << "(val);" << std::endl
         << indent(1) << "}" << std::endl;
-    
+
     _out
         << varType << std::endl
         << "Ctl" + _currentService << "::_get" << stateVar.getName() << "()" << std::endl
@@ -1627,6 +1627,6 @@ CtlDeviceCpp::stateVar(const StateVar& stateVar)
         << indent(1) << "return _pService->getStateVar<" << varType << ">(\"" << stateVar.getName() << "\");" << std::endl
         << "}" << std::endl
         << std::endl;
-    
+
     _firstStateVar = false;
 }

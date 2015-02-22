@@ -467,7 +467,7 @@ ConnectionManager::endConnection()
 void
 ConnectionManager::addConnection(Connection* pConnection, const std::string& protInfo)
 {
-    ui4 connectionId = pConnection->getThisPeer(_pDevice->getDeviceType()).getConnectionId();
+    ui4 connectionId = pConnection->getThisPeer(_pDevice->getDeviceTypeFullString()).getConnectionId();
     LOG(upnpav, debug, "ConnectionManager add connection id: " + Poco::NumberFormatter::format(connectionId) + ", count connections: " + Poco::NumberFormatter::format(_connections.size()) + ", prot info: " + protInfo);
     if (_connections.find(connectionId) != _connections.end()) {
         // connectionId already present, replace connection (and delete old one)

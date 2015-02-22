@@ -20,14 +20,14 @@
  ***************************************************************************/
 
 
-#include "Poco/Util/ServerApplication.h"
-#include "Poco/Util/Option.h"
-#include "Poco/Util/OptionSet.h"
-#include "Poco/Util/HelpFormatter.h"
+#include <Poco/Util/ServerApplication.h>
+#include <Poco/Util/Option.h>
+#include <Poco/Util/OptionSet.h>
+#include <Poco/Util/HelpFormatter.h>
 
 
-#include "Upnp.h"
-#include "UpnpPrivate.h"
+#include "Omm/Upnp.h"
+#include "Omm/UpnpPrivate.h"
 
 using Poco::Util::ServerApplication;
 using Poco::Util::Application;
@@ -42,41 +42,41 @@ public:
     SsdpTest(): _helpRequested(false)
     {
     }
-    
+
     ~SsdpTest()
     {
     }
-    
+
 protected:
     void initialize(Application& self)
     {
         loadConfiguration(); // load default configuration files, if present
         ServerApplication::initialize(self);
     }
-    
+
     void uninitialize()
     {
         ServerApplication::uninitialize();
     }
-    
+
     void defineOptions(OptionSet& options)
     {
         ServerApplication::defineOptions(options);
-        
+
         options.addOption(
                            Option("help", "h", "display help information on command line arguments")
                            .required(false)
                            .repeatable(false));
     }
-    
+
     void handleOption(const std::string& name, const std::string& value)
     {
         ServerApplication::handleOption(name, value);
-        
+
         if (name == "help")
             _helpRequested = true;
     }
-    
+
     void displayHelp()
     {
         HelpFormatter helpFormatter(options());
@@ -85,7 +85,7 @@ protected:
         helpFormatter.setHeader("A sniffer for SSDP (Simple Service Discovery Protocol).");
         helpFormatter.format(std::cout);
     }
-    
+
 /*    void handleSsdpMessage(const AutoPtr<SsdpMessage>& pNf)
 //     void handleSsdpMessage(AutoPtr<SsdpMessage> pNf)
     {
@@ -93,13 +93,13 @@ protected:
         pNf->toString();
 //         std::cout << pNf->toString();
     }*/
-    
+
     void handleSsdpMessage(Omm::SsdpMessage* pNf)
     {
         std::cout << "SSDP message from " << pNf->getSender().toString() << std::endl;
         std::cout << pNf->toString();
     }
-    
+
     int main(const std::vector<std::string>& args)
     {
         if (_helpRequested)
@@ -110,7 +110,7 @@ protected:
         {
         // get parameters from configuration file
 //             unsigned short port = (unsigned short) config().getInt("EchoServer.port", 9977);
-            
+
         // set-up a server socket
 //             SsdpSocket s(NObserver<SsdpTest, SsdpMessage>(*this, &SsdpTest::handleSsdpMessage));
             Omm::SsdpSocket s;
@@ -120,7 +120,7 @@ protected:
         }
         return Application::EXIT_OK;
     }
-    
+
 private:
     bool _helpRequested;
 };

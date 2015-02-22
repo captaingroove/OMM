@@ -59,7 +59,7 @@ void
 CtlMediaRenderer::initController()
 {
     for (ServiceIterator it = beginService(); it != endService(); ++it) {
-        if ((*it)->getServiceType() == Av::ServiceType::AVT_1 || (*it)->getServiceType() == Av::ServiceType::RC_1) {
+        if ((*it)->getServiceTypeFullString() == Av::ServiceType::AVT_1 || (*it)->getServiceTypeFullString() == Av::ServiceType::RC_1) {
             (*it)->setControllerSubscribeEventing(true);
         }
     }

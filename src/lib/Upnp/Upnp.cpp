@@ -404,7 +404,7 @@ SsdpSocket::sendMessage(SsdpMessage& message, const Poco::Net::SocketAddress& re
     std::string m = message.toString();
 
     int bytesSent = 0;
-    LOG(ssdp, debug, "sending SSDP message to address: " + receiver.toString() + " ...");
+    LOG(ssdp, debug, "sending SSDP message to address: " + receiver.toString() + " ..." + Poco::LineEnding::NEWLINE_DEFAULT + m);
     try {
         if (_mode & Multicast) {
             LOG(ssdp, debug, "sending SSDP message through multicast socket ...");
@@ -755,7 +755,7 @@ DescriptionReader::service(Poco::XML::Node* pNode)
     while (pNode)
     {
         if (pNode->nodeName() == "serviceType" && pNode->hasChildNodes()) {
-            pRes->setServiceType(pNode->innerText());
+            pRes->setServiceTypeFullString(pNode->innerText());
         }
         if (pNode->nodeName() == "serviceId" && pNode->hasChildNodes()) {
             pRes->setServiceId(pNode->innerText());
@@ -1183,7 +1183,7 @@ DescriptionWriter::device(Device& device)
 
     // device type
     Poco::AutoPtr<Poco::XML::Element> pDeviceType = _pDoc->createElement("deviceType");
-    Poco::AutoPtr<Poco::XML::Text> pDeviceTypeVal = _pDoc->createTextNode(device.getDeviceType());
+    Poco::AutoPtr<Poco::XML::Text> pDeviceTypeVal = _pDoc->createTextNode(device.getDeviceTypeFullString());
     pDeviceType->appendChild(pDeviceTypeVal);
     pDevice->appendChild(pDeviceType);
     // UUID
@@ -1217,7 +1217,7 @@ DescriptionWriter::device(Device& device)
     pDevice->appendChild(pServiceList);
     for (Device::ServiceIterator it = device.beginService(); it != device.endService(); ++it) {
         pServiceList->appendChild(service(*it));
-        LOG(desc, debug, "writer added service: " + (*it)->getServiceType());
+        LOG(desc, debug, "writer added service: " + (*it)->getServiceTypeFullString());
     }
 
     return pDevice;
@@ -1231,7 +1231,7 @@ DescriptionWriter::service(Service* pService)
 
     // serviceType
     Poco::AutoPtr<Poco::XML::Element> pServiceType = _pDoc->createElement("serviceType");
-    Poco::AutoPtr<Poco::XML::Text> pServiceTypeVal = _pDoc->createTextNode(pService->getServiceType());
+    Poco::AutoPtr<Poco::XML::Text> pServiceTypeVal = _pDoc->createTextNode(pService->getServiceTypeFullString());
     pServiceType->appendChild(pServiceTypeVal);
     pServiceElement->appendChild(pServiceType);
     // serviceId
@@ -1448,7 +1448,7 @@ ActionRequestWriter::action(Action* action)
     Poco::AutoPtr<Poco::XML::Element> pEnvelope = _pDoc->createElementNS("http://schemas.xmlsoap.org/soap/envelope/", "Envelope");
     pEnvelope->setAttributeNS("http://schemas.xmlsoap.org/soap/envelope/", "encodingStyle", "http://schemas.xmlsoap.org/soap/encoding/");
     Poco::AutoPtr<Poco::XML::Element> pBody = _pDoc->createElementNS("http://schemas.xmlsoap.org/soap/envelope/", "Body");
-    Poco::AutoPtr<Poco::XML::Element> pActionRequest = _pDoc->createElementNS(action->getService()->getServiceType(), action->getName());
+    Poco::AutoPtr<Poco::XML::Element> pActionRequest = _pDoc->createElementNS(action->getService()->getServiceTypeFullString(), action->getName());
 
     for(Action::ArgumentIterator i = action->beginInArgument(); i != action->endInArgument(); ++i) {
         Poco::AutoPtr<Poco::XML::Element> pArgument = _pDoc->createElement((*i)->getName());
@@ -1489,7 +1489,7 @@ ActionResponseWriter::action(Action& action)
     Poco::AutoPtr<Poco::XML::Element> pEnvelope = pDoc->createElementNS("http://schemas.xmlsoap.org/soap/envelope/", "Envelope");
     pEnvelope->setAttributeNS("http://schemas.xmlsoap.org/soap/envelope/", "encodingStyle", "http://schemas.xmlsoap.org/soap/encoding/");
     Poco::AutoPtr<Poco::XML::Element> pBody = pDoc->createElementNS("http://schemas.xmlsoap.org/soap/envelope/", "Body");
-    Poco::AutoPtr<Poco::XML::Element> pActionResponse = pDoc->createElementNS(action.getService()->getServiceType(), action.getName() + "Response");
+    Poco::AutoPtr<Poco::XML::Element> pActionResponse = pDoc->createElementNS(action.getService()->getServiceTypeFullString(), action.getName() + "Response");
 
     for(Action::ArgumentIterator i = action.beginOutArgument(); i != action.endOutArgument(); ++i) {
         Poco::AutoPtr<Poco::XML::Element> pArgument = pDoc->createElement((*i)->getName());
@@ -2085,7 +2085,7 @@ Service::endEventCallbackPath()
 
 
 std::string
-Service::getServiceType() const
+Service::getServiceTypeFullString() const
 {
     return _serviceType;
 }
@@ -2184,7 +2184,7 @@ Service::getStateVarReference(const std::string& key)
 
 
 void
-Service::setServiceType(std::string serviceType)
+Service::setServiceTypeFullString(std::string serviceType)
 {
     _serviceType = serviceType;
 }
@@ -2766,12 +2766,9 @@ ControlRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco
     std::string actionName = soapAction.substr(hash+1);
     LOG(ctrl, debug, "action received: \"" + actionName + "\" (service type " + serviceType + ")");
 
-//     std::clog << "ControlRequestHandler for ServiceType: " << _pService->getServiceType() << std::endl;
     // TODO: make getAction() robust against wrong action names
     Action* pAction = _pService->getAction(actionName);
-//     std::clog << "getAction(): " << pAction->getName() << std::endl;
     pAction = pAction->clone();
-//     std::clog << "cloned Action(): " << pAction->getName() << std::endl;
     // TODO: introduce ActionRequestReader::write(Action*) to get rid of confusing pAction stuff
     ActionRequestReader requestReader(requestBody, pAction);
     pAction = requestReader.action();
@@ -3437,15 +3434,15 @@ DeviceContainer::~DeviceContainer()
 }
 
 
-Service*
-DeviceContainer::getServiceType(const std::string& serviceType)
-{
-    std::map<std::string,Service*>::iterator i = _serviceTypes.find(serviceType);
-    if (i == _serviceTypes.end()) {
-        LOG(upnp, error, "unknown service type: " + serviceType);
-    }
-    return _serviceTypes[serviceType];
-}
+//Service*
+//DeviceContainer::getServiceType(const std::string& serviceType)
+//{
+//    std::map<std::string,Service*>::iterator i = _serviceTypes.find(serviceType);
+//    if (i == _serviceTypes.end()) {
+//        LOG(upnp, error, "unknown service type: " + serviceType);
+//    }
+//    return _serviceTypes[serviceType];
+//}
 
 
 void
@@ -3620,33 +3617,33 @@ DeviceContainer::setDescriptionUri(const std::string uri)
 void
 DeviceContainer::addServiceType(Service* pService)
 {
-    _serviceTypes[pService->getServiceType()] = pService;
+    _serviceTypes[pService->getServiceTypeFullString()] = pService;
 }
 
 
-void
-DeviceContainer::print()
-{
-    for(DeviceIterator d = beginDevice(); d != endDevice(); ++d) {
-        std::cout << "DeviceType: " << (*d)->getDeviceType() << std::endl;
-        for(Device::ServiceIterator s = (*d)->beginService(); s != (*d)->endService(); ++s) {
-            std::cout << "    Service pointer: " << *s << std::endl;
-            std::cout << "    ServiceType: " << (*s)->getServiceType() << std::endl;
-            int stateVarCount = 0;
-            for(Service::StateVarIterator v = (*s)->beginStateVar(); v != (*s)->endStateVar(); ++v) {
-                stateVarCount++;
-                std::string val;
-                (*v)->getValue(val);
-                std::cout
-                    << "        StateVar: " << (*v)->getName() << std::endl
-                    << "          number: " << stateVarCount << std::endl
-                    << "            type: " << (*v)->getType() << std::endl
-                    << "         evented: " << (*v)->getSendEvents() << std::endl
-                    << "             val: " << val << std::endl;
-            }
-        }
-    }
-}
+//void
+//DeviceContainer::print()
+//{
+//    for(DeviceIterator d = beginDevice(); d != endDevice(); ++d) {
+//        std::cout << "DeviceType: " << (*d)->getDeviceTypeFullString() << std::endl;
+//        for(Device::ServiceIterator s = (*d)->beginService(); s != (*d)->endService(); ++s) {
+//            std::cout << "    Service pointer: " << *s << std::endl;
+//            std::cout << "    ServiceType: " << (*s)->getServiceTypeFullString() << std::endl;
+//            int stateVarCount = 0;
+//            for(Service::StateVarIterator v = (*s)->beginStateVar(); v != (*s)->endStateVar(); ++v) {
+//                stateVarCount++;
+//                std::string val;
+//                (*v)->getValue(val);
+//                std::cout
+//                    << "        StateVar: " << (*v)->getName() << std::endl
+//                    << "          number: " << stateVarCount << std::endl
+//                    << "            type: " << (*v)->getType() << std::endl
+//                    << "         evented: " << (*v)->getSendEvents() << std::endl
+//                    << "             val: " << val << std::endl;
+//            }
+//        }
+//    }
+//}
 
 
 void
@@ -3713,7 +3710,7 @@ DeviceContainer::initDevice()
             (*i)->setIconRequestPath("/" + (*d)->getUuid() + "/" + (*i)->getIconRequestPath());
         }
         for(Device::ServiceIterator s = (*d)->beginService(); s != (*d)->endService(); ++s) {
-            std::string servicePathPrefix = "/" + (*d)->getUuid() + "/" + (*s)->getServiceType();
+            std::string servicePathPrefix = "/" + (*d)->getUuid() + "/" + (*s)->getServiceTypeFullString();
             (*s)->setDescriptionPath(servicePathPrefix + "/Description.xml");
             (*s)->setControlPath(servicePathPrefix + "/Control");
             (*s)->setEventSubscriptionPath(servicePathPrefix + "/EventSubscription");
@@ -3751,20 +3748,19 @@ DeviceContainer::writeSsdpMessages()
     _pSsdpNotifyAliveMessages->clear();
     _pSsdpNotifyByebyeMessages->clear();
 
-    SsdpNotifyAliveWriter aliveWriter(*_pSsdpNotifyAliveMessages);
-    SsdpNotifyByebyeWriter byebyeWriter(*_pSsdpNotifyByebyeMessages);
-    aliveWriter.deviceContainer(*this);
-    byebyeWriter.deviceContainer(*this);
+    SsdpMessageSetWriter aliveWriter(_pSsdpNotifyAliveMessages, SsdpMessageSetWriter::Alive);
+    SsdpMessageSetWriter byebyeWriter(_pSsdpNotifyByebyeMessages, SsdpMessageSetWriter::ByeBye);
+    aliveWriter.deviceContainer(this);
+    byebyeWriter.deviceContainer(this);
 
     for(DeviceIterator d = beginDevice(); d != endDevice(); ++d) {
-        Device& device = **d;
-        LOG(ssdp, debug, "writing messages for device: " + device.getDeviceType());
-        aliveWriter.device(device);
-        byebyeWriter.device(device);
-        for(Device::ServiceIterator s = device.beginService(); s != device.endService(); ++s) {
-            LOG(ssdp, debug, "writing messages for service: " + (*s)->getServiceType());
-            aliveWriter.service(**s);
-            byebyeWriter.service(**s);
+        LOG(ssdp, debug, "writing messages for device: " + (*d)->getDeviceTypeFullString());
+        aliveWriter.device(*d);
+        byebyeWriter.device(*d);
+        for(Device::ServiceIterator s = (*d)->beginService(); s != (*d)->endService(); ++s) {
+            LOG(ssdp, debug, "writing messages for service: " + (*s)->getServiceTypeFullString());
+            aliveWriter.service(*s);
+            byebyeWriter.service(*s);
         }
     }
     LOG(ssdp, debug, "writing messages finished.");
@@ -3889,7 +3885,7 @@ Device::controllerSubscribeEventing()
 {
     for(ServiceIterator s = beginService(); s != endService(); ++s) {
         if ((*s)->getControllerSubscribeEventing()) {
-            (*s)->addEventCallbackPath(getUuid() + "/" + (*s)->getServiceType() + "/EventNotification");
+            (*s)->addEventCallbackPath(getUuid() + "/" + (*s)->getServiceTypeFullString() + "/EventNotification");
             _pDeviceContainer->getDeviceManager()->registerHttpRequestHandler((*s)->getEventCallbackPath(), new EventNotificationRequestHandler((*s)));
 
             (*s)->setSubscriptionDuration(EVENT_SUBSCRIPTION_DURATION);
@@ -3917,7 +3913,7 @@ Device::controllerUnsubscribeEventing()
                 (*s)->sendCancelSubscriptionRequest();
             }
             catch (Poco::Exception& e) {
-                LOG(event, error, "controller failed to unsubscribe service type: " + (*s)->getServiceType() + ", subscription path: " + (*s)->getEventSubscriptionPath() + ", error: " + e.displayText());
+                LOG(event, error, "controller failed to unsubscribe service type: " + (*s)->getServiceTypeFullString() + ", subscription path: " + (*s)->getEventSubscriptionPath() + ", error: " + e.displayText());
             }
             (*s)->deleteSubscription();
         }
@@ -4015,7 +4011,7 @@ Device::getUuid() const
 
 
 std::string
-Device::getDeviceType() const
+Device::getDeviceTypeFullString() const
 {
     return _pDeviceData->_deviceType;
 }
@@ -4029,7 +4025,7 @@ Device::getFriendlyName()
 
 
 Service*
-Device::getService(std::string serviceType)
+Device::getServiceForTypeFullString(std::string serviceType)
 {
     Service* pRes = 0;
     try {
@@ -4182,7 +4178,7 @@ DeviceData::addProperty(const std::string& name, const std::string& val)
 void
 DeviceData::addService(Service* pService)
 {
-    _services.append(pService->getServiceType(), pService);
+    _services.append(pService->getServiceTypeFullString(), pService);
     pService->setDeviceData(this);
 }
 
@@ -4216,33 +4212,36 @@ _sendTimerIsRunning(false)
 
 SsdpMessageSet::~SsdpMessageSet()
 {
-    if (_continuous) {
-        _sendTimer.stop();
-    }
-/* // This causes a segfault:
-   for (std::vector<SsdpMessage*>::iterator i = _ssdpMessages.begin(); i != _ssdpMessages.end(); ++i) {
-        delete *i;
-    }*/
+    clear();
 }
 
 
 void
 SsdpMessageSet::clear()
 {
+    if (_continuous) {
+        _sendTimer.stop();
+    }
+    for (std::vector<SsdpMessage*>::iterator i = _ssdpMessages.begin(); i != _ssdpMessages.end(); ++i) {
+        delete *i;
+    }
     _ssdpMessages.clear();
 }
 
 
 void
-SsdpMessageSet::addMessage(SsdpMessage& message)
+SsdpMessageSet::addMessage(SsdpMessage* pMessage)
 {
-    _ssdpMessages.push_back(&message);
+    _ssdpMessages.push_back(pMessage);
 }
 
 
 void
 SsdpMessageSet::send(SsdpSocket& socket, int repeat, long delay, Poco::UInt16 cacheDuration, bool continuous, const Poco::Net::SocketAddress& receiver)
 {
+    if (_ssdpMessages.size() == 0) {
+        return;
+    }
     Poco::ScopedLock<Poco::FastMutex> lock(_sendTimerLock);
     // check if continuous Timer is already running and if so then cancel sending of message set and return.
      if (_sendTimerIsRunning) {
@@ -4319,6 +4318,14 @@ CtlDeviceCode::init()
 }
 
 
+const std::string Controller::SearchTargetAll("ssdp:all");
+const std::string Controller::SearchTargetRootDevice("upnp:rootdevice");
+const std::string Controller::SearchTargetUpnpDeviceType("urn:schemas-upnp-org:device:");
+const std::string Controller::SearchTargetUpnpServiceType("urn:schemas-upnp-org:service:");
+const std::string Controller::SearchTargetUuid("uuid:");
+const std::string Controller::SearchTargetUrn("urn:");
+
+
 Controller::Controller() :
 DeviceManager(new Socket),
 _featureSubscribeToEvents(false)
@@ -4385,21 +4392,23 @@ Controller::startSsdp()
 {
     LOG(upnp, debug, "controller start sending ssdp messages");
     DeviceManager::startSsdp();
-    sendMSearch();
+//    sendMSearch();
+
+//    sendMSearch(SearchTargetAll);
+    sendMSearch(SearchTargetRootDevice);
+//    sendMSearch(SearchTargetUuid + "84944fac-9a5e-42fb-bc3c-09edb315f292");  // omm-server-music.sh
+//    sendMSearch(SearchTargetUuid + "636719d1-0081-4538-b1df-2bc6d625104b");  // win media server on tristan mini
+//    sendMSearch(SearchTargetUpnpDeviceType + "MediaServer:1");
+//    sendMSearch(SearchTargetUpnpServiceType + "ContentDirectory:1");
 }
 
 
 void
-Controller::sendMSearch()
+Controller::sendMSearch(const std::string& searchTarget)
 {
-    LOG(upnp, debug, "controller sends MSearch");
-    SsdpMessage m;
-    m.setRequestMethod(SsdpMessage::REQUEST_SEARCH);
-    m.setHost();
-    m.setHttpExtensionNamespace();
-    m.setMaximumWaitTime();
-//     m.setSearchTarget("ssdp:all");
-    m.setSearchTarget("upnp:rootdevice");
+    LOG(upnp, debug, "controller sends M-SEARCH");
+    SsdpMessage m(SsdpMessage::REQUEST_SEARCH);
+    m.setSearchTarget(searchTarget);
 
     // FIXME: network exception in controller when sending MSearch after network device removal
     _pSocket->sendSsdpMessage(m);
@@ -4524,8 +4533,8 @@ Controller::addDeviceContainer(DeviceContainer* pDeviceContainer)
 
         for (DeviceContainer::DeviceIterator it = pDeviceContainer->beginDevice(); it != pDeviceContainer->endDevice(); ++it) {
             Device* pDevice = *it;
-            LOG(upnp, debug, "controller discovers device of type: " + pDevice->getDeviceType() + ", friendly name: " + pDevice->getFriendlyName() + ", uuid: " + pDevice->getUuid());
-            DeviceGroup* pDeviceGroup = getDeviceGroup(pDevice->getDeviceType());
+            LOG(upnp, debug, "controller discovers device of type: " + pDevice->getDeviceTypeFullString() + ", friendly name: " + pDevice->getFriendlyName() + ", uuid: " + pDevice->getUuid());
+            DeviceGroup* pDeviceGroup = getDeviceGroup(pDevice->getDeviceTypeFullString());
             if (pDeviceGroup) {
                 Device* pTypedDevice = pDeviceGroup->createDevice();
                 pDeviceContainer->replaceDevice(pDevice, pTypedDevice);
@@ -4566,7 +4575,7 @@ Controller::removeDeviceContainer(DeviceContainer* pDeviceContainer)
         for (DeviceContainer::DeviceIterator it = pDeviceContainer->beginDevice(); it != pDeviceContainer->endDevice(); ++it) {
             Device* pDevice = *it;
             pDevice->stopSubscriptionTimer();
-            DeviceGroup* pDeviceGroup = getDeviceGroup(pDevice->getDeviceType());
+            DeviceGroup* pDeviceGroup = getDeviceGroup(pDevice->getDeviceTypeFullString());
             if (pDeviceGroup) {
                 LOG(upnp, information, "controller removes device, friendly name: " + pDevice->getFriendlyName() + ", uuid: " + pDevice->getUuid());
                 pDeviceGroup->removeDevice(pDevice);
@@ -4686,141 +4695,193 @@ DeviceServer::handleSsdpMessage(SsdpMessage* pMessage)
     if (pMessage->getRequestMethod() == SsdpMessage::REQUEST_SEARCH) {
         LOG(ssdp, debug, "device server reply to m-search");
         for (DeviceContainerIterator it = beginDeviceContainer(); it != endDeviceContainer(); ++it) {
-            SsdpMessage m;
-            // TODO: use a skeleton to create response message
-            m.setRequestMethod(SsdpMessage::REQUEST_RESPONSE);
-            m.setCacheControl();
-            m.setDate();
-            m.setHttpExtensionConfirmed();
-            m.setLocation((*it)->getDescriptionUri());
-            m.setServer("Omm/" + OMM_VERSION);
-            // ST field in response depends on ST field in M-SEARCH
-            m.setSearchTarget("upnp:rootdevice");
-            // same as USN in NOTIFY message
-            m.setUniqueServiceName("uuid:" + (*it)->getRootDevice()->getUuid() + "::upnp:rootdevice");
+            std::string descriptionUri = (*it)->getDescriptionUri();
+            std::string searchTarget = pMessage->getSearchTarget();
+            Poco::StringTokenizer searchTargetFields(searchTarget, ":");
+            bool respond = false;
+            SsdpMessageSet responseMessageSet;
 
-            // TODO: react on ST field (search target)
-            // TODO: fill in the correct value for CacheControl
-            //       -> _ssdpNotifyAliveMessages._sendTimer
-            //       -> need to know the elapsed time ... (though initial timer val isn't so wrong)
-            int mx = pMessage->getMaximumWaitTime();
-            // MX greater than 5 then cut down to 5
-            mx = (mx > 5) ? 5 : mx;
-            SsdpMessageSet ms;
-            ms.addMessage(m);
-            // send out response delayed according to MX field of msearch request
-            _pSocket->sendSsdpMessageSet(ms, 1, mx * 1000, pMessage->getSender());
+            if (searchTarget == "ssdp:all") {
+                respond = true;
+                SsdpMessageSetWriter msw(&responseMessageSet, SsdpMessageSetWriter::SearchAllResponse);
+                msw.deviceContainer(*it);
+                for(DeviceContainer::DeviceIterator d = (*it)->beginDevice(); d != (*it)->endDevice(); ++d) {
+                    msw.device(*d);
+                    for(Device::ServiceIterator s = (*d)->beginService(); s != (*d)->endService(); ++s) {
+                        msw.service(*s);
+                    }
+                }
+            }
+            else {
+                SsdpMessage* pM = new SsdpMessage(SsdpMessage::REQUEST_RESPONSE);
+                pM->setSearchTarget(searchTarget);
+                pM->setLocation(descriptionUri);
+
+                if (searchTarget == "upnp:rootdevice") {
+                    respond = true;
+                    pM->setUniqueServiceName("uuid:" + (*it)->getRootDevice()->getUuid() + "::" + searchTarget);
+                }
+                else if (searchTargetFields.count() == 2 && searchTargetFields[0] == "uuid") {
+                    for (DeviceContainer::DeviceIterator dit = (*it)->beginDevice(); dit != (*it)->endDevice(); ++dit) {
+                        if ((*dit)->getUuid() == searchTargetFields[1]) {
+                            respond = true;
+                            pM->setUniqueServiceName("uuid:" + (*dit)->getUuid());
+                        }
+                    }
+                }
+                else if (searchTargetFields.count() == 5 && searchTargetFields[0] == "urn" && searchTargetFields[1] == "schemas-upnp-org") {
+                    if (searchTargetFields[2] == "device") {
+                        for (DeviceContainer::DeviceIterator dit = (*it)->beginDevice(); dit != (*it)->endDevice(); ++dit) {
+                            if ((*dit)->getDeviceTypeFullString() == searchTarget) {
+                                respond = true;
+                                pM->setUniqueServiceName("uuid:" + (*dit)->getUuid() + "::" + (*dit)->getDeviceTypeFullString());
+                            }
+                        }
+                    }
+                    else if (searchTargetFields[2] == "service") {
+                        for (DeviceContainer::DeviceIterator dit = (*it)->beginDevice(); dit != (*it)->endDevice(); ++dit) {
+                            Service* pService = (*dit)->getServiceForTypeFullString(searchTarget);
+                            if (pService) {
+                                respond = true;
+                                pM->setUniqueServiceName("uuid:" + (*dit)->getUuid() + "::" + pService->getServiceTypeFullString());
+                            }
+                        }
+                    }
+                }
+                if (respond) {
+                    responseMessageSet.addMessage(pM);
+                }
+                else {
+                    delete pM;
+                }
+            }
+            if (respond) {
+                // TODO: fill in the correct value for CacheControl
+                //       -> _ssdpNotifyAliveMessages._sendTimer
+                //       -> need to know the elapsed time ... (though initial timer val isn't so wrong)
+                int mx = pMessage->getMaximumWaitTime();
+                // MX greater than SSDP_MAX_WAIT_TIME then cut down to SSDP_MAX_WAIT_TIME
+                mx = (mx > SSDP_MAX_WAIT_TIME) ? SSDP_MAX_WAIT_TIME : mx;
+                // send out response delayed according to MX field of msearch request
+                _pSocket->sendSsdpMessageSet(responseMessageSet, 1, mx * 1000, pMessage->getSender());
+            }
         }
     }
 }
 
 
 void
-SsdpNotifyAliveWriter::deviceContainer(const DeviceContainer& pDeviceContainer)
+SsdpMessageSetWriter::deviceContainer(const DeviceContainer* pDeviceContainer)
 {
     // root device first message
-    SsdpMessage* m = new SsdpMessage(SsdpMessage::REQUEST_NOTIFY_ALIVE);
-    m->setLocation(pDeviceContainer.getDescriptionUri());    // location of UPnP description of the root device
-    m->setNotificationType("upnp:rootdevice");  // once for root device
-    m->setUniqueServiceName("uuid:" + pDeviceContainer.getRootDevice()->getUuid() + "::upnp:rootdevice");
-    _res->addMessage(*m);
+    SsdpMessage* pM1 = createMessage();
+    if (_type == Alive || _type == SearchAllResponse) {
+        pM1->setLocation(pDeviceContainer->getDescriptionUri());    // location of UPnP description of the root device
+    }
+    if (_type == Alive || _type == ByeBye) {
+        pM1->setNotificationType("upnp:rootdevice");  // once for root device
+    }
+    if (_type == SearchAllResponse) {
+        pM1->setSearchTarget("upnp:rootdevice");  // once for root device
+    }
+    pM1->setUniqueServiceName("uuid:" + pDeviceContainer->getRootDevice()->getUuid() + "::upnp:rootdevice");
+    _res->addMessage(pM1);
 }
 
 
 void
-SsdpNotifyAliveWriter::device(const Device& pDevice)
+SsdpMessageSetWriter::device(const Device* pDevice)
 {
-    // device first message (root device second message)
-    SsdpMessage* m = new SsdpMessage(SsdpMessage::REQUEST_NOTIFY_ALIVE);
-    m->setLocation(pDevice.getDeviceContainer()->getDescriptionUri());    // location of UPnP description of the root device
-    m->setNotificationType("uuid:" + pDevice.getUuid());
-    m->setUniqueServiceName("uuid:" + pDevice.getUuid());
-    _res->addMessage(*m);
-    // device second message (root device third message)
-    m->setNotificationType(pDevice.getDeviceType());
-    m->setUniqueServiceName("uuid:" + pDevice.getUuid() + "::" + pDevice.getDeviceType());
-    _res->addMessage(*m);
+     // device first and second message (root device second and third message)
+    SsdpMessage* pM2 = createMessage();
+    SsdpMessage* pM3 = createMessage();
+    if (_type == Alive || _type == SearchAllResponse) {
+        pM2->setLocation(pDevice->getDeviceContainer()->getDescriptionUri());    // location of UPnP description of the root device
+        pM3->setLocation(pDevice->getDeviceContainer()->getDescriptionUri());    // location of UPnP description of the root device
+    }
+    if (_type == Alive || _type == ByeBye) {
+        pM2->setNotificationType("uuid:" + pDevice->getUuid());
+        pM3->setNotificationType(pDevice->getDeviceTypeFullString());
+    }
+    if (_type == SearchAllResponse) {
+        pM2->setSearchTarget("uuid:" + pDevice->getUuid());
+        pM3->setSearchTarget(pDevice->getDeviceTypeFullString());
+    }
+    pM2->setUniqueServiceName("uuid:" + pDevice->getUuid());
+    pM3->setUniqueServiceName("uuid:" + pDevice->getUuid() + "::" + pDevice->getDeviceTypeFullString());
+    _res->addMessage(pM2);
+    _res->addMessage(pM3);
 }
 
 
 void
-SsdpNotifyAliveWriter::service(const Service& pService)
+SsdpMessageSetWriter::service(const Service* pService)
 {
     // service first (and only) message
-    SsdpMessage* m = new SsdpMessage(SsdpMessage::REQUEST_NOTIFY_ALIVE);
-    m->setLocation(pService.getDevice()->getDeviceContainer()->getDescriptionUri());    // location of UPnP description of the root device
-    m->setNotificationType(pService.getServiceType());
-    m->setUniqueServiceName("uuid:" + pService.getDevice()->getUuid() + "::" +  pService.getServiceType());
-    _res->addMessage(*m);
+    SsdpMessage* pM1 = createMessage();
+    if (_type == Alive || _type == SearchAllResponse) {
+        pM1->setLocation(pService->getDevice()->getDeviceContainer()->getDescriptionUri());    // location of UPnP description of the root device
+    }
+    if (_type == Alive || _type == ByeBye) {
+        pM1->setNotificationType(pService->getServiceTypeFullString());
+    }
+    if (_type == SearchAllResponse) {
+        pM1->setSearchTarget(pService->getServiceTypeFullString());
+    }
+    pM1->setUniqueServiceName("uuid:" + pService->getDevice()->getUuid() + "::" +  pService->getServiceTypeFullString());
+    _res->addMessage(pM1);
 }
 
 
-void
-SsdpNotifyByebyeWriter::deviceContainer(const DeviceContainer& pDeviceContainer)
+SsdpMessage*
+SsdpMessageSetWriter::createMessage()
 {
-    // root device first message
-    SsdpMessage* m = new SsdpMessage(SsdpMessage::REQUEST_NOTIFY_BYEBYE);
-    m->setNotificationType("upnp:rootdevice");  // once for root device
-    m->setUniqueServiceName("uuid:" + pDeviceContainer.getRootDevice()->getUuid() + "::upnp:rootdevice");
-    _res->addMessage(*m);
+    SsdpMessage* pRes = 0;
+    switch (_type) {
+        case Alive:
+            pRes = new SsdpMessage(SsdpMessage::REQUEST_NOTIFY_ALIVE);
+            break;
+        case ByeBye:
+            pRes = new SsdpMessage(SsdpMessage::REQUEST_NOTIFY_BYEBYE);
+            break;
+        case SearchAllResponse:
+            pRes = new SsdpMessage(SsdpMessage::REQUEST_RESPONSE);
+            break;
+    }
+    return pRes;
 }
 
 
-void
-SsdpNotifyByebyeWriter::device(const Device& pDevice)
-{
-    // device first message (root device second message)
-    SsdpMessage* m = new SsdpMessage(SsdpMessage::REQUEST_NOTIFY_BYEBYE);
-    m->setNotificationType("uuid:" + pDevice.getUuid());
-    m->setUniqueServiceName("uuid:" + pDevice.getUuid());
-    _res->addMessage(*m);
-    // device second message (root device third message)
-    m->setNotificationType(pDevice.getDeviceType());
-    m->setUniqueServiceName("uuid:" + pDevice.getUuid() + "::" + pDevice.getDeviceType());
-    _res->addMessage(*m);
-}
-
-
-void
-SsdpNotifyByebyeWriter::service(const Service& pService)
-{
-    // service first (and only) message
-    SsdpMessage* m = new SsdpMessage(SsdpMessage::REQUEST_NOTIFY_BYEBYE);
-    m->setNotificationType(pService.getServiceType());
-    m->setUniqueServiceName("uuid:" + pService.getDevice()->getUuid() + "::" +  pService.getServiceType());
-    _res->addMessage(*m);
-}
-
-
-SsdpMessage::SsdpMessage()
+SsdpMessage::SsdpMessage(TRequestMethod requestMethod) :
+_requestMethod(requestMethod)
 {
     initMessageMap();
-}
-
-
-SsdpMessage::SsdpMessage(TRequestMethod requestMethod)
-{
-    initMessageMap();
-    setRequestMethod(requestMethod);
-
-    if (requestMethod == REQUEST_NOTIFY ||
-        requestMethod == REQUEST_NOTIFY_ALIVE ||
-        requestMethod == REQUEST_NOTIFY_BYEBYE) {
-            setHost();
-            setServer("Omm/" + OMM_VERSION);
-            setCacheControl();
-        }
 
     switch (requestMethod) {
-    case REQUEST_NOTIFY_ALIVE:
-        _requestMethod = REQUEST_NOTIFY;
-        setNotificationSubtype(SsdpMessage::SUBTYPE_ALIVE);          // alive message
-        break;
-    case REQUEST_NOTIFY_BYEBYE:
-        _requestMethod = REQUEST_NOTIFY;
-        setNotificationSubtype(SsdpMessage::SUBTYPE_BYEBYE);         // byebye message
-        break;
-    }
+        case REQUEST_NOTIFY_BYEBYE:
+            _requestMethod = REQUEST_NOTIFY;
+            setNotificationSubtype(SsdpMessage::SUBTYPE_BYEBYE);
+            setHost();
+            break;
+        case REQUEST_NOTIFY_ALIVE:
+            _requestMethod = REQUEST_NOTIFY;
+            setNotificationSubtype(SsdpMessage::SUBTYPE_ALIVE);
+            setServer("Omm/" + OMM_VERSION);
+            setCacheControl();
+            setHost();
+            break;
+        case REQUEST_RESPONSE:
+            setServer("Omm/" + OMM_VERSION);
+            setHttpExtensionConfirmed();
+            setCacheControl();
+            setDate();
+            break;
+        case REQUEST_SEARCH:
+            setHost();
+            setHttpExtensionNamespace();
+            setMaximumWaitTime();
+            break;
+        }
 }
 
 
@@ -4905,14 +4966,14 @@ SsdpMessage::toString()
 }
 
 
-void
-SsdpMessage::setRequestMethod(TRequestMethod requestMethod)
-{
-    _requestMethod = requestMethod;
-//     if (_requestMethod == REQUEST_NOTIFY_ALIVE || _requestMethod == REQUEST_NOTIFY_BYEBYE) {
-//         requestMethod = REQUEST_NOTIFY;
-//     }
-}
+//void
+//SsdpMessage::setRequestMethod(TRequestMethod requestMethod)
+//{
+//    _requestMethod = requestMethod;
+////     if (_requestMethod == REQUEST_NOTIFY_ALIVE || _requestMethod == REQUEST_NOTIFY_BYEBYE) {
+////         requestMethod = REQUEST_NOTIFY;
+////     }
+//}
 
 
 SsdpMessage::TRequestMethod

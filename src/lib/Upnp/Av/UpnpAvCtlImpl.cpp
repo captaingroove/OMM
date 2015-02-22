@@ -221,8 +221,8 @@ CtlConnectionManagerImpl::addConnection(Connection* pConnection, const std::stri
 {
     LOG(upnpav, debug, "controller, add connection");
 
-    ConnectionPeer& thisPeer = pConnection->getThisPeer(_pThisDevice->getDeviceType());
-    ConnectionPeer& remotePeer = pConnection->getRemotePeer(_pThisDevice->getDeviceType());
+    ConnectionPeer& thisPeer = pConnection->getThisPeer(_pThisDevice->getDeviceTypeFullString());
+    ConnectionPeer& remotePeer = pConnection->getRemotePeer(_pThisDevice->getDeviceTypeFullString());
 
     i4 connectionId;
     i4 avTransportId;
@@ -271,11 +271,11 @@ CtlConnectionManagerImpl::getConnection(ui4 connectionId)
     ConnectionManagerId peerConnectionManager;
     peerConnectionManager.parseManagerIdString(PeerConnectionManager);
     Connection* pConnection = 0;
-    if (_pDevice->getDeviceType() == DeviceType::MEDIA_RENDERER_1) {
+    if (_pDevice->getDeviceTypeFullString() == DeviceType::MEDIA_RENDERER_1) {
 //    if (peerConnectionManager.getServiceId() == ServiceType::CD_1) {
         pConnection = new Connection(peerConnectionManager.getUuid(), _pDevice->getUuid());
     }
-    else if (_pDevice->getDeviceType() == DeviceType::MEDIA_SERVER_1) {
+    else if (_pDevice->getDeviceTypeFullString() == DeviceType::MEDIA_SERVER_1) {
 //    else if (peerConnectionManager.getServiceId() == ServiceType::AVT_1) {
         pConnection = new Connection(_pDevice->getUuid(), peerConnectionManager.getUuid());
     }

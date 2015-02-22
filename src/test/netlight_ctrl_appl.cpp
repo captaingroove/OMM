@@ -39,12 +39,12 @@ class MyController : public Omm::Controller
     {
         std::cout << "MyController::deviceAdded()" << std::endl;
         std::cout << "uuid: " << pDeviceContainer->getRootDevice()->getUuid() << std::endl;
-        std::cout << "type: " << pDeviceContainer->getRootDevice()->getDeviceType() << std::endl;
+        std::cout << "type: " << pDeviceContainer->getRootDevice()->getDeviceTypeFullString() << std::endl;
 //         std::cout << "friendly name: " << pDeviceContainer->getRootDevice()->getFriendlyName() << std::endl;
         
         // NOTE: could write a DeviceFactory here ...
         // NOTE: could iterate through all devices of DeviceContainer here ...
-        if (pDeviceContainer->getRootDevice()->getDeviceType() == "urn:schemas-upnp-org:device:DimmableLight:1") {
+        if (pDeviceContainer->getRootDevice()->getDeviceTypeFullString() == "urn:schemas-upnp-org:device:DimmableLight:1") {
             Poco::Timestamp t;
             std::cout << "TIME: " << t.elapsed() << std::endl;
             DimmableLightController* pDimmableLightCtrl = new DimmableLightController(pDeviceContainer->getRootDevice(), new SwitchPowerControllerImpl);
