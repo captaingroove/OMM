@@ -1664,8 +1664,14 @@ std::string
 Subscription::getEventKey()
 {
     // TODO: should lock this
-    _eventKey = (++_eventKey == 0) ? 1 : _eventKey;
-    return Poco::NumberFormatter::format(_eventKey);
+    std::string res = Poco::NumberFormatter::format(_eventKey);
+    // event key wrap when overflow (eventKey == 0, again), then set to 1. Otherwise just increment.
+    // event key for initial event message must be 0 (not 1)
+    _eventKey++;
+    if (_eventKey == 0) {
+        _eventKey = 1;
+    }
+    return res;
 }
 
 
