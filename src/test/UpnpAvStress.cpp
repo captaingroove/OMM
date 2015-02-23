@@ -28,7 +28,9 @@
 #include <Poco/DirectoryIterator.h>
 
 #include <Omm/UpnpAvCtlObject.h>
+#include <Omm/UpnpGui/UpnpApplication.h>
 #include <Omm/Util.h>
+#include <Omm/Upnp.h>
 
 
 class StressAvUserInterface : public Omm::Av::AvUserInterface
@@ -130,12 +132,14 @@ StressAvUserInterface::chooseRandomItem(Omm::Av::CtlMediaObject* pParentContaine
 
 int
 main(int argc, char** argv) {
-    Omm::Av::AvController controller;
-    StressAvUserInterface userInterface;
+//    Omm::Av::AvController controller;
+    Omm::Controller controller;
+//    Omm::UpnpApplication app;
+//    StressAvUserInterface userInterface;
 
-    controller.setUserInterface(&userInterface);
+//    controller.setUserInterface(&userInterface);
     controller.setState(Omm::DeviceManager::Public);
 
     LOGNS(Omm::Av, upnpav, debug, "Upnp-AV stress test: starting event loop");
-    return userInterface.eventLoop();
+//    return userInterface.eventLoop();
 }

@@ -195,21 +195,53 @@ UpnpApplication::handleOption(const std::string& name, const std::string& value)
         _helpRequested = true;
     }
     else if (name == "server") {
-        Poco::StringTokenizer serverSpec(value, ":");
+        Poco::StringTokenizer serverSpec(value, ",");
         if (serverSpec.count() < 4) {
-            LOGNS(Av, upnpav, information, "server spec \"" + value + "\" needs four parameters, \"name:uuid:datamodel:basepath\", ignoring");
+            LOGNS(Av, upnpav, information, "server spec \"" + value + "\" needs four parameters, \"name, uuid, model, path\", ignoring");
         }
         else {
-            std::string uuid = serverSpec[1];
+            bool correctSyntax = true;
+            std::string friendlyName;
+            std::string uuid;
+            std::string model;
+            std::string basePath;
+            for (Poco::StringTokenizer::Iterator it = serverSpec.begin(); it != serverSpec.end(); ++it) {
+                Poco::StringTokenizer paramSpec(*it, "=");
+                if (paramSpec.count() < 2) {
+                    LOGNS(Av, upnpav, information, "parameter of server spec must be \"key = value\", but is: " + *it + ", ignoring");
+                    correctSyntax = false;
+                }
+                else {
+                    std::string key = Poco::trim(paramSpec[0]);
+                    std::string value = Poco::trim(paramSpec[1]);
+                    if (key == "name") {
+                        friendlyName = value;
+                    }
+                    else if (key == "uuid") {
+                        uuid = value;
+                    }
+                    else if (key == "model") {
+                        model = value;
+                    }
+                    else if (key == "path") {
+                        basePath = value;
+                    }
+                    else {
+                        correctSyntax = false;
+                    }
+                }
+            }
             // uuid may be a valid uuid or empty, when empty assign a random uuid
             if (uuid == "") {
                 uuid = Poco::UUIDGenerator().createRandom().toString();
             }
-            config().setString("server." + uuid + ".enable", "true");
-            config().setString("server." + uuid + ".friendlyName", serverSpec[0]);
-            config().setString("server." + uuid + ".uuid", uuid);
-            config().setString("server." + uuid + ".plugin", "model-" + serverSpec[2]);
-            config().setString("server." + uuid + ".basePath", serverSpec[3]);
+            if (correctSyntax) {
+                config().setString("server." + uuid + ".enable", "true");
+                config().setString("server." + uuid + ".friendlyName", friendlyName);
+                config().setString("server." + uuid + ".uuid", uuid);
+                config().setString("server." + uuid + ".plugin", "model-" + model);
+                config().setString("server." + uuid + ".basePath", basePath);
+            }
         }
     }
 }
@@ -580,9 +612,10 @@ UpnpApplication::addLocalServer(const std::string& id)
     pContainer->setDataModel(pDataModel);
     std::string basePath = config().getString("server." + id + ".basePath", "webradio.xml");
     std::string path = basePath;
+    Poco::Path ppath(path);
     // if relative path then search file in config directory
-    if (basePath[0] != '/') {
-        path = Omm::Util::Home::instance()->getConfigDirPath("/") + basePath;
+    if (ppath.isRelative()) {
+        path = Omm::Util::Home::instance()->getConfigDirPath() + basePath;
     }
     pContainer->setBasePath(path);
     pContainer->setLayout(config().getString("server." + id + ".layout", Av::ServerContainer::LAYOUT_FLAT));

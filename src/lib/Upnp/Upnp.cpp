@@ -4334,7 +4334,7 @@ const std::string Controller::SearchTargetUrn("urn:");
 
 Controller::Controller() :
 DeviceManager(new Socket),
-_featureSubscribeToEvents(false)
+_featureSubscribeToEvents(true)
 {
 }
 
