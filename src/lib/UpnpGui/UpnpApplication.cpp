@@ -165,6 +165,8 @@ UpnpApplication::runEventLoop(int argc, char** argv)
 {
     initLocalDevices();
     startApp();
+//    run(argc, argv);
+    // FIXME: on windows Ctrl-C terminates immediately without shutting down the application
     waitForTerminationRequest();
     stopApp();
     return Poco::Util::ServerApplication::EXIT_OK;

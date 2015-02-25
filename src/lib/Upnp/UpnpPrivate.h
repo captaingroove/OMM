@@ -55,12 +55,12 @@ static const std::string    SSDP_ADDRESS        = "239.255.255.250";
 static const std::string    SSDP_LOOP_ADDRESS   = "127.255.255.255";
 static const Poco::UInt16   SSDP_PORT           = 1900;
 static const Poco::UInt16   SSDP_CACHE_DURATION = 1800;
-//static const Poco::UInt16   SSDP_CACHE_DURATION = 90;
 static const Poco::UInt16   SSDP_MIN_WAIT_TIME  = 1;
 static const Poco::UInt16   SSDP_MAX_WAIT_TIME  = 120;
+static const Poco::UInt16   SSDP_DEFAULT_WAIT_TIME  = 2;
 
-//static const Poco::UInt16   EVENT_SUBSCRIPTION_DURATION = 1800;
-static const Poco::UInt16   EVENT_SUBSCRIPTION_DURATION = 90;
+static const Poco::UInt16   EVENT_SUBSCRIPTION_DURATION = 1800;
+//static const Poco::UInt16   EVENT_SUBSCRIPTION_DURATION = 90;
 
 class ControlRequestHandler;
 class HttpSocket;
@@ -232,7 +232,7 @@ public:
     std::string getServerUpnpVersion();
     std::string getServerProductNameVersion();
 
-    void setMaximumWaitTime(int waitTime = SSDP_MIN_WAIT_TIME);  // max time to delay response, between 1 and 120 seconds.
+    void setMaximumWaitTime(int waitTime = SSDP_DEFAULT_WAIT_TIME);  // max time to delay response, between 1 and 120 seconds.
     int getMaximumWaitTime();
 
     void setDate();

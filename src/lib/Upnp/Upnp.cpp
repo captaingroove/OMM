@@ -2390,7 +2390,7 @@ Service::sendSubscriptionRequest(bool renew)
     Poco::URI eventSubscriptionUri(baseUri);
     eventSubscriptionUri.resolve(getEventSubscriptionPath());
 //    LOG(event, debug, "preparing subscription request for uri: "  + eventSubscriptionUri.toString());
-    Poco::Net::HTTPRequest request("SUBSCRIBE", eventSubscriptionUri.getPath(), "HTTP/1.1");
+    Poco::Net::HTTPRequest request("SUBSCRIBE", eventSubscriptionUri.getPathEtc(), "HTTP/1.1");
     request.set("HOST", baseUri.getAuthority());
     if (renew) {
         request.set("SID", "uuid:" + _pControllerSubscriptionData->getUuid());
@@ -2730,14 +2730,14 @@ DescriptionRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, 
         LOG(desc, debug, "description (header) successfully sent");
     }
 
-    /*
-    mediatomb needs this for SAMSUNGs:
-    <custom-http-headers>
-    <!-- Samsung needs it -->
-    <add header="transferMode.dlna.org: Streaming"/>
-    <add header="contentFeatures.dlna.org: DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000"/>
-    </custom-http-headers>
-    */
+
+//    mediatomb needs this for SAMSUNGs:
+//    <custom-http-headers>
+//    <!-- Samsung needs it -->
+//    <add header="transferMode.dlna.org: Streaming"/>
+//    <add header="contentFeatures.dlna.org: DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000"/>
+//    </custom-http-headers>
+
 }
 
 
@@ -4412,11 +4412,11 @@ Controller::startSsdp()
 void
 Controller::sendMSearch(const std::string& searchTarget)
 {
+    // FIXME: network exception in controller when sending MSearch after network device removal
     LOG(upnp, debug, "controller sends M-SEARCH");
+
     SsdpMessage m(SsdpMessage::REQUEST_SEARCH);
     m.setSearchTarget(searchTarget);
-
-    // FIXME: network exception in controller when sending MSearch after network device removal
     _pSocket->sendSsdpMessage(m);
 }
 
