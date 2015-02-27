@@ -109,7 +109,8 @@ class ControllerWidgetClusterController : public Omm::Gui::ClusterController
 ControllerWidget::ControllerWidget(GuiUpnpApplication* pApplication) :
 //ClusterView(0, Gui::ClusterView::Generic),
 ClusterView(0, Gui::ClusterView::Column),
-_pApplication(pApplication)
+_pApplication(pApplication),
+_featureSignalNetworkActivity(false)
 {
     LOGNS(Gui, gui, debug, "controller widget ctor ...");
 
@@ -368,7 +369,9 @@ ControllerWidget::back()
 void
 ControllerWidget::signalNetworkActivity(bool on)
 {
-    on ? _pActivityIndicator->startActivity() : _pActivityIndicator->stopActivity();
+    if (_featureSignalNetworkActivity) {
+        on ? _pActivityIndicator->startActivity() : _pActivityIndicator->stopActivity();
+    }
 }
 
 

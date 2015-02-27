@@ -134,16 +134,16 @@ ${OMM_AVSTREAM}
 )
 
 
-#add_executable(upnpavstress
-#UpnpAvStress.cpp
-#)
-#
-#target_link_libraries(upnpavstress
-#${POCO_UTIL}
-#${OMM_UTIL}
-#${OMM}
-#${OMM_AV}
-#)
+add_executable(upnpavstress
+UpnpAvStress.cpp
+)
+
+target_link_libraries(upnpavstress
+${POCO_UTIL}
+${OMM_UTIL}
+${OMM}
+${OMM_AV}
+)
 
 
 add_executable(search
@@ -153,4 +153,10 @@ SearchCriteria.cpp
 target_link_libraries(search
 ${OMM}
 ${OMM_AV}
+)
+
+
+install(TARGETS upnpavstress
+RUNTIME DESTINATION bin
+LIBRARY DESTINATION lib
 )

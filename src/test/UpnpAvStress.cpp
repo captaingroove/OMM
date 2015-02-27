@@ -1,7 +1,7 @@
 /***************************************************************************|
 |  OMM - Open Multimedia                                                    |
 |                                                                           |
-|  Copyright (C) 2009, 2010, 2011                                           |
+|  Copyright (C) 2009, 2010, 2011, 2015                                     |
 |  Jörg Bakker (jb'at'open-multimedia.org)                                  |
 |                                                                           |
 |  This file is part of OMM.                                                |
@@ -26,31 +26,110 @@
 #include <Poco/Random.h>
 #include <Poco/Environment.h>
 #include <Poco/DirectoryIterator.h>
+#include <Poco/Util/ServerApplication.h>
+#include <Poco/Util/Option.h>
+#include <Poco/Util/OptionSet.h>
+#include <Poco/Util/HelpFormatter.h>
 
-#include <Omm/UpnpAvCtlObject.h>
-#include <Omm/UpnpGui/UpnpApplication.h>
 #include <Omm/Util.h>
 #include <Omm/Upnp.h>
+#include <Omm/UpnpAv.h>
+#include <Omm/UpnpAvCtlServer.h>
+#include <Omm/UpnpAvCtlRenderer.h>
+#include <Omm/UpnpAvCtlObject.h>
 
 
-class StressAvUserInterface : public Omm::Av::AvUserInterface
+class MediaServerGroup : public Omm::DeviceGroup
 {
 public:
-    virtual int eventLoop();
+    MediaServerGroup(Omm::DeviceGroupDelegate* pDeviceGroupDelegate) : DeviceGroup(pDeviceGroupDelegate) {}
 
 private:
-    Omm::Av::CtlMediaObject* chooseRandomItem(Omm::Av::CtlMediaObject* pParentContainer);
+    virtual Omm::Device* createDevice() { return new Omm::Av::CtlMediaServer; }
 };
 
 
-int
-StressAvUserInterface::eventLoop()
+class MediaRendererGroup : public Omm::DeviceGroup
 {
-    const int maxTests = 10;
+public:
+    MediaRendererGroup(Omm::DeviceGroupDelegate* pDeviceGroupDelegate) : DeviceGroup(pDeviceGroupDelegate) {}
+
+private:
+    virtual Omm::Device* createDevice() { return new Omm::Av::CtlMediaRenderer; }
+};
+
+
+class AvStressController : public Poco::Util::ServerApplication
+{
+public:
+    AvStressController():
+        _helpRequested(false),
+        _mediaRendererGroup(new Omm::Av::MediaRendererGroupDelegate),
+        _mediaServerGroup(new Omm::Av::MediaServerGroupDelegate),
+        _controllerThreadRunnable(*this, &AvStressController::controllerThread),
+        _controllerThreadRunning(false)
+    {}
+
+    void displayHelp() {}
+    void start();
+    void stop();
+
+
+protected:
+    int main(const std::vector<std::string>& args);
+
+private:
+    void controllerThread();
+    bool controllerThreadRunning();
+
+    Omm::Av::CtlMediaObject* chooseRandomItem(Omm::Av::CtlMediaObject* pParentContainer);
+
+    bool                                        _helpRequested;
+    MediaRendererGroup                          _mediaRendererGroup;
+    MediaServerGroup                            _mediaServerGroup;
+    Omm::Controller                             _controller;
+    Poco::Thread                                _controllerThread;
+    Poco::RunnableAdapter<AvStressController>   _controllerThreadRunnable;
+    bool                                        _controllerThreadRunning;
+    Poco::FastMutex                             _controllerThreadRunningLock;
+};
+
+
+void
+AvStressController::start()
+{
+    _controller.registerDeviceGroup(&_mediaRendererGroup);
+    _controller.registerDeviceGroup(&_mediaServerGroup);
+    _controller.init();
+    _controller.setState(Omm::DeviceManager::Public);
+    _controllerThread.start(_controllerThreadRunnable);
+}
+
+
+void
+AvStressController::stop()
+{
+    _controllerThreadRunningLock.lock();
+    _controllerThreadRunning = false;
+    _controllerThreadRunningLock.unlock();
+    if (controllerThreadRunning() && !_controllerThread.tryJoin(1000)) {
+        LOGNS(Omm::Av, upnpav, error, "failed to join controller thread");
+    }
+    else {
+        LOGNS(Omm::Av, upnpav, debug, "controller thread finished.");
+    }
+    _controller.setState(Omm::DeviceManager::Stopped);
+}
+
+
+void
+AvStressController::controllerThread()
+{
+    _controllerThreadRunning = true;
+    LOGNS(Omm::Av, upnpav, debug, "Upnp-AV stress test: controller thread started");
+
     const int maxPlayTime = 3500;  // msec
-//    const int maxPlayTime = 1000;  // msec
     const int waitForDevice = 1000; // msec
-    const std::string ignoreServerUuid("fa095ecc-e13e-40e7-8e6c-001f3fbdd43e");
 
     Poco::Random serverNumber;
     serverNumber.seed();
@@ -59,46 +138,49 @@ StressAvUserInterface::eventLoop()
     Poco::Random playTime;
     playTime.seed();
 
-    bool testCountUnlimited = true;
     int test = 1;
-    while (testCountUnlimited || test <= maxTests) {
-        if (serverCount() == 0 || rendererCount() == 0) {
+    while (controllerThreadRunning()) {
+        Omm::DeviceGroup* pServerGroup = _controller.getDeviceGroup(Omm::Av::DeviceType::MEDIA_SERVER_1);
+        Omm::DeviceGroup* pRendererGroup = _controller.getDeviceGroup(Omm::Av::DeviceType::MEDIA_RENDERER_1);
+
+        if (pServerGroup == 0 || pRendererGroup == 0 || pServerGroup->getDeviceCount() == 0 || pRendererGroup->getDeviceCount() == 0) {
+            LOGNS(Omm::Av, upnpav, debug, "wait for devices ...");
             Poco::Thread::sleep(waitForDevice);
         }
         else {
             LOGNS(Omm::Av, upnpav, debug, "test #" + Poco::NumberFormatter::format(test)\
-                + ", servers: " + Poco::NumberFormatter::format(serverCount())\
-                + ", renderers: " + Poco::NumberFormatter::format(rendererCount()));
+                + ", servers: " + Poco::NumberFormatter::format(pServerGroup->getDeviceCount())\
+                + ", renderers: " + Poco::NumberFormatter::format(pRendererGroup->getDeviceCount()));
             // choose a random server
-            int selectedServerNumber;
-            do {
-                selectedServerNumber = serverNumber.next(serverCount());
-            }
-            while (serverUuid(selectedServerNumber) == ignoreServerUuid);
+            int selectedServerNumber = serverNumber.next(pServerGroup->getDeviceCount());
 
-            Omm::Av::CtlMediaObject* pRootObject = serverRootObject(selectedServerNumber);
-            LOGNS(Omm::Av, upnpav, debug, "server: " + pRootObject->getTitle() + ", uuid: " + serverUuid(selectedServerNumber));
+            Omm::Av::CtlMediaServer* pSelectedServer = dynamic_cast<Omm::Av::CtlMediaServer*>(pServerGroup->getDevice(selectedServerNumber));
+            if (pSelectedServer) {
+                pSelectedServer->browseRootObject();
+                Omm::Av::CtlMediaObject* pRootObject = pSelectedServer->getRootObject();
+                LOGNS(Omm::Av, upnpav, debug, "server: " + pSelectedServer->getFriendlyName()); // + ", root object: " + pRootObject->getTitle());
 
-            // choose a random item
-            Omm::Av::CtlMediaObject* pObject = pRootObject;
-            if (pRootObject->isContainer()) {
-                pObject = chooseRandomItem(pRootObject);
-            }
+                // choose a random item
+                Omm::Av::CtlMediaObject* pObject = 0;
+                Omm::Av::CtlMediaObject* pParent = 0;
+                if (pRootObject && pRootObject->isContainer()) {
+                    pObject = chooseRandomItem(pRootObject);
+                    pParent = dynamic_cast<Omm::Av::CtlMediaObject*>(pObject->getParent());
+                }
 
-            // choose a random renderer
-            Omm::Av::AvRendererView* pRenderer = rendererView(rendererNumber.next(rendererCount()));
+                // choose a random renderer
+                int selectedRendererNumber = rendererNumber.next(pRendererGroup->getDeviceCount());
+                Omm::Av::CtlMediaRenderer* pRenderer = dynamic_cast<Omm::Av::CtlMediaRenderer*>(pRendererGroup->getDevice(selectedRendererNumber));
 
-            // play item on renderer
-            if (pRenderer && pObject) {
-                rendererSelected(pRenderer);
-                mediaObjectSelected(pObject);
-                LOGNS(Omm::Av, upnpav, debug, "playing: " + pObject->getTitle() + " on: " + pRenderer->getName());
-                playPressed();
-                Poco::Thread::sleep(maxPlayTime);
-//                Poco::Thread::sleep(playTime.next(maxPlayTime));
-                // without stop, renderer crashes occasionally (vlc engine: "No active input").
-                // so we put further stress on the engine without stopping it.
-//                stopPressed();
+                // play item on renderer
+                if (pRenderer && pObject && pParent) {
+                    pRenderer->setObject(pObject, pParent, 0);
+                    pRenderer->playPressed();
+                    LOGNS(Omm::Av, upnpav, debug, "playing: " + pObject->getTitle() + " on: " + pRenderer->getFriendlyName());
+                    Poco::Thread::sleep(maxPlayTime);
+                    // we put further stress on the engine without stopping it.
+    //                pRenderer->stopPressed();
+                }
             }
             test++;
         }
@@ -106,22 +188,47 @@ StressAvUserInterface::eventLoop()
 }
 
 
+bool
+AvStressController::controllerThreadRunning()
+{
+    Poco::ScopedLock<Poco::FastMutex> _lock(_controllerThreadRunningLock);
+    return _controllerThreadRunning;
+}
+
+
+int
+AvStressController::main(const std::vector<std::string>& args)
+{
+    if (_helpRequested)
+    {
+        displayHelp();
+    }
+    else
+    {
+        start();
+        waitForTerminationRequest();
+        stop();
+    }
+    return Application::EXIT_OK;
+}
+
+
 Omm::Av::CtlMediaObject*
-StressAvUserInterface::chooseRandomItem(Omm::Av::CtlMediaObject* pParentContainer)
+AvStressController::chooseRandomItem(Omm::Av::CtlMediaObject* pParentContainer)
 {
     Poco::Random childNumber;
     childNumber.seed();
 
-    if (pParentContainer->childCount() == 0) {
+    if (pParentContainer->getChildCount() == 0) {
         return 0;
     }
 
-    int child = childNumber.next(pParentContainer->childCount());
+    int child = childNumber.next(pParentContainer->getChildCount());
     while (pParentContainer->getChildCount() <= child) {
         pParentContainer->fetchChildren();
     }
 
-    Omm::Av::CtlMediaObject* pObject = static_cast<Omm::Av::CtlMediaObject*>(pParentContainer->getChild(child));
+    Omm::Av::CtlMediaObject* pObject = dynamic_cast<Omm::Av::CtlMediaObject*>(pParentContainer->getChildForRow(child));
     if (pObject->isContainer()) {
         pObject = chooseRandomItem(pObject);
     }
@@ -132,14 +239,6 @@ StressAvUserInterface::chooseRandomItem(Omm::Av::CtlMediaObject* pParentContaine
 
 int
 main(int argc, char** argv) {
-//    Omm::Av::AvController controller;
-    Omm::Controller controller;
-//    Omm::UpnpApplication app;
-//    StressAvUserInterface userInterface;
-
-//    controller.setUserInterface(&userInterface);
-    controller.setState(Omm::DeviceManager::Public);
-
-    LOGNS(Omm::Av, upnpav, debug, "Upnp-AV stress test: starting event loop");
-//    return userInterface.eventLoop();
+    AvStressController controller;
+    return controller.run(argc, argv);
 }

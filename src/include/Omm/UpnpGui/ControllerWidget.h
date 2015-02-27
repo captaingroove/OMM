@@ -95,6 +95,7 @@ private:
     ActivityIndicator*          _pActivityIndicator;
     std::string                 _localRendererUuid;
     GuiUpnpApplication*         _pApplication;
+    bool                        _featureSignalNetworkActivity;
 };
 
 
