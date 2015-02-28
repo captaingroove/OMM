@@ -22,6 +22,9 @@
 #ifndef UpnpApplication_INCLUDED
 #define UpnpApplication_INCLUDED
 
+#include <map>
+#include <set>
+
 #include <Poco/Notification.h>
 #include <Poco/Util/ServerApplication.h>
 #include <Poco/Util/Option.h>
@@ -78,6 +81,8 @@ protected:
     // Poco::Util::Application interface
     virtual void defineOptions(Poco::Util::OptionSet& options);
     virtual void handleOption(const std::string& name, const std::string& value);
+    bool parseParameters(std::map<std::string,std::string>& parameters, const std::set<std::string>& allowedNames, const std::string& values);
+    void setParameters(const std::map<std::string,std::string>& parameters, const std::string& baseKey);
 
     virtual int runEventLoop(int argc, char** argv);
     virtual void defaultConfig();

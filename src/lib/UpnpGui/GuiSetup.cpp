@@ -161,7 +161,7 @@ class RendererDoneButton : Gui::Button
     virtual void pushed()
     {
         _pRendererConfView->writeConf();
-        _pGuiSetup->_pRendererItemModel->getLabelModel()->setLabel(_pGuiSetup->_pApp->getFileConfiguration()->getString("renderer.friendlyName", ""));
+        _pGuiSetup->_pRendererItemModel->getLabelModel()->setLabel(_pGuiSetup->_pApp->getFileConfiguration()->getString("renderer.name", ""));
         _pGuiSetup->_pRendererItem->syncView();
         _pGuiSetup->pop();
         _pGuiSetup->_pApp->restartLocalDeviceContainer();
@@ -220,7 +220,7 @@ _pGuiSetup(pGuiSetup)
 //    pRendererFriendlyNameLabel->setStretchFactor(-1.0);
     pRendererFriendlyNameLabel->setSizeConstraint(20, 20, Gui::View::Pref);
     _pRendererFriendlyNameText = new Gui::TextLine(pRendererFriendlyNameView);
-    _pRendererFriendlyNameText->setTextLine(_pGuiSetup->_pApp->getFileConfiguration()->getString("renderer.friendlyName", ""));
+    _pRendererFriendlyNameText->setTextLine(_pGuiSetup->_pApp->getFileConfiguration()->getString("renderer.name", ""));
 
 //        Gui::View* pRendererUuidView = new Gui::View(this);
 //        pRendererUuidView->setLayout(new Gui::HorizontalLayout);
@@ -242,7 +242,7 @@ void
 RendererConfView::writeConf()
 {
     _pGuiSetup->_pApp->getFileConfiguration()->setBool("renderer.enable", _pRendererEnableSwitch->getStateOn());
-    _pGuiSetup->_pApp->getFileConfiguration()->setString("renderer.friendlyName", _pRendererFriendlyNameText->getTextLine());
+    _pGuiSetup->_pApp->getFileConfiguration()->setString("renderer.name", _pRendererFriendlyNameText->getTextLine());
 }
 
 
@@ -561,12 +561,12 @@ class ServerConfModel : public Gui::Model
 
     std::string getFriendlyName()
     {
-        return _pGuiSetup->_pApp->getFileConfiguration()->getString("server." + _id + ".friendlyName", "");
+        return _pGuiSetup->_pApp->getFileConfiguration()->getString("server." + _id + ".name", "");
     }
 
     std::string getPlugin()
     {
-        return _pGuiSetup->_pApp->getFileConfiguration()->getString("server." + _id + ".plugin", "");
+        return _pGuiSetup->_pApp->getFileConfiguration()->getString("server." + _id + ".model", "");
     }
 
     std::string getPluginText()
@@ -585,7 +585,7 @@ class ServerConfModel : public Gui::Model
 
     std::string getBasePath()
     {
-        return _pGuiSetup->_pApp->getFileConfiguration()->getString("server." + _id + ".basePath", "");
+        return _pGuiSetup->_pApp->getFileConfiguration()->getString("server." + _id + ".path", "");
     }
 
     std::string getPollTime()
@@ -610,10 +610,10 @@ class ServerConfModel : public Gui::Model
     void writeConf()
     {
         _pGuiSetup->_pApp->getFileConfiguration()->setBool("server." + _id + ".enable", _pConfView->_pServerEnableSwitch->getStateOn());
-        _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".friendlyName", _pConfView->_pServerFriendlyNameText->getTextLine());
+        _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".name", _pConfView->_pServerFriendlyNameText->getTextLine());
         _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".uuid", _uuid);
-//        _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".plugin", _pConfView->_pServerPluginSelector->getTextLine());
-        _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".basePath", _pConfView->_pServerBasePathText->getTextLine());
+//        _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".model", _pConfView->_pServerPluginSelector->getTextLine());
+        _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".path", _pConfView->_pServerBasePathText->getTextLine());
 //        _pGuiSetup->_pApp->getFileConfiguration()->setString("server." + _id + ".pollUpdateId", _pConfView->_pServerPollText->getTextLine());
         switch(_pConfView->_pServerLayoutSelector->getCurrentIndex()) {
             case 0:
@@ -689,7 +689,7 @@ class ServerScanButton : Gui::Button
             // FIX: ServerConfView::getBasePath() returns not the contents of the text line.
             std::string basePath = _pServerConfView->getBasePath();
             pServer->getRoot()->setBasePath(basePath);
-            _pApp->getFileConfiguration()->setString("server." + pServerConfModel->_id + ".basePath", basePath);
+            _pApp->getFileConfiguration()->setString("server." + pServerConfModel->_id + ".path", basePath);
 //            pServerConfModel->writeConf();
             Av::AbstractDataModel* pDataModel = pServer->getRoot()->getDataModel();
             if (pDataModel) {
@@ -1046,7 +1046,7 @@ ServerListModel::readConfig()
     std::string serversString = _pGuiSetup->_pApp->getFileConfiguration()->getString("servers", "");
     Poco::StringTokenizer servers(serversString, ",");
     for (Poco::StringTokenizer::Iterator it = servers.begin(); it != servers.end(); ++it) {
-        appendConfigItem(*it, _pGuiSetup->_pApp->getFileConfiguration()->getString("server." + *it + ".friendlyName", ""));
+        appendConfigItem(*it, _pGuiSetup->_pApp->getFileConfiguration()->getString("server." + *it + ".name", ""));
     }
 }
 
@@ -1160,7 +1160,7 @@ _pApp(pApp)
     _pRendererItem->setSizeConstraint(20, itemHeight, Gui::View::Pref);
     _pRendererItemModel = new Gui::ListItemModel;
     Gui::LabelModel* pRendererItemLabel = new Gui::LabelModel;
-    pRendererItemLabel->setLabel(_pApp->getFileConfiguration()->getString("renderer.friendlyName", "Local Renderer"));
+    pRendererItemLabel->setLabel(_pApp->getFileConfiguration()->getString("renderer.name", "Local Renderer"));
     _pRendererItemModel->setLabelModel(pRendererItemLabel);
     _pRendererItem->setModel(_pRendererItemModel);
     _pRendererItem->attachController(new RendererItemController(this));

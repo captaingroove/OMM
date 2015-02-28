@@ -81,14 +81,14 @@ WebSetup::generateConfigPage()
 
     *pOutStream << "<h2>Media Renderer</h2>\n";
     bool rendererEnable = _pConf->getBool("renderer.enable", false);
-    std::string rendererName = _pConf->getString("renderer.friendlyName", "");
+    std::string rendererName = _pConf->getString("renderer.name", "");
     std::string rendererUuid = _pConf->getString("renderer.uuid", "");
-    std::string rendererPlugin = _pConf->getString("renderer.plugin", "");
+    std::string rendererPlugin = _pConf->getString("renderer.engine", "");
     *pOutStream << "<fieldset><legend>" + rendererName + "</legend>"
         "<table>"
-        "<tr><td>friendly name</td><td><input type=\"text\" name=\"renderer.friendlyName\" size=\"32\" value=\"" + rendererName +  "\"></td></tr>\n"
+        "<tr><td>friendly name</td><td><input type=\"text\" name=\"renderer.name\" size=\"32\" value=\"" + rendererName +  "\"></td></tr>\n"
         "<tr><td>uuid</td><td><input type=\"text\" name=\"renderer.uuid\" size=\"32\" value=\"" + rendererUuid +  "\"></td></tr>\n"
-        "<tr><td>plugin</td><td><input type=\"text\" name=\"renderer.plugin\" size=\"32\" value=\"" + rendererPlugin +  "\"></td></tr>\n"
+        "<tr><td>plugin</td><td><input type=\"text\" name=\"renderer.engine\" size=\"32\" value=\"" + rendererPlugin +  "\"></td></tr>\n"
         "<tr><td>enable</td><td><input type=\"checkbox\" name=\"renderer.enable\" value=\"true\"" +  (rendererEnable ? "checked" : "") + " ></td></tr>\n"
         "</table>"
         "</fieldset>";
@@ -99,10 +99,10 @@ WebSetup::generateConfigPage()
     for (Poco::StringTokenizer::Iterator it = servers.begin(); it != servers.end(); ++it) {
         std::string serverKey = "server." + *it;
         bool serverEnable = _pConf->getBool(serverKey + ".enable", false);
-        std::string serverName = _pConf->getString(serverKey + ".friendlyName", "");
+        std::string serverName = _pConf->getString(serverKey + ".name", "");
         std::string serverUuid = _pConf->getString(serverKey + ".uuid", "");
-        std::string serverPlugin = _pConf->getString(serverKey + ".plugin", "");
-        std::string basePath = _pConf->getString(serverKey + ".basePath", "");
+        std::string serverPlugin = _pConf->getString(serverKey + ".model", "");
+        std::string basePath = _pConf->getString(serverKey + ".path", "");
         std::string pollUpdateId = _pConf->getString(serverKey + ".pollUpdateId", "0");
         bool checkMod = _pConf->getBool(serverKey + ".checkMod", false);
         std::string layout = _pConf->getString(serverKey + ".layout", "");
@@ -110,10 +110,10 @@ WebSetup::generateConfigPage()
         *pOutStream << "<fieldset><legend>" + serverName + "</legend>"
             "<table>"
             "<tr><td>enable</td><td><input type=\"hidden\" name=\"" + serverKey + ".enable\" value=\"false\"/><input type=\"checkbox\" name=\"" + serverKey + ".enable\" value=\"true\" " +  (serverEnable ? "checked" : "") + "></td></tr>\n"
-            "<tr><td>friendly name</td><td><input type=\"text\" name=\"" + serverKey + ".friendlyName\" size=\"32\" value=\"" + serverName +  "\"></td></tr>\n"
+            "<tr><td>friendly name</td><td><input type=\"text\" name=\"" + serverKey + ".name\" size=\"32\" value=\"" + serverName +  "\"></td></tr>\n"
             "<tr><td>uuid</td><td><input type=\"text\" name=\"" + serverKey + ".uuid\" size=\"32\" value=\"" + serverUuid +  "\"></td></tr>\n"
-            "<tr><td>plugin</td><td><input type=\"text\" name=\"" + serverKey + ".plugin\" size=\"32\" value=\"" + serverPlugin +  "\"></td></tr>\n"
-            "<tr><td>base path</td><td><input type=\"text\" name=\"" + serverKey + ".basePath\" size=\"32\" value=\"" + basePath +  "\"></td></tr>\n"
+            "<tr><td>plugin</td><td><input type=\"text\" name=\"" + serverKey + ".model\" size=\"32\" value=\"" + serverPlugin +  "\"></td></tr>\n"
+            "<tr><td>base path</td><td><input type=\"text\" name=\"" + serverKey + ".path\" size=\"32\" value=\"" + basePath +  "\"></td></tr>\n"
             "<tr><td>poll</td><td><input type=\"text\" name=\"" + serverKey + ".pollUpdateId\" size=\"10\" value=\"" + pollUpdateId +  "\"></td></tr>\n"
             "<tr><td>check mod</td><td><input type=\"hidden\" name=\"" + serverKey + ".checkMod\" value=\"false\"/><input type=\"checkbox\" name=\"" + serverKey + ".checkMod\" value=\"true\" " +  (checkMod ? "checked" : "") + "></td></tr>\n"
             "<tr><td>layout</td><td><select name=\"" + serverKey + ".layout\" size=\"1\">"
@@ -130,10 +130,10 @@ WebSetup::generateConfigPage()
     *pOutStream << "<fieldset><legend>New Server</legend>"
             "<table>"
             "<tr><td>enable</td><td><input type=\"hidden\" name=\"" + newServerKey + ".enable\" value=\"false\"/><input type=\"checkbox\" name=\"" + newServerKey + ".enable\" value=\"true\"></td></tr>\n"
-            "<tr><td>friendly name</td><td><input type=\"text\" name=\"" + newServerKey + ".friendlyName\" size=\"32\" value=\"\"></td></tr>\n"
+            "<tr><td>friendly name</td><td><input type=\"text\" name=\"" + newServerKey + ".name\" size=\"32\" value=\"\"></td></tr>\n"
             "<tr><td>uuid</td><td><input type=\"text\" name=\"" + newServerKey + ".uuid\" size=\"32\" value=\"" + Poco::UUIDGenerator().createRandom().toString() +  "\"></td></tr>\n"
-            "<tr><td>plugin</td><td><input type=\"text\" name=\"" + newServerKey + ".plugin\" size=\"32\" value=\"\"></td></tr>\n"
-            "<tr><td>base path</td><td><input type=\"text\" name=\"" + newServerKey + ".basePath\" size=\"32\" value=\"\"></td></tr>\n"
+            "<tr><td>plugin</td><td><input type=\"text\" name=\"" + newServerKey + ".model\" size=\"32\" value=\"\"></td></tr>\n"
+            "<tr><td>base path</td><td><input type=\"text\" name=\"" + newServerKey + ".path\" size=\"32\" value=\"\"></td></tr>\n"
             "<tr><td>poll</td><td><input type=\"text\" name=\"" + newServerKey + ".pollUpdateId\" size=\"10\" value=\"0\"></td></tr>\n"
             "<tr><td>check mod</td><td><input type=\"hidden\" name=\"" + newServerKey + ".checkMod\" value=\"false\"/><input type=\"checkbox\" name=\"" + newServerKey + ".checkMod\" value=\"true\"></td></tr>\n"
             "<tr><td>layout</td><td><select name=\"" + newServerKey + ".layout\" size=\"1\"> <option>" + Av::ServerContainer::LAYOUT_FLAT + "</option>"

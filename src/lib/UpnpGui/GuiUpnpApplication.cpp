@@ -112,7 +112,7 @@ GuiUpnpApplication::defineOptions(Poco::Util::OptionSet& options)
     options.addOption(Poco::Util::Option("renderer", "r", "enable renderer  \"name:uuid:engine\"")
                       .required(false)
                       .repeatable(false)
-                      .argument("renderername", true));
+                      .argument("rendererSpec", true));
 }
 
 
@@ -122,20 +122,23 @@ GuiUpnpApplication::handleOption(const std::string& name, const std::string& val
     UpnpApplication::handleOption(name, value);
 
     if (name == "renderer") {
-        Poco::StringTokenizer rendererSpec(value, ":");
-        if (rendererSpec.count() < 3) {
-            LOGNS(Av, upnpav, information, "renderer spec \"" + value + "\" needs four parameters, \"name:uuid:engine\", ignoring");
-        }
-        else {
-            std::string uuid = rendererSpec[1];
-            // uuid may be a valid uuid or empty, when empty assign a random uuid
+        std::map<std::string,std::string> params;
+        std::set<std::string> allowed;
+        allowed.insert("name");
+        allowed.insert("uuid");
+        allowed.insert("engine");
+
+        if (parseParameters(params, allowed, value)) {
+            std::string uuid = params["uuid"];
             if (uuid == "") {
                 uuid = Poco::UUIDGenerator().createRandom().toString();
             }
-            config().setString("renderer.enable", "true");
-            config().setString("renderer.friendlyName", rendererSpec[0]);
-            config().setString("renderer.uuid", uuid);
-            config().setString("renderer.plugin", "engine-" + rendererSpec[2]);
+            params["uuid"] = uuid;
+            params["enable"] = "true";
+            setParameters(params, "renderer");
+        }
+        else {
+            LOGNS(Av, upnpav, error, "wrong renderer spec in command line, ignoring");
         }
     }
     else if (name == "fullscreen") {
@@ -171,9 +174,9 @@ GuiUpnpApplication::presentedMainView()
     if (_showRendererVisualOnly) {
         if (!config().getBool("renderer.enable", false)) {
             config().setString("renderer.enable", "true");
-            config().setString("renderer.friendlyName", "OMM Player");
+            config().setString("renderer.name", "OMM Player");
 //            config().setString("renderer.uuid", "aed5b05a-f7e8-4354-bb24-812996d179a9");
-            config().setString("renderer.plugin", "engine-vlc");
+            config().setString("renderer.engine", "vlc");
         }
     }
     else {
@@ -224,9 +227,8 @@ GuiUpnpApplication::defaultConfig()
 
     LOGNS(Av, upnpav, information, "creating gui application default config");
     _pConf->setBool("renderer.enable", true);
-    _pConf->setString("renderer.friendlyName", "OMM Media Player");
-    _pConf->setString("renderer.plugin", "engine-vlc");
-//    _pConf->setString("renderer.uuid", "rra123bc-de45-6789-ffff-gg1234hhh56i");
+    _pConf->setString("renderer.name", "OMM Media Player");
+    _pConf->setString("renderer.engine", "vlc");
 }
 
 
@@ -282,9 +284,9 @@ GuiUpnpApplication::initLocalDevices()
     // add local renderer
     LOGNS(Av, upnpav, debug, "omm gui application init local devices ...");
     if (config().getBool("renderer.enable", false)) {
-        setLocalRenderer(config().getString("renderer.friendlyName", "OMM Renderer"),
+        setLocalRenderer(config().getString("renderer.name", "OMM Renderer"),
                 config().getString("renderer.uuid", ""),
-                config().getString("renderer.plugin", ""));
+                config().getString("renderer.engine", ""));
     }
 //#ifndef __IPHONE__
     if (_enableRenderer) {
@@ -317,7 +319,7 @@ GuiUpnpApplication::setLocalRenderer(const std::string& name, const std::string&
     _enableRenderer = true;
     _rendererName = name;
     _rendererUuid = uuid;
-    _rendererPlugin = pluginName;
+    _rendererPlugin = "engine-" + pluginName;
 }
 
 

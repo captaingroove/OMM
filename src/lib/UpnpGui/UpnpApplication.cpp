@@ -184,7 +184,7 @@ UpnpApplication::defineOptions(Poco::Util::OptionSet& options)
     options.addOption(Poco::Util::Option("server", "s", "add server \"name:uuid:datamodel:basepath\"")
                       .required(false)
                       .repeatable(true)
-                      .argument("device", true));
+                      .argument("serverSpec", true));
 }
 
 
@@ -197,54 +197,60 @@ UpnpApplication::handleOption(const std::string& name, const std::string& value)
         _helpRequested = true;
     }
     else if (name == "server") {
-        Poco::StringTokenizer serverSpec(value, ",");
-        if (serverSpec.count() < 4) {
-            LOGNS(Av, upnpav, information, "server spec \"" + value + "\" needs four parameters, \"name, uuid, model, path\", ignoring");
-        }
-        else {
-            bool correctSyntax = true;
-            std::string friendlyName;
-            std::string uuid;
-            std::string model;
-            std::string basePath;
-            for (Poco::StringTokenizer::Iterator it = serverSpec.begin(); it != serverSpec.end(); ++it) {
-                Poco::StringTokenizer paramSpec(*it, "=");
-                if (paramSpec.count() < 2) {
-                    LOGNS(Av, upnpav, information, "parameter of server spec must be \"key = value\", but is: " + *it + ", ignoring");
-                    correctSyntax = false;
-                }
-                else {
-                    std::string key = Poco::trim(paramSpec[0]);
-                    std::string value = Poco::trim(paramSpec[1]);
-                    if (key == "name") {
-                        friendlyName = value;
-                    }
-                    else if (key == "uuid") {
-                        uuid = value;
-                    }
-                    else if (key == "model") {
-                        model = value;
-                    }
-                    else if (key == "path") {
-                        basePath = value;
-                    }
-                    else {
-                        correctSyntax = false;
-                    }
-                }
-            }
-            // uuid may be a valid uuid or empty, when empty assign a random uuid
+        std::map<std::string,std::string> params;
+        std::set<std::string> allowed;
+        allowed.insert("name");
+        allowed.insert("uuid");
+        allowed.insert("model");
+        allowed.insert("path");
+
+        if (parseParameters(params, allowed, value)) {
+            std::string uuid = params["uuid"];
             if (uuid == "") {
                 uuid = Poco::UUIDGenerator().createRandom().toString();
             }
-            if (correctSyntax) {
-                config().setString("server." + uuid + ".enable", "true");
-                config().setString("server." + uuid + ".friendlyName", friendlyName);
-                config().setString("server." + uuid + ".uuid", uuid);
-                config().setString("server." + uuid + ".plugin", "model-" + model);
-                config().setString("server." + uuid + ".basePath", basePath);
+            params["uuid"] = uuid;
+            params["enable"] = "true";
+            setParameters(params, "server." + uuid);
+        }
+        else {
+            LOGNS(Av, upnpav, error, "wrong server spec in command line, ignoring");
+        }
+    }
+}
+
+
+bool
+UpnpApplication::parseParameters(std::map<std::string,std::string>& parameters, const std::set<std::string>& allowedNames, const std::string& values)
+{
+    Poco::StringTokenizer serverSpec(values, ",");
+    bool correctSyntax = true;
+    for (Poco::StringTokenizer::Iterator it = serverSpec.begin(); it != serverSpec.end(); ++it) {
+        Poco::StringTokenizer paramSpec(*it, "=");
+        if (paramSpec.count() < 2) {
+            LOGNS(Av, upnpav, error, "parameter of server spec must be a comma seperated list of \"key = value\" pairs, but is: " + *it + ", ignoring");
+            correctSyntax = false;
+        }
+        else {
+            std::string key = Poco::trim(paramSpec[0]);
+            std::string value = Poco::trim(paramSpec[1]);
+            if (allowedNames.find(key) != allowedNames.end()) {
+                parameters[key] = value;
+            }
+            else {
+                correctSyntax = false;
             }
         }
+    }
+    return correctSyntax;
+}
+
+
+void
+UpnpApplication::setParameters(const std::map<std::string,std::string>& parameters, const std::string& baseKey)
+{
+    for (std::map<std::string,std::string>::const_iterator it = parameters.begin(); it != parameters.end(); ++it) {
+        config().setString(baseKey + "." + it->first, it->second);
     }
 }
 
@@ -402,48 +408,44 @@ UpnpApplication::defaultConfig()
     int serverCount = 0;
     std::string serverString;
 
-    _pConf->setString("server.0.basePath", Sys::SysPath::getPath(Sys::SysPath::Home));
+    _pConf->setString("server.0.path", Sys::SysPath::getPath(Sys::SysPath::Home));
     _pConf->setBool("server.0.checkMod", false);
     _pConf->setBool("server.0.enable", false);
-    _pConf->setString("server.0.friendlyName", "OMM Media Files");
+    _pConf->setString("server.0.name", "OMM Media Files");
     _pConf->setString("server.0.layout", Av::ServerContainer::LAYOUT_FLAT);
-    _pConf->setString("server.0.plugin", "model-file");
+    _pConf->setString("server.0.model", "file");
     _pConf->setInt("server.0.pollUpdateId", 0);
-//    _pConf->setString("server.0.uuid", "00a123bc-de45-6789-ffff-gg1234hhh56i");
     serverString += Poco::NumberFormatter::format(serverCount++);
 
-    _pConf->setString("server.1.basePath", "webradio.xml");
+    _pConf->setString("server.1.path", "webradio.xml");
     _pConf->setBool("server.1.checkMod", false);
     _pConf->setBool("server.1.enable", false);
-    _pConf->setString("server.1.friendlyName", "OMM Webradio");
+    _pConf->setString("server.1.name", "OMM Webradio");
     _pConf->setString("server.1.layout", Av::ServerContainer::LAYOUT_FLAT);
-    _pConf->setString("server.1.plugin", "model-webradio");
+    _pConf->setString("server.1.model", "webradio");
     _pConf->setInt("server.1.pollUpdateId", 0);
-//    _pConf->setString("server.1.uuid", "01a123bc-de45-6789-ffff-gg1234hhh56i");
     serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount++);
 
     std::vector<Sys::Device*> dvbDevices;
     Sys::System::instance()->getDevicesForType(dvbDevices, Sys::System::DeviceTypeDvb);
     if(dvbDevices.size() > 0) {
-        _pConf->setString("server.2.basePath", "dvb.xml");
+        _pConf->setString("server.2.path", "dvb.xml");
         _pConf->setBool("server.2.checkMod", false);
         _pConf->setBool("server.2.enable", false);
-        _pConf->setString("server.2.friendlyName", "OMM Digital TV");
+        _pConf->setString("server.2.name", "OMM Digital TV");
         _pConf->setString("server.2.layout", Av::ServerContainer::LAYOUT_FLAT);
-        _pConf->setString("server.2.plugin", "model-dvb");
+        _pConf->setString("server.2.model", "dvb");
         _pConf->setInt("server.2.pollUpdateId", 0);
-//        _pConf->setString("server.2.uuid", "02a123bc-de45-6789-ffff-gg1234hhh56i");
         serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount++);
     }
 
-    _pConf->setString("server.new.basePath", "");
+    _pConf->setString("server.new.path", "");
     _pConf->setBool("server.new.checkMod", false);
     _pConf->setBool("server.new.enable", false);
-    _pConf->setString("server.new.friendlyName", "");
+    _pConf->setString("server.new.name", "");
     _pConf->setString("server.new.layout", Av::ServerContainer::LAYOUT_FLAT);
-    _pConf->setString("server.new.plugin", "");
+    _pConf->setString("server.new.model", "");
     _pConf->setInt("server.new.pollUpdateId", 0);
-//    _pConf->setString("server.new.uuid", "xxa123bc-de45-6789-ffff-gg1234hhh56i");
 
     _pConf->setString("servers", serverString);
 }
@@ -575,7 +577,7 @@ UpnpApplication::addLocalServer(const std::string& id)
 {
     LOGNS(Av, upnpav, debug, "omm application add local server with id: " + id + " ...");
 
-    std::string pluginName = config().getString("server." + id + ".plugin", "model-webradio");
+    std::string pluginName = "model-" + config().getString("server." + id + ".model", "webradio");
     Omm::Av::AbstractDataModel* pDataModel;
 #ifdef __IPHONE__
     if (pluginName == "model-mpmedia") {
@@ -593,10 +595,10 @@ UpnpApplication::addLocalServer(const std::string& id)
         pDataModel = pluginLoader.load(pluginName);
     }
     catch(Poco::NotFoundException) {
-        LOGNS(Av, upnpav, error, "could not find server plugin: " + pluginName);
+        LOGNS(Av, upnpav, error, "could not find server model plugin: " + pluginName);
         return;
     }
-    LOGNS(Av, upnpav, information, "container plugin: " + pluginName + " loaded successfully");
+    LOGNS(Av, upnpav, information, "container model plugin: " + pluginName + " loaded successfully");
 #endif
 
     pDataModel->setCacheDirPath(Util::Home::instance()->getCacheDirPath(), id);
@@ -607,12 +609,12 @@ UpnpApplication::addLocalServer(const std::string& id)
     _enableServer = true;
     Omm::Av::MediaServer* pMediaServer = new Av::MediaServer;
 
-    std::string name = config().getString("server." + id + ".friendlyName", "OMM Server");
+    std::string name = config().getString("server." + id + ".name", "OMM Server");
     Omm::Av::ServerContainer* pContainer = new Av::ServerContainer(pMediaServer);
     pContainer->setTitle(name);
     pContainer->setClass(Omm::Av::AvClass::className(Omm::Av::AvClass::CONTAINER));
     pContainer->setDataModel(pDataModel);
-    std::string basePath = config().getString("server." + id + ".basePath", "webradio.xml");
+    std::string basePath = config().getString("server." + id + ".path", "webradio.xml");
     std::string path = basePath;
     Poco::Path ppath(path);
     // if relative path then search file in config directory
