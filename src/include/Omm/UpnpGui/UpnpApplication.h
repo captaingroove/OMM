@@ -99,6 +99,7 @@ protected:
     Poco::Util::PropertyFileConfiguration*      _pConf;
     DeviceContainer*                            _pLocalDeviceContainer;
     bool                                        _enableLocalDeviceServer;
+    bool                                        _featureCheckInstance;
 
 private:
     // Poco::Util::Application interface

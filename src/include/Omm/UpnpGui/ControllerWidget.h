@@ -81,6 +81,7 @@ public:
     Av::CtlMediaRenderer* getSelectedRenderer();
 
     void showPlaylistEditor(bool show = true);
+    void setFeatureShowNetworkActivity(bool on = true);
 
 private:
     void playlistNotification(PlaylistNotification* pNotification);
@@ -95,7 +96,7 @@ private:
     ActivityIndicator*          _pActivityIndicator;
     std::string                 _localRendererUuid;
     GuiUpnpApplication*         _pApplication;
-    bool                        _featureSignalNetworkActivity;
+    bool                        _featureShowNetworkActivity;
 };
 
 

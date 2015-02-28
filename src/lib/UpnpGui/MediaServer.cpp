@@ -101,15 +101,17 @@ _editorVisible(false)
 Device*
 MediaServerGroupWidget::createDevice()
 {
-    LOGNS(Gui, gui, debug, "media server group widget create server device.");
-    return new MediaServerDevice(this);
+//    LOGNS(Gui, gui, debug, "media server group widget create server device.");
+    MediaServerDevice* pRes = new MediaServerDevice(this);
+    pRes->setFeatureHandleUpdateIdChange(Poco::Util::Application::instance().config().getBool("controller.handleUpdateId", false));
+    return pRes;
 }
 
 
 Gui::View*
 MediaServerGroupWidget::createItemView()
 {
-    LOGNS(Gui, gui, debug, "media server group widget create server view.");
+//    LOGNS(Gui, gui, debug, "media server group widget create server view.");
     return new MediaServerView;
 }
 

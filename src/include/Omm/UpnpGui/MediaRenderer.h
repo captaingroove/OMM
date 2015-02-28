@@ -106,6 +106,9 @@ public:
 
     std::string getTransportState();
 
+    void setFeaturePollPosition(bool on = true) { _featurePollPosition = on; }
+    void setFeatureTrackInfoFromConnection(bool on = true) { _featureTrackInfoFromConnection = on; }
+
 private:
     virtual void initController();
 

@@ -140,6 +140,7 @@ _ignoreConfig(false),
 //#endif
 _enableServer(false),
 _enableLocalDeviceServer(false),
+_featureCheckInstance(false),
 _pLocalDeviceServer(new DeviceServer),
 _pLocalDeviceContainer(new DeviceContainer),
 _pConf(0),
@@ -181,10 +182,14 @@ UpnpApplication::defineOptions(Poco::Util::OptionSet& options)
     options.addOption(Poco::Util::Option("help", "", "display help information on command line arguments")
                       .required(false)
                       .repeatable(false));
-    options.addOption(Poco::Util::Option("server", "s", "add server \"name:uuid:datamodel:basepath\"")
+    options.addOption(Poco::Util::Option("server", "s", "add server \"name=<name>, uuid=<uuid>, model=<model>, path=<path>\"")
                       .required(false)
                       .repeatable(true)
                       .argument("serverSpec", true));
+   options.addOption(Poco::Util::Option("application", "a", "application config parameters")
+                      .required(false)
+                      .repeatable(false)
+                      .argument("applicationSpec", true));
 }
 
 
@@ -215,6 +220,18 @@ UpnpApplication::handleOption(const std::string& name, const std::string& value)
         }
         else {
             LOGNS(Av, upnpav, error, "wrong server spec in command line, ignoring");
+        }
+    }
+    else if (name == "application") {
+        std::map<std::string,std::string> params;
+        std::set<std::string> allowed;
+        allowed.insert("checkInstance");
+
+        if (parseParameters(params, allowed, value)) {
+            setParameters(params, "application");
+        }
+        else {
+            LOGNS(Av, upnpav, error, "wrong application spec in command line, ignoring");
         }
     }
 }
@@ -269,12 +286,13 @@ UpnpApplication::main(const std::vector<std::string>& args)
         installGlobalErrorHandler();
 
 //        Poco::Util::ServerApplication::init(_argc, _argv);
-    // TODO: reenable _feature instance checking (segfaults with mutex)
-//        if (instanceAlreadyRunning()) {
-//            LOG(upnp, information, "omm application instance running, starting in controller mode");
-//            setLockInstance(false);
-//            setIgnoreConfig(true);
-//        }
+
+        _featureCheckInstance = config().getBool("application.checkInstance", false);
+        if (_featureCheckInstance && instanceAlreadyRunning()) {
+            LOG(upnp, information, "omm application instance running, starting in controller mode");
+            setLockInstance(false);
+            setIgnoreConfig(true);
+        }
         loadConfig();
         initConfig();
 
@@ -643,8 +661,7 @@ UpnpApplication::startAppHttpServer()
 {
     int port = config().getInt("application.configPort", _appStandardPort);
     bool useRandomPort = true;
-// TODO: reenable _feature instance checking (segfaults with mutex)
-//    if (!instanceAlreadyRunning()) {
+    if (!_featureCheckInstance || (_featureCheckInstance && !instanceAlreadyRunning())) {
         try {
             _socket = Poco::Net::ServerSocket(port);
             useRandomPort = false;
@@ -652,7 +669,7 @@ UpnpApplication::startAppHttpServer()
         catch (Poco::Exception& e) {
             LOG(upnp, error, "failed to start application http server on port " + Poco::NumberFormatter::format(port) + "(" + e.displayText() + ") , using random port.");
         }
-//    }
+    }
     if (useRandomPort) {
         try {
             _socket = Poco::Net::ServerSocket(0);

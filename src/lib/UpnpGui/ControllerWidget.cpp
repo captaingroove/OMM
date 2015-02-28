@@ -110,7 +110,7 @@ ControllerWidget::ControllerWidget(GuiUpnpApplication* pApplication) :
 //ClusterView(0, Gui::ClusterView::Generic),
 ClusterView(0, Gui::ClusterView::Column),
 _pApplication(pApplication),
-_featureSignalNetworkActivity(false)
+_featureShowNetworkActivity(true)
 {
     LOGNS(Gui, gui, debug, "controller widget ctor ...");
 
@@ -369,7 +369,7 @@ ControllerWidget::back()
 void
 ControllerWidget::signalNetworkActivity(bool on)
 {
-    if (_featureSignalNetworkActivity) {
+    if (_featureShowNetworkActivity) {
         on ? _pActivityIndicator->startActivity() : _pActivityIndicator->stopActivity();
     }
 }
@@ -405,6 +405,13 @@ ControllerWidget::showPlaylistEditor(bool show)
     else {
         _pPlaylistEditorView->hide();
     }
+}
+
+
+void
+ControllerWidget::setFeatureShowNetworkActivity(bool on)
+{
+    _featureShowNetworkActivity = on;
 }
 
 

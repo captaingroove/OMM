@@ -456,6 +456,8 @@ public:
 
     virtual void signalNetworkActivity(bool on) {}
 
+    void setFeatureSubscribeEventing(bool on = true) { _featureSubscribeToEvents = on; }
+
 protected:
     virtual void addDeviceContainer(DeviceContainer* pDeviceContainer, int index, bool begin) {}
     virtual void removeDeviceContainer(DeviceContainer* pDeviceContainer, int index, bool begin) {}

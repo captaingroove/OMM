@@ -22,13 +22,13 @@
 #include <cmath>
 #include <string>
 
+#include <Poco/Util/Application.h>
+
 #include "Util.h"
 #include "Gui/GuiLogger.h"
-
 #include "UpnpGui/ControllerWidget.h"
 #include "UpnpGui/MediaRenderer.h"
 #include "UpnpGui/MediaServer.h"
-
 #include "MediaImages.h"
 
 
@@ -59,7 +59,10 @@ Device*
 MediaRendererGroupWidget::createDevice()
 {
 //    LOGNS(Gui, gui, debug, "media renderer group widget create renderer device.");
-    return new MediaRendererDevice(_pControllerWidget);
+    MediaRendererDevice* pRes = new MediaRendererDevice(_pControllerWidget);
+    pRes->setFeaturePollPosition(Poco::Util::Application::instance().config().getBool("controller.pollPosition", false));
+    pRes->setFeatureTrackInfoFromConnection(Poco::Util::Application::instance().config().getBool("controller.trackConnection", true));
+    return pRes;
 }
 
 

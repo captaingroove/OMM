@@ -109,7 +109,11 @@ GuiUpnpApplication::defineOptions(Poco::Util::OptionSet& options)
                       .required(false)
                       .repeatable(false)
                       .argument("scale", true));
-    options.addOption(Poco::Util::Option("renderer", "r", "enable renderer  \"name:uuid:engine\"")
+    options.addOption(Poco::Util::Option("controller", "c", "controller config parameters")
+                      .required(false)
+                      .repeatable(false)
+                      .argument("controllerSpec", true));
+    options.addOption(Poco::Util::Option("renderer", "r", "enable renderer  \"name=<name>, uuid=<uuid>, engine=<engine>\"")
                       .required(false)
                       .repeatable(false)
                       .argument("rendererSpec", true));
@@ -144,6 +148,22 @@ GuiUpnpApplication::handleOption(const std::string& name, const std::string& val
     else if (name == "fullscreen") {
         config().setString("application.fullscreen", "true");
     }
+    else if (name == "controller") {
+        std::map<std::string,std::string> params;
+        std::set<std::string> allowed;
+        allowed.insert("subscribeEventing");
+        allowed.insert("showNetworkActivity");
+        allowed.insert("pollPosition");
+        allowed.insert("trackConnection");
+        allowed.insert("handleUpdateId");
+
+        if (parseParameters(params, allowed, value)) {
+            setParameters(params, "controller");
+        }
+        else {
+            LOGNS(Av, upnpav, error, "wrong controller spec in command line, ignoring");
+        }
+    }
 }
 
 
@@ -175,7 +195,6 @@ GuiUpnpApplication::presentedMainView()
         if (!config().getBool("renderer.enable", false)) {
             config().setString("renderer.enable", "true");
             config().setString("renderer.name", "OMM Player");
-//            config().setString("renderer.uuid", "aed5b05a-f7e8-4354-bb24-812996d179a9");
             config().setString("renderer.engine", "vlc");
         }
     }
@@ -201,6 +220,8 @@ GuiUpnpApplication::start()
     LOGNS(Av, upnpav, debug, "omm gui application starting ...");
     if (_enableController) {
         LOGNS(Av, upnpav, debug, "omm application starting controller ...");
+        _pControllerWidget->setFeatureSubscribeEventing(config().getBool("controller.subscribeEventing", true));
+        _pControllerWidget->setFeatureShowNetworkActivity(config().getBool("controller.showNetworkActivity", true));
         _pControllerWidget->setState(DeviceManager::PublicLocal);
     }
     LOGNS(Av, upnpav, debug, "omm gui application started.");

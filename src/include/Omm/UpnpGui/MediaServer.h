@@ -88,6 +88,8 @@ public:
 
     virtual void newSystemUpdateId(ui4 id);
 
+    void setFeatureHandleUpdateIdChange(bool on = true) { _featureHandleUpdateIdChange = on; }
+
 private:
     MediaServerGroupWidget*     _pServerGroupWidget;
     bool                        _featureHandleUpdateIdChange;
