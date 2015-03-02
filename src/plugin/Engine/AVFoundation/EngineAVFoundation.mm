@@ -80,7 +80,7 @@
 //}
 //
 //
-- (id)playUrl:(NSURL*)contentURL
+- (void)playUrl:(NSURL*)contentURL
 {
     LOGNS(Omm::Av, upnpav, debug, "AV Foundation engine play url ...");
 
@@ -108,7 +108,7 @@
 }
 
 
-- (id)stop
+- (void)stop
 {
     LOGNS(Omm::Av, upnpav, debug, "AV Foundation engine stop ...");
 

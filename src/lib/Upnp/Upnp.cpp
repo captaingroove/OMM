@@ -4353,7 +4353,7 @@ Controller::setState(State newState)
         return;
     }
     _stateLock.lock();
-    _state == Transitioning;
+    _state = Transitioning;
     _stateLock.unlock();
 
     if (newState == Public || newState == Local || newState == PublicLocal) {

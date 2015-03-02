@@ -376,6 +376,7 @@ class ServerLayoutSelector : Gui::Selector
             case 2:
                 return Av::ServerContainer::LAYOUT_PROPERTY_GROUPS;
         }
+        return "";
     }
 };
 

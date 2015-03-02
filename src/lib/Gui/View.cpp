@@ -195,6 +195,7 @@ View::width(SizeConstraint size)
         case Max:
             return _maxWidth * _scaleFactor;
     }
+    return 0;
 }
 
 
@@ -211,6 +212,7 @@ View::height(SizeConstraint size)
         case Max:
             return _maxHeight * _scaleFactor;
     }
+    return 0;
 }
 
 

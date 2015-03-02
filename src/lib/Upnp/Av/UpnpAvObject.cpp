@@ -1023,11 +1023,12 @@ MemoryMediaObject::getChildForRow(ui4 row)
 {
 //    LOG(upnpav, debug, "MemoryMediaObject::getChild() number: " + Poco::NumberFormatter::format(numChild));
     ui4 childRow = row;
-    if (childRow < _childVec.size() && childRow >= 0) {
+    if (childRow < _childVec.size()) {
         return _childVec[childRow];
     }
     else {
         LOG(upnpav, error, "MemoryMediaObject::getChildForRow() row out of range: " + Poco::NumberFormatter::format(row));
+        return 0;
     }
 }
 
@@ -1473,11 +1474,12 @@ BlockCache::getMediaObjectForRow(ui4 row)
 {
     LOG(upnpav, debug, "block cache get media object in row: " + Poco::NumberFormatter::format(row) + " ...");
 
-    if (row < 0) {
-        LOG(upnpav, error, "block cache get media object failed, negative row.");
-        return 0;
-    }
-    else if (_offset <= row && row < _offset + getCacheSize()) {
+//    if (row < 0) { // ui4 row is always >= 0
+//        LOG(upnpav, error, "block cache get media object failed, negative row.");
+//        return 0;
+//    }
+//    else
+    if (_offset <= row && row < _offset + getCacheSize()) {
         // cache hit, do nothing
         LOG(upnpav, debug, "block cache get media object cache hit");
     }
@@ -1494,6 +1496,7 @@ BlockCache::getMediaObjectForRow(ui4 row)
         insertBlock(block, true);
         _offset -= blockSize;
     }
+    // FIXME: ui4 row - (_offset + getCacheSize()) >= 0 is always true
     else if (row - (_offset + getCacheSize()) < _blockSize && row - (_offset + getCacheSize()) >= 0) {
         // near cache miss, insert block after current cache
         LOG(upnpav, debug, "block cache get media object cache near miss after");

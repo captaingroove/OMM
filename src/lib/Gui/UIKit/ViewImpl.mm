@@ -122,7 +122,7 @@
 }
 
 
-- (id)selectedAction
+- (void)selectedAction
 {
     _pViewImpl->selected();
 }

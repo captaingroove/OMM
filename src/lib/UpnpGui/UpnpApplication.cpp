@@ -433,7 +433,8 @@ UpnpApplication::defaultConfig()
     _pConf->setString("server.0.layout", Av::ServerContainer::LAYOUT_FLAT);
     _pConf->setString("server.0.model", "file");
     _pConf->setInt("server.0.pollUpdateId", 0);
-    serverString += Poco::NumberFormatter::format(serverCount++);
+    serverString += Poco::NumberFormatter::format(serverCount);
+    serverCount++;
 
     _pConf->setString("server.1.path", "webradio.xml");
     _pConf->setBool("server.1.checkMod", false);
@@ -442,7 +443,8 @@ UpnpApplication::defaultConfig()
     _pConf->setString("server.1.layout", Av::ServerContainer::LAYOUT_FLAT);
     _pConf->setString("server.1.model", "webradio");
     _pConf->setInt("server.1.pollUpdateId", 0);
-    serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount++);
+    serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount);
+    serverCount++;
 
     std::vector<Sys::Device*> dvbDevices;
     Sys::System::instance()->getDevicesForType(dvbDevices, Sys::System::DeviceTypeDvb);
@@ -454,7 +456,8 @@ UpnpApplication::defaultConfig()
         _pConf->setString("server.2.layout", Av::ServerContainer::LAYOUT_FLAT);
         _pConf->setString("server.2.model", "dvb");
         _pConf->setInt("server.2.pollUpdateId", 0);
-        serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount++);
+        serverString += (serverCount ? "," : "") + Poco::NumberFormatter::format(serverCount);
+        serverCount++;
     }
 
     _pConf->setString("server.new.path", "");
