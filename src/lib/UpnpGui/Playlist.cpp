@@ -141,7 +141,7 @@ PlaylistEditor::getPlaylistResource()
 std::string
 PlaylistEditor::getPlaylistResourceUri()
 {
-    _pControllerWidget->_pApplication->getAppHttpUri() + GuiUpnpApplication::PLAYLIST_URI;
+    return _pControllerWidget->_pApplication->getAppHttpUri() + GuiUpnpApplication::PLAYLIST_URI;
 }
 
 

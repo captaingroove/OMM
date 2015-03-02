@@ -203,3 +203,10 @@ Switch.cpp
 target_link_libraries(switch
 ${OMM_GUI}
 )
+
+#install(TARGETS plain label buttonsubclass buttoncontroller group layout
+#    group1tonmodel stringlist list itemlist drag draglist lazylist lazylistbidir
+#    navigator slider scrollarea image web splitter cluster selector switch
+#RUNTIME DESTINATION bin
+#LIBRARY DESTINATION lib
+#)

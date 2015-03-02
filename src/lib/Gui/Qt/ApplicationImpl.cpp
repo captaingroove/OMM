@@ -195,6 +195,13 @@ int
 ApplicationImpl::run(int argc, char** argv)
 {
     LOG(gui, debug, "event loop exec ...");
+#ifdef __WINDOWS__
+//    QApplication::setStyle(new QPlastiqueStyle);        // avoid the standard QWindowsStyle (WinNT)
+    QApplication::setStyle(new QCleanlooksStyle);        // avoid the standard QWindowsStyle (WinNT)
+//    QApplication::setStyle(new QWindowsStyle);
+//    QApplication::setStyle(new QWindowsXPStyle);      // linking error, not contained in Qt libs
+//    QApplication::setStyle(new QWindowsVistaStyle);   // linking error, not contained in Qt libs
+#endif
     _pQtApplication = new QApplication(argc, argv);
     _pMainWindow = new QMainWindow;
     if (_pFullscreenStyleSheet) {

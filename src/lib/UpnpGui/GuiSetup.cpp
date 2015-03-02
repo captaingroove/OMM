@@ -92,6 +92,7 @@ class AppStateSelector : public Gui::Selector
                 return DeviceManager::Stopped;
                 break;
         }
+        return "";
     }
 
 
@@ -457,6 +458,7 @@ class ServerPluginSelector : Gui::Selector
             case 2:
                 return "Digital TV";
         }
+        return "";
     }
 
 
@@ -464,24 +466,25 @@ class ServerPluginSelector : Gui::Selector
     {
         switch(getCurrentIndex()) {
             case 0:
-                return "model-file";
+                return "file";
             case 1:
-                return "model-webradio";
+                return "webradio";
             case 2:
-                return "model-dvb";
+                return "dvb";
         }
+        return "";
     }
 
 
     void setTextLine(const std::string& model)
     {
-        if (model == "model-file") {
+        if (model == "file") {
             setCurrentIndex(0);
         }
-        else if (model == "model-webradio") {
+        else if (model == "webradio") {
             setCurrentIndex(1);
         }
-        else if (model == "model-dvb") {
+        else if (model == "dvb") {
             setCurrentIndex(2);
         }
     }
@@ -540,11 +543,11 @@ class ServerConfModel : public Gui::Model
     {
         _uuid = _pGuiSetup->_pApp->getFileConfiguration()->getString("server." + _id + ".uuid", Poco::UUIDGenerator().createRandom().toString());
 #ifdef __DVB_SUPPORT__
-        if (getPlugin() == "model-dvb") {
+        if (getPlugin() == "dvb") {
             _pDvbDevice = Omm::Dvb::Device::instance();
             for (Omm::Dvb::Device::AdapterIterator it = _pDvbDevice->adapterBegin(); it != _pDvbDevice->adapterEnd(); ++it) {
                 for (Omm::Dvb::Adapter::FrontendIterator fit = it->second->frontendBegin(); fit != it->second->frontendEnd(); ++fit) {
-                    LOGNS(Gui, gui, debug, "server conf model-dvb, frontend type: " + (*fit)->getType());
+                    LOGNS(Gui, gui, debug, "server conf model dvb, frontend type: " + (*fit)->getType());
 //                    (*fit)->getInitialTransponderKeys(_dvbFrontendKeys[(*fit)->getType()]);
 //                    _dvbFrontendKeys[(*fit)->getType()] = DvbFrontendKeySelectorModel(*fit);
                     _dvbFrontendKeys.insert(std::make_pair((*fit)->getType(), DvbFrontendKeySelectorModel(*fit)));
@@ -572,15 +575,16 @@ class ServerConfModel : public Gui::Model
     std::string getPluginText()
     {
         std::string plugin = getPlugin();
-        if(plugin == "model-file") {
+        if(plugin == "file") {
             return "Fileserver";
         }
-        else if (plugin == "model-webradio") {
+        else if (plugin == "webradio") {
             return "Webradio";
         }
-        else if (plugin == "model-dvb") {
+        else if (plugin == "dvb") {
             return "Digital TV";
         }
+        return "";
     }
 
     std::string getBasePath()
@@ -903,7 +907,7 @@ void
 ServerConfView::syncViewImpl()
 {
 #ifdef __DVB_SUPPORT__
-    if (static_cast<ServerConfModel*>(_pModel)->getPlugin() == "model-dvb") {
+    if (static_cast<ServerConfModel*>(_pModel)->getPlugin() == "dvb") {
         LOGNS(Gui, gui, debug, "server conf view show dvb frontend key selector");
         for (std::map<std::string, DvbFrontendKeySelectorModel>::iterator fit = static_cast<ServerConfModel*>(_pModel)->_dvbFrontendKeys.begin(); fit != static_cast<ServerConfModel*>(_pModel)->_dvbFrontendKeys.end(); ++fit) {
             Gui::Label* pServerDvbFrontendNameLabel = new Gui::Label(_pServerDvbFrontendSelectorView);
@@ -952,8 +956,8 @@ ServerConfView::syncViewImpl()
     else if (layout == Av::ServerContainer::LAYOUT_PROPERTY_GROUPS) {
         _pServerLayoutSelector->setCurrentIndex(2);
     }
-    LOGNS(Gui, gui, debug, "scan notification server uuid: " + static_cast<ServerConfModel*>(_pModel)->_uuid);
     try {
+        LOGNS(Gui, gui, debug, "scan notification server uuid: " + static_cast<ServerConfModel*>(_pModel)->_uuid);
         Av::MediaServer* pMediaServer = _pGuiSetup->_pApp->getLocalMediaServer(static_cast<ServerConfModel*>(_pModel)->_uuid);
         if (pMediaServer) {
 //            pMediaServer->getRoot()->setScanNotification(static_cast<ServerConfModel*>(_pModel)->_pServerScanNotification);
@@ -978,14 +982,14 @@ std::string
 ServerConfView::getBasePath()
 {
 #ifdef __DVB_SUPPORT__
-    if (static_cast<ServerConfModel*>(_pModel)->getPlugin() == "model-dvb") {
+    if (static_cast<ServerConfModel*>(_pModel)->getPlugin() == "dvb") {
         static_cast<ServerConfModel*>(_pModel)->setDvbFrontendKey("dvb-t", _pServerDvbFrontendKeySelector->getCurrentIndex());
 //        DvbFrontendKeySelectorModel* pSelectorModel = static_cast<DvbFrontendKeySelectorModel*>(_pServerDvbFrontendKeySelector->getModel());
 //        return pSelectorModel->getItemLabel(_pServerDvbFrontendKeySelector->getCurrentIndex());
         return Omm::Util::Home::instance()->getConfigDirPath("/") + "dvb.xml";
     }
 #endif
-    if (static_cast<ServerConfModel*>(_pModel)->getPlugin() == "model-webradio") {
+    if (static_cast<ServerConfModel*>(_pModel)->getPlugin() == "webradio") {
         return Omm::Util::Home::instance()->getConfigDirPath("/") + "webradio.xml";
     }
     return _pServerBasePathText->getTextLine();
