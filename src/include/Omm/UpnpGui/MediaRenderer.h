@@ -102,12 +102,17 @@ class MediaRendererDevice : public Av::CtlMediaRenderer, public Gui::Model
 
 public:
     MediaRendererDevice(ControllerWidget* pControllerWidget) :
-    _transportState(""), _featurePollPosition(false), _featureTrackInfoFromConnection(true), _duration(0), _pControllerWidget(pControllerWidget) {}
+        _transportState(""),
+        _featurePollPosition(false), _featureTrackInfoFromConnection(false),
+        _featureTrackVolume(true), _featureTrackTransportState(false),
+        _duration(0), _pControllerWidget(pControllerWidget) {}
 
     std::string getTransportState();
 
     void setFeaturePollPosition(bool on = true) { _featurePollPosition = on; }
     void setFeatureTrackInfoFromConnection(bool on = true) { _featureTrackInfoFromConnection = on; }
+    void setFeatureTrackVolume(bool on = true) { _featureTrackVolume = on; }
+    void setFeatureTrackTransportState(bool on = true) { _featureTrackTransportState = on; }
 
 private:
     virtual void initController();
@@ -123,6 +128,8 @@ private:
     std::string         _transportState;
     bool                _featurePollPosition;
     bool                _featureTrackInfoFromConnection;
+    bool                _featureTrackVolume;
+    bool                _featureTrackTransportState;
     r8                  _duration;
     Gui::LabelModel     _rendererName;
     Gui::LabelModel     _trackName;

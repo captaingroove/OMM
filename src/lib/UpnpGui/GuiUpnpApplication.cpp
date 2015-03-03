@@ -155,6 +155,8 @@ GuiUpnpApplication::handleOption(const std::string& name, const std::string& val
         allowed.insert("showNetworkActivity");
         allowed.insert("pollPosition");
         allowed.insert("trackConnection");
+        allowed.insert("trackVolume");
+        allowed.insert("trackTransportState");
         allowed.insert("handleUpdateId");
 
         if (parseParameters(params, allowed, value)) {

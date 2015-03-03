@@ -61,7 +61,9 @@ MediaRendererGroupWidget::createDevice()
 //    LOGNS(Gui, gui, debug, "media renderer group widget create renderer device.");
     MediaRendererDevice* pRes = new MediaRendererDevice(_pControllerWidget);
     pRes->setFeaturePollPosition(Poco::Util::Application::instance().config().getBool("controller.pollPosition", false));
-    pRes->setFeatureTrackInfoFromConnection(Poco::Util::Application::instance().config().getBool("controller.trackConnection", true));
+    pRes->setFeatureTrackInfoFromConnection(Poco::Util::Application::instance().config().getBool("controller.trackConnection", false));
+    pRes->setFeatureTrackVolume(Poco::Util::Application::instance().config().getBool("controller.trackVolume", true));
+    pRes->setFeatureTrackTransportState(Poco::Util::Application::instance().config().getBool("controller.trackTransportState", false));
     return pRes;
 }
 
@@ -178,6 +180,10 @@ void
 MediaRendererDevice::newVolume(const int volume)
 {
     LOGNS(Gui, gui, debug, "media renderer device \"" + getFriendlyName() + "\" new volume: " + Poco::NumberFormatter::format(volume));
+    if (!_featureTrackVolume) {
+        return;
+    }
+
     _volumeLabel.setLabel(Poco::NumberFormatter::format(volume) + "%");
     _volume.setValue(volume);
     syncViews();
@@ -188,6 +194,10 @@ void
 MediaRendererDevice::newTransportState(const std::string& transportState)
 {
     LOGNS(Gui, gui, debug, "media renderer device \"" + getFriendlyName() + "\" new transport state: " + transportState);
+    if (!_featureTrackTransportState) {
+        return;
+    }
+
     _transportState = transportState;
     syncViews();
     if (_featurePollPosition) {
