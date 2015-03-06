@@ -38,6 +38,7 @@ _pView(pView)
 {
     setFlat(true);
     setIcon(QIcon(QString(":/images/right_arrow.gif")));
+//    setIcon(QIcon(QString(":images/right_arrow.gif")));
 //    setStyle(new QCleanlooksStyle);
 //    setStyle(new QPlastiqueStyle);
 //    setIcon(style()->standardIcon(QStyle::SP_ArrowRight));

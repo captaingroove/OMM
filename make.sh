@@ -10,6 +10,7 @@ PRINT_USAGE=
 CMAKE_CMD=cmake
 CMAKE_GENERATOR="Unix Makefiles"
 if [ "${MSYSTEM}" = "MINGW32" ]
+# MSYSTEM environment variable is defined by mingw
 then
     CMAKE_GENERATOR="MSYS Makefiles"
 fi
@@ -94,7 +95,7 @@ fi
 # now do the stuff ...
 if [ ! -d ${BIN_DIR} ]
 then
-    mkdir -p ${BIN_DIR}
+    mkdir -p ${BIN_DIR}/resgen
 fi
 
 # clean up build and staging directories
@@ -111,19 +112,17 @@ then
 elif [ "${1}" = "config" ]
 then
     # configure build system
-    cd ${BIN_DIR}
-    rm -f CMakeCache.txt
 
     # resgen needs to be build first and executed on host platform, not target platform
-    ${CMAKE_CMD} -G"${CMAKE_GENERATOR}" ${CMAKE_NATIVE_OPTS} -DCMAKE_MODULE_PATH=${SRC_DIR}/cmake ${SRC_DIR}/src/util/resgen
+    cd ${BIN_DIR}/resgen
+    ${CMAKE_CMD} -G"${CMAKE_GENERATOR}" -DCMAKE_MODULE_PATH=${SRC_DIR}/cmake ${SRC_DIR}/src/util/resgen
     # make resgen, which is needed for building the libraries
     make ${VERBOSE} resgen && \
-    RESGEN=${BIN_DIR}/resgen; \
+    RESGEN=${BIN_DIR}/resgen/resgen; \
     echo "resgen for host platform should be available: ${RESGEN}"
-    # remove native cmake config needed only for resgen
-    rm -rf ${BIN_DIR}/CMakeFiles/ ${BIN_DIR}/CMakeCache.txt ${BIN_DIR}/cmake_install.cmake
 
     # configure again to honor resgen's presence
+    cd ..
     ${CMAKE_CMD} -G"${CMAKE_GENERATOR}" ${CMAKE_OPTS} -DRESGEN=${RESGEN} ${SRC_DIR}
 else
     # build targets in out of source tree

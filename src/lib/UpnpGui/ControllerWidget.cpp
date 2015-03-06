@@ -193,7 +193,7 @@ _featureShowNetworkActivity(true)
 void
 ControllerWidget::setState(State newState)
 {
-    LOG(upnp, debug, "controller widget state change: " + _state + " -> " + newState);
+    LOGNS(Gui, gui, debug, "controller widget state change: " + _state + " -> " + newState);
     if (_state == newState) {
         LOG(upnp, debug, "new state equal to old state, ignoring");
         return;
@@ -223,7 +223,7 @@ ControllerWidget::setState(State newState)
 //        _pMediaRendererGroupWidget->getVisibleView()->syncView();
         _pMediaRendererGroupWidget->getDeviceGroupView().syncView();
     }
-    LOG(upnp, debug, "controller widget state change finished");
+    LOGNS(Gui, gui, debug, "controller widget state change finished");
 }
 
 
