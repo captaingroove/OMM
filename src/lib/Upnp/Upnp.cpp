@@ -1442,18 +1442,18 @@ ServiceDescriptionWriter::stateVar(StateVar* pStateVar)
 
 
 void
-ActionRequestWriter::action(Action* action)
+ActionRequestWriter::action(Poco::AutoPtr<Action>& pAction)
 {
     // TODO: nearly same code as in ActionResponseWriter
     _pDoc = new Poco::XML::Document;
     Poco::AutoPtr<Poco::XML::Element> pEnvelope = _pDoc->createElementNS("http://schemas.xmlsoap.org/soap/envelope/", "Envelope");
     pEnvelope->setAttributeNS("http://schemas.xmlsoap.org/soap/envelope/", "encodingStyle", "http://schemas.xmlsoap.org/soap/encoding/");
     Poco::AutoPtr<Poco::XML::Element> pBody = _pDoc->createElementNS("http://schemas.xmlsoap.org/soap/envelope/", "Body");
-    Poco::AutoPtr<Poco::XML::Element> pActionRequest = _pDoc->createElementNS(action->getService()->getServiceTypeFullString(), action->getName());
+    Poco::AutoPtr<Poco::XML::Element> pActionRequest = _pDoc->createElementNS(pAction->getService()->getServiceTypeFullString(), pAction->getName());
 
-    for(Action::ArgumentIterator i = action->beginInArgument(); i != action->endInArgument(); ++i) {
+    for(Action::ArgumentIterator i = pAction->beginInArgument(); i != pAction->endInArgument(); ++i) {
         Poco::AutoPtr<Poco::XML::Element> pArgument = _pDoc->createElement((*i)->getName());
-        Poco::AutoPtr<Poco::XML::Text> pArgumentValue = _pDoc->createTextNode(action->getArgument<std::string>((*i)->getName()));
+        Poco::AutoPtr<Poco::XML::Text> pArgumentValue = _pDoc->createTextNode(pAction->getArgument<std::string>((*i)->getName()));
         pArgument->appendChild(pArgumentValue);
         pActionRequest->appendChild(pArgument);
     }
@@ -1484,17 +1484,17 @@ _responseBody(&responseBody)
 
 
 void
-ActionResponseWriter::action(Action& action)
+ActionResponseWriter::action(Action* pAction)
 {
     Poco::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
     Poco::AutoPtr<Poco::XML::Element> pEnvelope = pDoc->createElementNS("http://schemas.xmlsoap.org/soap/envelope/", "Envelope");
     pEnvelope->setAttributeNS("http://schemas.xmlsoap.org/soap/envelope/", "encodingStyle", "http://schemas.xmlsoap.org/soap/encoding/");
     Poco::AutoPtr<Poco::XML::Element> pBody = pDoc->createElementNS("http://schemas.xmlsoap.org/soap/envelope/", "Body");
-    Poco::AutoPtr<Poco::XML::Element> pActionResponse = pDoc->createElementNS(action.getService()->getServiceTypeFullString(), action.getName() + "Response");
+    Poco::AutoPtr<Poco::XML::Element> pActionResponse = pDoc->createElementNS(pAction->getService()->getServiceTypeFullString(), pAction->getName() + "Response");
 
-    for(Action::ArgumentIterator i = action.beginOutArgument(); i != action.endOutArgument(); ++i) {
+    for(Action::ArgumentIterator i = pAction->beginOutArgument(); i != pAction->endOutArgument(); ++i) {
         Poco::AutoPtr<Poco::XML::Element> pArgument = pDoc->createElement((*i)->getName());
-        Poco::AutoPtr<Poco::XML::Text> pArgumentValue = pDoc->createTextNode(action.getArgument<std::string>((*i)->getName()));
+        Poco::AutoPtr<Poco::XML::Text> pArgumentValue = pDoc->createTextNode(pAction->getArgument<std::string>((*i)->getName()));
         pArgument->appendChild(pArgumentValue);
         pActionResponse->appendChild(pArgument);
     }
@@ -2018,6 +2018,12 @@ Service::~Service()
     if (_pControllerSubscriptionData) {
         delete _pControllerSubscriptionData;
     }
+    // NOTE: be carefull with Container<Action>, these are Poco::Notifications
+    //       and should be stored in Poco::AutoPtr, which is currently not possible with Container
+    for (ActionIterator it = beginAction(); it != endAction(); ++it) {
+        (*it)->release();
+    }
+    // TODO: delete the other members that are allocated on the heap
 }
 
 
@@ -2305,7 +2311,7 @@ Service::actionNetworkActivity(bool begin)
 
 
 void
-Service::sendAction(Action* pAction)
+Service::sendAction(Poco::AutoPtr<Action>& pAction)
 {
     std::string actionMessage;
     ActionRequestWriter requestWriter;
@@ -2615,7 +2621,7 @@ Service::setDescriptionRequestHandler()
 Action*
 Action::clone()
 {
-    Action* res = new Action();
+    Action* res = new Action;
     res->_actionName = _actionName;
     res->_pService = _pService;
     // make a deep copy of the Arguments
@@ -2759,7 +2765,7 @@ void
 ControlRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
 {
     LOG(ctrl, debug, "*** action request: " + request.getURI() + " ***");
-    // synchronous action handling: wait until handleAction() has finished. This must be done in under 30 sec,
+    // synchronous action handling: wait until handling of action request has finished. This must be done in under 30 sec,
     // otherwise it should return and an event should be sent on finishing the action request.
     int length = request.getContentLength();
     char buf[length];
@@ -2773,18 +2779,29 @@ ControlRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco
     std::string actionName = soapAction.substr(hash+1);
     LOG(ctrl, debug, "action received: \"" + actionName + "\" (service type " + serviceType + ")");
 
-    // TODO: make getAction() robust against wrong action names
-    Action* pAction = _pService->getAction(actionName);
+    Action* pAction = 0;
+    try {
+        pAction = _pService->getAction(actionName);
+    }
+    catch (Poco::Exception& e) {
+        LOG(ctrl, error, "unkown action with name: " + actionName + ", ignoring");
+        // TODO: respond the request with an error message
+        return;
+    }
+    // allocate a copy of the requested Action
     pAction = pAction->clone();
     // TODO: introduce ActionRequestReader::write(Action*) to get rid of confusing pAction stuff
     ActionRequestReader requestReader(requestBody, pAction);
     pAction = requestReader.action();
+    // action is posted through the notification center of the device
     _pService->getDevice()->postAction(pAction);
 
     // return Action response with out arguments filled in by Notification Handler
     std::string responseBody;
     ActionResponseWriter responseWriter(responseBody);
-    responseWriter.action(*pAction);
+    responseWriter.action(pAction);
+    // there is only one registered notification handler per device, so we can release the Action here
+    pAction->release();
 
     response.setContentType("text/xml");
     // TODO: set EXT header
@@ -3215,7 +3232,7 @@ DeviceManager::registerHttpRequestHandler(std::string path, UpnpRequestHandler* 
 
 
 void
-DeviceManager::handleNetworkInterfaceChangedNotification(Net::NetworkInterfaceNotification* pNotification)
+DeviceManager::handleNetworkInterfaceChangedNotification(const Poco::AutoPtr<Net::NetworkInterfaceNotification>& pNotification)
 {
     LOG(upnp, debug, "device manager receives network interface change notification");
 
@@ -3291,7 +3308,7 @@ DeviceManager::init()
 
     _pSocket->initSockets();
     _pSocket->registerSsdpMessageHandler(Poco::NObserver<DeviceManager, SsdpMessage>(*this, &DeviceManager::handleSsdpMessage));
-    Net::NetworkInterfaceManager::instance()->registerInterfaceChangeHandler(Poco::Observer<DeviceManager, Net::NetworkInterfaceNotification>(*this, &DeviceManager::handleNetworkInterfaceChangedNotification));
+    Net::NetworkInterfaceManager::instance()->registerInterfaceChangeHandler(Poco::NObserver<DeviceManager, Net::NetworkInterfaceNotification>(*this, &DeviceManager::handleNetworkInterfaceChangedNotification));
 }
 
 
@@ -4718,6 +4735,7 @@ DeviceServer::handleSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pMessage)
                 }
             }
             else {
+//                Poco::AutoPtr<SsdpMessage> pM = new SsdpMessage(SsdpMessage::REQUEST_RESPONSE);
                 SsdpMessage* pM = new SsdpMessage(SsdpMessage::REQUEST_RESPONSE);
                 pM->setSearchTarget(searchTarget);
                 pM->setLocation(descriptionUri);
@@ -4757,7 +4775,7 @@ DeviceServer::handleSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pMessage)
                     responseMessageSet.addMessage(pM);
                 }
                 else {
-                    delete pM;
+                    pM->release();
                 }
             }
             if (respond) {

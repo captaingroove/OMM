@@ -134,18 +134,18 @@ protected:
     Service* _pService;
 
 private:
-    void _threadSetAVTransportURI(Action* pAction);
-    void _threadGetMediaInfo(Action* pAction);
-    void _threadGetTransportInfo(Action* pAction);
-    void _threadGetPositionInfo(Action* pAction);
-    void _threadGetDeviceCapabilities(Action* pAction);
-    void _threadGetTransportSettings(Action* pAction);
-    void _threadStop(Action* pAction);
-    void _threadPlay(Action* pAction);
-    void _threadPause(Action* pAction);
-    void _threadSeek(Action* pAction);
-    void _threadNext(Action* pAction);
-    void _threadPrevious(Action* pAction);
+    void _threadSetAVTransportURI(Poco::AutoPtr<Action> pAction);
+    void _threadGetMediaInfo(Poco::AutoPtr<Action> pAction);
+    void _threadGetTransportInfo(Poco::AutoPtr<Action> pAction);
+    void _threadGetPositionInfo(Poco::AutoPtr<Action> pAction);
+    void _threadGetDeviceCapabilities(Poco::AutoPtr<Action> pAction);
+    void _threadGetTransportSettings(Poco::AutoPtr<Action> pAction);
+    void _threadStop(Poco::AutoPtr<Action> pAction);
+    void _threadPlay(Poco::AutoPtr<Action> pAction);
+    void _threadPause(Poco::AutoPtr<Action> pAction);
+    void _threadSeek(Poco::AutoPtr<Action> pAction);
+    void _threadNext(Poco::AutoPtr<Action> pAction);
+    void _threadPrevious(Poco::AutoPtr<Action> pAction);
 };
 
 
@@ -187,11 +187,11 @@ protected:
     Service* _pService;
 
 private:
-    void _threadGetProtocolInfo(Action* pAction);
-    void _threadPrepareForConnection(Action* pAction);
-    void _threadConnectionComplete(Action* pAction);
-    void _threadGetCurrentConnectionIDs(Action* pAction);
-    void _threadGetCurrentConnectionInfo(Action* pAction);
+    void _threadGetProtocolInfo(Poco::AutoPtr<Action> pAction);
+    void _threadPrepareForConnection(Poco::AutoPtr<Action> pAction);
+    void _threadConnectionComplete(Poco::AutoPtr<Action> pAction);
+    void _threadGetCurrentConnectionIDs(Poco::AutoPtr<Action> pAction);
+    void _threadGetCurrentConnectionInfo(Poco::AutoPtr<Action> pAction);
 };
 
 
@@ -253,18 +253,18 @@ protected:
     Service* _pService;
 
 private:
-    void _threadGetSearchCapabilities(Action* pAction);
-    void _threadGetSortCapabilities(Action* pAction);
-    void _threadGetSystemUpdateID(Action* pAction);
-    void _threadBrowse(Action* pAction);
-    void _threadSearch(Action* pAction);
-    void _threadCreateObject(Action* pAction);
-    void _threadDestroyObject(Action* pAction);
-    void _threadUpdateObject(Action* pAction);
-    void _threadImportResource(Action* pAction);
-    void _threadGetTransferProgress(Action* pAction);
-    void _threadDeleteResource(Action* pAction);
-    void _threadCreateReference(Action* pAction);
+    void _threadGetSearchCapabilities(Poco::AutoPtr<Action> pAction);
+    void _threadGetSortCapabilities(Poco::AutoPtr<Action> pAction);
+    void _threadGetSystemUpdateID(Poco::AutoPtr<Action> pAction);
+    void _threadBrowse(Poco::AutoPtr<Action> pAction);
+    void _threadSearch(Poco::AutoPtr<Action> pAction);
+    void _threadCreateObject(Poco::AutoPtr<Action> pAction);
+    void _threadDestroyObject(Poco::AutoPtr<Action> pAction);
+    void _threadUpdateObject(Poco::AutoPtr<Action> pAction);
+    void _threadImportResource(Poco::AutoPtr<Action> pAction);
+    void _threadGetTransferProgress(Poco::AutoPtr<Action> pAction);
+    void _threadDeleteResource(Poco::AutoPtr<Action> pAction);
+    void _threadCreateReference(Poco::AutoPtr<Action> pAction);
 };
 
 
@@ -391,41 +391,41 @@ protected:
     Service* _pService;
 
 private:
-    void _threadListPresets(Action* pAction);
-    void _threadSelectPreset(Action* pAction);
-    void _threadGetBrightness(Action* pAction);
-    void _threadSetBrightness(Action* pAction);
-    void _threadGetContrast(Action* pAction);
-    void _threadSetContrast(Action* pAction);
-    void _threadGetSharpness(Action* pAction);
-    void _threadSetSharpness(Action* pAction);
-    void _threadGetRedVideoGain(Action* pAction);
-    void _threadSetRedVideoGain(Action* pAction);
-    void _threadGetGreenVideoGain(Action* pAction);
-    void _threadSetGreenVideoGain(Action* pAction);
-    void _threadGetBlueVideoGain(Action* pAction);
-    void _threadSetBlueVideoGain(Action* pAction);
-    void _threadGetRedVideoBlackLevel(Action* pAction);
-    void _threadSetRedVideoBlackLevel(Action* pAction);
-    void _threadGetGreenVideoBlackLevel(Action* pAction);
-    void _threadSetGreenVideoBlackLevel(Action* pAction);
-    void _threadGetBlueVideoBlackLevel(Action* pAction);
-    void _threadSetBlueVideoBlackLevel(Action* pAction);
-    void _threadGetColorTemperature (Action* pAction);
-    void _threadSetColorTemperature(Action* pAction);
-    void _threadGetHorizontalKeystone(Action* pAction);
-    void _threadSetHorizontalKeystone(Action* pAction);
-    void _threadGetVerticalKeystone(Action* pAction);
-    void _threadSetVerticalKeystone(Action* pAction);
-    void _threadGetMute(Action* pAction);
-    void _threadSetMute(Action* pAction);
-    void _threadGetVolume(Action* pAction);
-    void _threadSetVolume(Action* pAction);
-    void _threadGetVolumeDB(Action* pAction);
-    void _threadSetVolumeDB(Action* pAction);
-    void _threadGetVolumeDBRange(Action* pAction);
-    void _threadGetLoudness(Action* pAction);
-    void _threadSetLoudness(Action* pAction);
+    void _threadListPresets(Poco::AutoPtr<Action> pAction);
+    void _threadSelectPreset(Poco::AutoPtr<Action> pAction);
+    void _threadGetBrightness(Poco::AutoPtr<Action> pAction);
+    void _threadSetBrightness(Poco::AutoPtr<Action> pAction);
+    void _threadGetContrast(Poco::AutoPtr<Action> pAction);
+    void _threadSetContrast(Poco::AutoPtr<Action> pAction);
+    void _threadGetSharpness(Poco::AutoPtr<Action> pAction);
+    void _threadSetSharpness(Poco::AutoPtr<Action> pAction);
+    void _threadGetRedVideoGain(Poco::AutoPtr<Action> pAction);
+    void _threadSetRedVideoGain(Poco::AutoPtr<Action> pAction);
+    void _threadGetGreenVideoGain(Poco::AutoPtr<Action> pAction);
+    void _threadSetGreenVideoGain(Poco::AutoPtr<Action> pAction);
+    void _threadGetBlueVideoGain(Poco::AutoPtr<Action> pAction);
+    void _threadSetBlueVideoGain(Poco::AutoPtr<Action> pAction);
+    void _threadGetRedVideoBlackLevel(Poco::AutoPtr<Action> pAction);
+    void _threadSetRedVideoBlackLevel(Poco::AutoPtr<Action> pAction);
+    void _threadGetGreenVideoBlackLevel(Poco::AutoPtr<Action> pAction);
+    void _threadSetGreenVideoBlackLevel(Poco::AutoPtr<Action> pAction);
+    void _threadGetBlueVideoBlackLevel(Poco::AutoPtr<Action> pAction);
+    void _threadSetBlueVideoBlackLevel(Poco::AutoPtr<Action> pAction);
+    void _threadGetColorTemperature (Poco::AutoPtr<Action> pAction);
+    void _threadSetColorTemperature(Poco::AutoPtr<Action> pAction);
+    void _threadGetHorizontalKeystone(Poco::AutoPtr<Action> pAction);
+    void _threadSetHorizontalKeystone(Poco::AutoPtr<Action> pAction);
+    void _threadGetVerticalKeystone(Poco::AutoPtr<Action> pAction);
+    void _threadSetVerticalKeystone(Poco::AutoPtr<Action> pAction);
+    void _threadGetMute(Poco::AutoPtr<Action> pAction);
+    void _threadSetMute(Poco::AutoPtr<Action> pAction);
+    void _threadGetVolume(Poco::AutoPtr<Action> pAction);
+    void _threadSetVolume(Poco::AutoPtr<Action> pAction);
+    void _threadGetVolumeDB(Poco::AutoPtr<Action> pAction);
+    void _threadSetVolumeDB(Poco::AutoPtr<Action> pAction);
+    void _threadGetVolumeDBRange(Poco::AutoPtr<Action> pAction);
+    void _threadGetLoudness(Poco::AutoPtr<Action> pAction);
+    void _threadSetLoudness(Poco::AutoPtr<Action> pAction);
 };
 
 

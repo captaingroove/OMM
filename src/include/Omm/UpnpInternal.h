@@ -254,7 +254,7 @@ public:
     void addEventCallbackPath(const std::string path);
 
     void initController();
-    void sendAction(Action* pAction);
+    void sendAction(Poco::AutoPtr<Action>& pAction);
 
     void setSubscriptionDuration(unsigned int duration);
     void stopSubscriptionExpirationTimer();
@@ -347,9 +347,8 @@ public:
 
     std::string getName() const { return _actionName; }
     Service* getService() const { return _pService; }
-    template<typename T> const T getArgument(const std::string& name)
+    template<typename T> const T getArgument(const std::string& name) const
     {
-//         std::clog << "Action::getArgument() name: " << name << std::endl;
         return _arguments.getValue<T>(name);
     }
 
@@ -357,11 +356,13 @@ public:
     void setService(Service* pService) { _pService = pService; }
     template<typename T> void setArgument(std::string name, const T& val)
     {
-//         std::clog << "Action::setArgument() name: " << name << std::endl;
         _arguments.setValue(name, val);
     }
 
     void appendArgument(Argument* pArgument);
+
+protected:
+    ~Action() {}
 
 private:
     Service*                            _pService;
@@ -377,9 +378,9 @@ template<class ServiceClass>
 class ActionThread : public Poco::Runnable
 {
 public:
-    typedef void (ServiceClass::*Callback)(Action* pAction);
+    typedef void (ServiceClass::*Callback)(Poco::AutoPtr<Action> pAction);
 
-    ActionThread(ServiceClass* pObject, Callback method, Action* arg):
+    ActionThread(ServiceClass* pObject, Callback method, Poco::AutoPtr<Action> arg):
         _pObject(pObject),
         _method(method),
         _arg(arg)
@@ -398,9 +399,9 @@ public:
     }
 
 private:
-    ServiceClass*   _pObject;
-    Callback        _method;
-    Action*         _arg;
+    ServiceClass*           _pObject;
+    Callback                _method;
+    Poco::AutoPtr<Action>   _arg;
 };
 
 

@@ -151,7 +151,7 @@ CtlMediaServerCode::eventHandler(StateVar* pStateVar)
 void
 CtlAVTransport::SetAVTransportURI(const ui4& InstanceID, const std::string& CurrentURI, const std::string& CurrentURIMetaData)
 {
-    Action* pAction = _pService->getAction("SetAVTransportURI")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetAVTransportURI")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("CurrentURI", CurrentURI);
     pAction->setArgument<std::string>("CurrentURIMetaData", CurrentURIMetaData);
@@ -161,7 +161,7 @@ CtlAVTransport::SetAVTransportURI(const ui4& InstanceID, const std::string& Curr
 void
 CtlAVTransport::GetMediaInfo(const ui4& InstanceID, ui4& NrTracks, std::string& MediaDuration, std::string& CurrentURI, std::string& CurrentURIMetaData, std::string& NextURI, std::string& NextURIMetaData, std::string& PlayMedium, std::string& RecordMedium, std::string& WriteStatus)
 {
-    Action* pAction = _pService->getAction("GetMediaInfo")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetMediaInfo")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     NrTracks = pAction->getArgument<ui4>("NrTracks");
@@ -178,7 +178,7 @@ CtlAVTransport::GetMediaInfo(const ui4& InstanceID, ui4& NrTracks, std::string& 
 void
 CtlAVTransport::GetTransportInfo(const ui4& InstanceID, std::string& CurrentTransportState, std::string& CurrentTransportStatus, std::string& CurrentSpeed)
 {
-    Action* pAction = _pService->getAction("GetTransportInfo")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetTransportInfo")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentTransportState = pAction->getArgument<std::string>("CurrentTransportState");
@@ -189,7 +189,7 @@ CtlAVTransport::GetTransportInfo(const ui4& InstanceID, std::string& CurrentTran
 void
 CtlAVTransport::GetPositionInfo(const ui4& InstanceID, ui4& Track, std::string& TrackDuration, std::string& TrackMetaData, std::string& TrackURI, std::string& RelTime, std::string& AbsTime, i4& RelCount, i4& AbsCount)
 {
-    Action* pAction = _pService->getAction("GetPositionInfo")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetPositionInfo")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     Track = pAction->getArgument<ui4>("Track");
@@ -205,7 +205,7 @@ CtlAVTransport::GetPositionInfo(const ui4& InstanceID, ui4& Track, std::string& 
 void
 CtlAVTransport::GetDeviceCapabilities(const ui4& InstanceID, std::string& PlayMedia, std::string& RecMedia, std::string& RecQualityModes)
 {
-    Action* pAction = _pService->getAction("GetDeviceCapabilities")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetDeviceCapabilities")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     PlayMedia = pAction->getArgument<std::string>("PlayMedia");
@@ -216,7 +216,7 @@ CtlAVTransport::GetDeviceCapabilities(const ui4& InstanceID, std::string& PlayMe
 void
 CtlAVTransport::GetTransportSettings(const ui4& InstanceID, std::string& PlayMode, std::string& RecQualityMode)
 {
-    Action* pAction = _pService->getAction("GetTransportSettings")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetTransportSettings")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     PlayMode = pAction->getArgument<std::string>("PlayMode");
@@ -226,7 +226,7 @@ CtlAVTransport::GetTransportSettings(const ui4& InstanceID, std::string& PlayMod
 void
 CtlAVTransport::Stop(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("Stop")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Stop")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
 }
@@ -234,7 +234,7 @@ CtlAVTransport::Stop(const ui4& InstanceID)
 void
 CtlAVTransport::Play(const ui4& InstanceID, const std::string& Speed)
 {
-    Action* pAction = _pService->getAction("Play")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Play")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Speed", Speed);
     _pService->sendAction(pAction);
@@ -243,7 +243,7 @@ CtlAVTransport::Play(const ui4& InstanceID, const std::string& Speed)
 void
 CtlAVTransport::Pause(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("Pause")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Pause")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
 }
@@ -251,7 +251,7 @@ CtlAVTransport::Pause(const ui4& InstanceID)
 void
 CtlAVTransport::Seek(const ui4& InstanceID, const std::string& Unit, const std::string& Target)
 {
-    Action* pAction = _pService->getAction("Seek")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Seek")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Unit", Unit);
     pAction->setArgument<std::string>("Target", Target);
@@ -261,7 +261,7 @@ CtlAVTransport::Seek(const ui4& InstanceID, const std::string& Unit, const std::
 void
 CtlAVTransport::Next(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("Next")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Next")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
 }
@@ -269,7 +269,7 @@ CtlAVTransport::Next(const ui4& InstanceID)
 void
 CtlAVTransport::Previous(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("Previous")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Previous")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
 }
@@ -284,7 +284,7 @@ CtlAVTransport::_getLastChange()
 void
 CtlAVTransport::_reqSetAVTransportURI(const ui4& InstanceID, const std::string& CurrentURI, const std::string& CurrentURIMetaData)
 {
-    Action* pAction = _pService->getAction("SetAVTransportURI")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetAVTransportURI")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("CurrentURI", CurrentURI);
     pAction->setArgument<std::string>("CurrentURIMetaData", CurrentURIMetaData);
@@ -295,7 +295,7 @@ CtlAVTransport::_reqSetAVTransportURI(const ui4& InstanceID, const std::string& 
 void
 CtlAVTransport::_reqGetMediaInfo(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetMediaInfo")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetMediaInfo")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlAVTransport> thread(this, &CtlAVTransport::_threadGetMediaInfo, pAction);
     thread.start();
@@ -304,7 +304,7 @@ CtlAVTransport::_reqGetMediaInfo(const ui4& InstanceID)
 void
 CtlAVTransport::_reqGetTransportInfo(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetTransportInfo")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetTransportInfo")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlAVTransport> thread(this, &CtlAVTransport::_threadGetTransportInfo, pAction);
     thread.start();
@@ -313,7 +313,7 @@ CtlAVTransport::_reqGetTransportInfo(const ui4& InstanceID)
 void
 CtlAVTransport::_reqGetPositionInfo(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetPositionInfo")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetPositionInfo")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlAVTransport> thread(this, &CtlAVTransport::_threadGetPositionInfo, pAction);
     thread.start();
@@ -322,7 +322,7 @@ CtlAVTransport::_reqGetPositionInfo(const ui4& InstanceID)
 void
 CtlAVTransport::_reqGetDeviceCapabilities(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetDeviceCapabilities")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetDeviceCapabilities")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlAVTransport> thread(this, &CtlAVTransport::_threadGetDeviceCapabilities, pAction);
     thread.start();
@@ -331,7 +331,7 @@ CtlAVTransport::_reqGetDeviceCapabilities(const ui4& InstanceID)
 void
 CtlAVTransport::_reqGetTransportSettings(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetTransportSettings")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetTransportSettings")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlAVTransport> thread(this, &CtlAVTransport::_threadGetTransportSettings, pAction);
     thread.start();
@@ -340,7 +340,7 @@ CtlAVTransport::_reqGetTransportSettings(const ui4& InstanceID)
 void
 CtlAVTransport::_reqStop(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("Stop")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Stop")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlAVTransport> thread(this, &CtlAVTransport::_threadStop, pAction);
     thread.start();
@@ -349,7 +349,7 @@ CtlAVTransport::_reqStop(const ui4& InstanceID)
 void
 CtlAVTransport::_reqPlay(const ui4& InstanceID, const std::string& Speed)
 {
-    Action* pAction = _pService->getAction("Play")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Play")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Speed", Speed);
     ActionThread<CtlAVTransport> thread(this, &CtlAVTransport::_threadPlay, pAction);
@@ -359,7 +359,7 @@ CtlAVTransport::_reqPlay(const ui4& InstanceID, const std::string& Speed)
 void
 CtlAVTransport::_reqPause(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("Pause")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Pause")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlAVTransport> thread(this, &CtlAVTransport::_threadPause, pAction);
     thread.start();
@@ -368,7 +368,7 @@ CtlAVTransport::_reqPause(const ui4& InstanceID)
 void
 CtlAVTransport::_reqSeek(const ui4& InstanceID, const std::string& Unit, const std::string& Target)
 {
-    Action* pAction = _pService->getAction("Seek")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Seek")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Unit", Unit);
     pAction->setArgument<std::string>("Target", Target);
@@ -379,7 +379,7 @@ CtlAVTransport::_reqSeek(const ui4& InstanceID, const std::string& Unit, const s
 void
 CtlAVTransport::_reqNext(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("Next")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Next")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlAVTransport> thread(this, &CtlAVTransport::_threadNext, pAction);
     thread.start();
@@ -388,14 +388,14 @@ CtlAVTransport::_reqNext(const ui4& InstanceID)
 void
 CtlAVTransport::_reqPrevious(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("Previous")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Previous")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlAVTransport> thread(this, &CtlAVTransport::_threadPrevious, pAction);
     thread.start();
 }
 
 void
-CtlAVTransport::_threadSetAVTransportURI(Action* pAction)
+CtlAVTransport::_threadSetAVTransportURI(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -405,7 +405,7 @@ CtlAVTransport::_threadSetAVTransportURI(Action* pAction)
 }
 
 void
-CtlAVTransport::_threadGetMediaInfo(Action* pAction)
+CtlAVTransport::_threadGetMediaInfo(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -422,7 +422,7 @@ CtlAVTransport::_threadGetMediaInfo(Action* pAction)
 }
 
 void
-CtlAVTransport::_threadGetTransportInfo(Action* pAction)
+CtlAVTransport::_threadGetTransportInfo(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -433,7 +433,7 @@ CtlAVTransport::_threadGetTransportInfo(Action* pAction)
 }
 
 void
-CtlAVTransport::_threadGetPositionInfo(Action* pAction)
+CtlAVTransport::_threadGetPositionInfo(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -449,7 +449,7 @@ CtlAVTransport::_threadGetPositionInfo(Action* pAction)
 }
 
 void
-CtlAVTransport::_threadGetDeviceCapabilities(Action* pAction)
+CtlAVTransport::_threadGetDeviceCapabilities(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -460,7 +460,7 @@ CtlAVTransport::_threadGetDeviceCapabilities(Action* pAction)
 }
 
 void
-CtlAVTransport::_threadGetTransportSettings(Action* pAction)
+CtlAVTransport::_threadGetTransportSettings(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -470,7 +470,7 @@ CtlAVTransport::_threadGetTransportSettings(Action* pAction)
 }
 
 void
-CtlAVTransport::_threadStop(Action* pAction)
+CtlAVTransport::_threadStop(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -478,7 +478,7 @@ CtlAVTransport::_threadStop(Action* pAction)
 }
 
 void
-CtlAVTransport::_threadPlay(Action* pAction)
+CtlAVTransport::_threadPlay(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -487,7 +487,7 @@ CtlAVTransport::_threadPlay(Action* pAction)
 }
 
 void
-CtlAVTransport::_threadPause(Action* pAction)
+CtlAVTransport::_threadPause(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -495,7 +495,7 @@ CtlAVTransport::_threadPause(Action* pAction)
 }
 
 void
-CtlAVTransport::_threadSeek(Action* pAction)
+CtlAVTransport::_threadSeek(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -505,7 +505,7 @@ CtlAVTransport::_threadSeek(Action* pAction)
 }
 
 void
-CtlAVTransport::_threadNext(Action* pAction)
+CtlAVTransport::_threadNext(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -513,7 +513,7 @@ CtlAVTransport::_threadNext(Action* pAction)
 }
 
 void
-CtlAVTransport::_threadPrevious(Action* pAction)
+CtlAVTransport::_threadPrevious(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -525,7 +525,7 @@ CtlAVTransport::_threadPrevious(Action* pAction)
 void
 CtlConnectionManager::GetProtocolInfo(std::string& Source, std::string& Sink)
 {
-    Action* pAction = _pService->getAction("GetProtocolInfo")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetProtocolInfo")->clone();
     _pService->sendAction(pAction);
     Source = pAction->getArgument<std::string>("Source");
     Sink = pAction->getArgument<std::string>("Sink");
@@ -535,7 +535,7 @@ CtlConnectionManager::GetProtocolInfo(std::string& Source, std::string& Sink)
 void
 CtlConnectionManager::PrepareForConnection(const std::string& RemoteProtocolInfo, const std::string& PeerConnectionManager, const i4& PeerConnectionID, const std::string& Direction, i4& ConnectionID, i4& AVTransportID, i4& RcsID)
 {
-    Action* pAction = _pService->getAction("PrepareForConnection")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("PrepareForConnection")->clone();
     pAction->setArgument<std::string>("RemoteProtocolInfo", RemoteProtocolInfo);
     pAction->setArgument<std::string>("PeerConnectionManager", PeerConnectionManager);
     pAction->setArgument<Omm::i4>("PeerConnectionID", PeerConnectionID);
@@ -550,7 +550,7 @@ CtlConnectionManager::PrepareForConnection(const std::string& RemoteProtocolInfo
 void
 CtlConnectionManager::ConnectionComplete(const i4& ConnectionID)
 {
-    Action* pAction = _pService->getAction("ConnectionComplete")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("ConnectionComplete")->clone();
     pAction->setArgument<i4>("ConnectionID", ConnectionID);
     _pService->sendAction(pAction);
 }
@@ -558,7 +558,7 @@ CtlConnectionManager::ConnectionComplete(const i4& ConnectionID)
 void
 CtlConnectionManager::GetCurrentConnectionIDs(std::string& ConnectionIDs)
 {
-    Action* pAction = _pService->getAction("GetCurrentConnectionIDs")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetCurrentConnectionIDs")->clone();
     _pService->sendAction(pAction);
     ConnectionIDs = pAction->getArgument<std::string>("ConnectionIDs");
 }
@@ -566,7 +566,7 @@ CtlConnectionManager::GetCurrentConnectionIDs(std::string& ConnectionIDs)
 void
 CtlConnectionManager::GetCurrentConnectionInfo(const i4& ConnectionID, i4& RcsID, i4& AVTransportID, std::string& ProtocolInfo, std::string& PeerConnectionManager, i4& PeerConnectionID, std::string& Direction, std::string& Status)
 {
-    Action* pAction = _pService->getAction("GetCurrentConnectionInfo")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetCurrentConnectionInfo")->clone();
     pAction->setArgument<i4>("ConnectionID", ConnectionID);
     _pService->sendAction(pAction);
     RcsID = pAction->getArgument<i4>("RcsID");
@@ -600,7 +600,7 @@ CtlConnectionManager::_getCurrentConnectionIDs()
 void
 CtlConnectionManager::_reqGetProtocolInfo()
 {
-    Action* pAction = _pService->getAction("GetProtocolInfo")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetProtocolInfo")->clone();
     ActionThread<CtlConnectionManager> thread(this, &CtlConnectionManager::_threadGetProtocolInfo, pAction);
     thread.start();
 }
@@ -609,7 +609,7 @@ CtlConnectionManager::_reqGetProtocolInfo()
 void
 CtlConnectionManager::_reqPrepareForConnection(const std::string& RemoteProtocolInfo, const std::string& PeerConnectionManager, const Omm::i4& PeerConnectionID, const std::string& Direction)
 {
-    Action* pAction = _pService->getAction("PrepareForConnection")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("PrepareForConnection")->clone();
     pAction->setArgument<std::string>("RemoteProtocolInfo", RemoteProtocolInfo);
     pAction->setArgument<std::string>("PeerConnectionManager", PeerConnectionManager);
     pAction->setArgument<Omm::i4>("PeerConnectionID", PeerConnectionID);
@@ -622,7 +622,7 @@ CtlConnectionManager::_reqPrepareForConnection(const std::string& RemoteProtocol
 void
 CtlConnectionManager::_reqConnectionComplete(const i4& ConnectionID)
 {
-    Action* pAction = _pService->getAction("ConnectionComplete")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("ConnectionComplete")->clone();
     pAction->setArgument<i4>("ConnectionID", ConnectionID);
     ActionThread<CtlConnectionManager> thread(this, &CtlConnectionManager::_threadConnectionComplete, pAction);
     thread.start();
@@ -631,7 +631,7 @@ CtlConnectionManager::_reqConnectionComplete(const i4& ConnectionID)
 void
 CtlConnectionManager::_reqGetCurrentConnectionIDs()
 {
-    Action* pAction = _pService->getAction("GetCurrentConnectionIDs")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetCurrentConnectionIDs")->clone();
     ActionThread<CtlConnectionManager> thread(this, &CtlConnectionManager::_threadGetCurrentConnectionIDs, pAction);
     thread.start();
 }
@@ -639,14 +639,14 @@ CtlConnectionManager::_reqGetCurrentConnectionIDs()
 void
 CtlConnectionManager::_reqGetCurrentConnectionInfo(const i4& ConnectionID)
 {
-    Action* pAction = _pService->getAction("GetCurrentConnectionInfo")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetCurrentConnectionInfo")->clone();
     pAction->setArgument<i4>("ConnectionID", ConnectionID);
     ActionThread<CtlConnectionManager> thread(this, &CtlConnectionManager::_threadGetCurrentConnectionInfo, pAction);
     thread.start();
 }
 
 void
-CtlConnectionManager::_threadGetProtocolInfo(Action* pAction)
+CtlConnectionManager::_threadGetProtocolInfo(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     std::string Source = pAction->getArgument<std::string>("Source");
@@ -656,7 +656,7 @@ CtlConnectionManager::_threadGetProtocolInfo(Action* pAction)
 
 
 void
-CtlConnectionManager::_threadPrepareForConnection(Action* pAction)
+CtlConnectionManager::_threadPrepareForConnection(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     std::string RemoteProtocolInfo = pAction->getArgument<std::string>("RemoteProtocolInfo");
@@ -671,7 +671,7 @@ CtlConnectionManager::_threadPrepareForConnection(Action* pAction)
 
 
 void
-CtlConnectionManager::_threadConnectionComplete(Action* pAction)
+CtlConnectionManager::_threadConnectionComplete(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     i4 ConnectionID = pAction->getArgument<i4>("ConnectionID");
@@ -679,7 +679,7 @@ CtlConnectionManager::_threadConnectionComplete(Action* pAction)
 }
 
 void
-CtlConnectionManager::_threadGetCurrentConnectionIDs(Action* pAction)
+CtlConnectionManager::_threadGetCurrentConnectionIDs(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     std::string ConnectionIDs = pAction->getArgument<std::string>("ConnectionIDs");
@@ -687,7 +687,7 @@ CtlConnectionManager::_threadGetCurrentConnectionIDs(Action* pAction)
 }
 
 void
-CtlConnectionManager::_threadGetCurrentConnectionInfo(Action* pAction)
+CtlConnectionManager::_threadGetCurrentConnectionInfo(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     i4 ConnectionID = pAction->getArgument<i4>("ConnectionID");
@@ -706,7 +706,7 @@ CtlConnectionManager::_threadGetCurrentConnectionInfo(Action* pAction)
 void
 CtlRenderingControl::ListPresets(const ui4& InstanceID, std::string& CurrentPresetNameList)
 {
-    Action* pAction = _pService->getAction("ListPresets")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("ListPresets")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentPresetNameList = pAction->getArgument<std::string>("CurrentPresetNameList");
@@ -715,7 +715,7 @@ CtlRenderingControl::ListPresets(const ui4& InstanceID, std::string& CurrentPres
 void
 CtlRenderingControl::SelectPreset(const ui4& InstanceID, const std::string& PresetName)
 {
-    Action* pAction = _pService->getAction("SelectPreset")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SelectPreset")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("PresetName", PresetName);
     _pService->sendAction(pAction);
@@ -724,7 +724,7 @@ CtlRenderingControl::SelectPreset(const ui4& InstanceID, const std::string& Pres
 void
 CtlRenderingControl::GetBrightness(const ui4& InstanceID, ui2& CurrentBrightness)
 {
-    Action* pAction = _pService->getAction("GetBrightness")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetBrightness")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentBrightness = pAction->getArgument<ui2>("CurrentBrightness");
@@ -733,7 +733,7 @@ CtlRenderingControl::GetBrightness(const ui4& InstanceID, ui2& CurrentBrightness
 void
 CtlRenderingControl::SetBrightness(const ui4& InstanceID, const ui2& DesiredBrightness)
 {
-    Action* pAction = _pService->getAction("SetBrightness")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetBrightness")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredBrightness", DesiredBrightness);
     _pService->sendAction(pAction);
@@ -742,7 +742,7 @@ CtlRenderingControl::SetBrightness(const ui4& InstanceID, const ui2& DesiredBrig
 void
 CtlRenderingControl::GetContrast(const ui4& InstanceID, ui2& CurrentContrast)
 {
-    Action* pAction = _pService->getAction("GetContrast")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetContrast")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentContrast = pAction->getArgument<ui2>("CurrentContrast");
@@ -751,7 +751,7 @@ CtlRenderingControl::GetContrast(const ui4& InstanceID, ui2& CurrentContrast)
 void
 CtlRenderingControl::SetContrast(const ui4& InstanceID, const ui2& DesiredContrast)
 {
-    Action* pAction = _pService->getAction("SetContrast")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetContrast")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredContrast", DesiredContrast);
     _pService->sendAction(pAction);
@@ -760,7 +760,7 @@ CtlRenderingControl::SetContrast(const ui4& InstanceID, const ui2& DesiredContra
 void
 CtlRenderingControl::GetSharpness(const ui4& InstanceID, ui2& CurrentSharpness)
 {
-    Action* pAction = _pService->getAction("GetSharpness")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetSharpness")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentSharpness = pAction->getArgument<ui2>("CurrentSharpness");
@@ -769,7 +769,7 @@ CtlRenderingControl::GetSharpness(const ui4& InstanceID, ui2& CurrentSharpness)
 void
 CtlRenderingControl::SetSharpness(const ui4& InstanceID, const ui2& DesiredSharpness)
 {
-    Action* pAction = _pService->getAction("SetSharpness")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetSharpness")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredSharpness", DesiredSharpness);
     _pService->sendAction(pAction);
@@ -778,7 +778,7 @@ CtlRenderingControl::SetSharpness(const ui4& InstanceID, const ui2& DesiredSharp
 void
 CtlRenderingControl::GetRedVideoGain(const ui4& InstanceID, ui2& CurrentRedVideoGain)
 {
-    Action* pAction = _pService->getAction("GetRedVideoGain")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetRedVideoGain")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentRedVideoGain = pAction->getArgument<ui2>("CurrentRedVideoGain");
@@ -787,7 +787,7 @@ CtlRenderingControl::GetRedVideoGain(const ui4& InstanceID, ui2& CurrentRedVideo
 void
 CtlRenderingControl::SetRedVideoGain(const ui4& InstanceID, const ui2& DesiredRedVideoGain)
 {
-    Action* pAction = _pService->getAction("SetRedVideoGain")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetRedVideoGain")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredRedVideoGain", DesiredRedVideoGain);
     _pService->sendAction(pAction);
@@ -796,7 +796,7 @@ CtlRenderingControl::SetRedVideoGain(const ui4& InstanceID, const ui2& DesiredRe
 void
 CtlRenderingControl::GetGreenVideoGain(const ui4& InstanceID, ui2& CurrentGreenVideoGain)
 {
-    Action* pAction = _pService->getAction("GetGreenVideoGain")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetGreenVideoGain")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentGreenVideoGain = pAction->getArgument<ui2>("CurrentGreenVideoGain");
@@ -805,7 +805,7 @@ CtlRenderingControl::GetGreenVideoGain(const ui4& InstanceID, ui2& CurrentGreenV
 void
 CtlRenderingControl::SetGreenVideoGain(const ui4& InstanceID, const ui2& DesiredGreenVideoGain)
 {
-    Action* pAction = _pService->getAction("SetGreenVideoGain")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetGreenVideoGain")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredGreenVideoGain", DesiredGreenVideoGain);
     _pService->sendAction(pAction);
@@ -814,7 +814,7 @@ CtlRenderingControl::SetGreenVideoGain(const ui4& InstanceID, const ui2& Desired
 void
 CtlRenderingControl::GetBlueVideoGain(const ui4& InstanceID, ui2& CurrentBlueVideoGain)
 {
-    Action* pAction = _pService->getAction("GetBlueVideoGain")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetBlueVideoGain")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentBlueVideoGain = pAction->getArgument<ui2>("CurrentBlueVideoGain");
@@ -823,7 +823,7 @@ CtlRenderingControl::GetBlueVideoGain(const ui4& InstanceID, ui2& CurrentBlueVid
 void
 CtlRenderingControl::SetBlueVideoGain(const ui4& InstanceID, const ui2& DesiredBlueVideoGain)
 {
-    Action* pAction = _pService->getAction("SetBlueVideoGain")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetBlueVideoGain")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredBlueVideoGain", DesiredBlueVideoGain);
     _pService->sendAction(pAction);
@@ -832,7 +832,7 @@ CtlRenderingControl::SetBlueVideoGain(const ui4& InstanceID, const ui2& DesiredB
 void
 CtlRenderingControl::GetRedVideoBlackLevel(const ui4& InstanceID, ui2& CurrentRedVideoBlackLevel)
 {
-    Action* pAction = _pService->getAction("GetRedVideoBlackLevel")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetRedVideoBlackLevel")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentRedVideoBlackLevel = pAction->getArgument<ui2>("CurrentRedVideoBlackLevel");
@@ -841,7 +841,7 @@ CtlRenderingControl::GetRedVideoBlackLevel(const ui4& InstanceID, ui2& CurrentRe
 void
 CtlRenderingControl::SetRedVideoBlackLevel(const ui4& InstanceID, const ui2& DesiredRedVideoBlackLevel)
 {
-    Action* pAction = _pService->getAction("SetRedVideoBlackLevel")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetRedVideoBlackLevel")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredRedVideoBlackLevel", DesiredRedVideoBlackLevel);
     _pService->sendAction(pAction);
@@ -850,7 +850,7 @@ CtlRenderingControl::SetRedVideoBlackLevel(const ui4& InstanceID, const ui2& Des
 void
 CtlRenderingControl::GetGreenVideoBlackLevel(const ui4& InstanceID, ui2& CurrentGreenVideoBlackLevel)
 {
-    Action* pAction = _pService->getAction("GetGreenVideoBlackLevel")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetGreenVideoBlackLevel")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentGreenVideoBlackLevel = pAction->getArgument<ui2>("CurrentGreenVideoBlackLevel");
@@ -859,7 +859,7 @@ CtlRenderingControl::GetGreenVideoBlackLevel(const ui4& InstanceID, ui2& Current
 void
 CtlRenderingControl::SetGreenVideoBlackLevel(const ui4& InstanceID, const ui2& DesiredGreenVideoBlackLevel)
 {
-    Action* pAction = _pService->getAction("SetGreenVideoBlackLevel")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetGreenVideoBlackLevel")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredGreenVideoBlackLevel", DesiredGreenVideoBlackLevel);
     _pService->sendAction(pAction);
@@ -868,7 +868,7 @@ CtlRenderingControl::SetGreenVideoBlackLevel(const ui4& InstanceID, const ui2& D
 void
 CtlRenderingControl::GetBlueVideoBlackLevel(const ui4& InstanceID, ui2& CurrentBlueVideoBlackLevel)
 {
-    Action* pAction = _pService->getAction("GetBlueVideoBlackLevel")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetBlueVideoBlackLevel")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentBlueVideoBlackLevel = pAction->getArgument<ui2>("CurrentBlueVideoBlackLevel");
@@ -877,7 +877,7 @@ CtlRenderingControl::GetBlueVideoBlackLevel(const ui4& InstanceID, ui2& CurrentB
 void
 CtlRenderingControl::SetBlueVideoBlackLevel(const ui4& InstanceID, const ui2& DesiredBlueVideoBlackLevel)
 {
-    Action* pAction = _pService->getAction("SetBlueVideoBlackLevel")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetBlueVideoBlackLevel")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredBlueVideoBlackLevel", DesiredBlueVideoBlackLevel);
     _pService->sendAction(pAction);
@@ -886,7 +886,7 @@ CtlRenderingControl::SetBlueVideoBlackLevel(const ui4& InstanceID, const ui2& De
 void
 CtlRenderingControl::GetColorTemperature (const ui4& InstanceID, ui2& CurrentColorTemperature)
 {
-    Action* pAction = _pService->getAction("GetColorTemperature ")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetColorTemperature ")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentColorTemperature = pAction->getArgument<ui2>("CurrentColorTemperature");
@@ -895,7 +895,7 @@ CtlRenderingControl::GetColorTemperature (const ui4& InstanceID, ui2& CurrentCol
 void
 CtlRenderingControl::SetColorTemperature(const ui4& InstanceID, const ui2& DesiredColorTemperature)
 {
-    Action* pAction = _pService->getAction("SetColorTemperature")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetColorTemperature")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredColorTemperature", DesiredColorTemperature);
     _pService->sendAction(pAction);
@@ -904,7 +904,7 @@ CtlRenderingControl::SetColorTemperature(const ui4& InstanceID, const ui2& Desir
 void
 CtlRenderingControl::GetHorizontalKeystone(const ui4& InstanceID, i2& CurrentHorizontalKeystone)
 {
-    Action* pAction = _pService->getAction("GetHorizontalKeystone")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetHorizontalKeystone")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentHorizontalKeystone = pAction->getArgument<i2>("CurrentHorizontalKeystone");
@@ -913,7 +913,7 @@ CtlRenderingControl::GetHorizontalKeystone(const ui4& InstanceID, i2& CurrentHor
 void
 CtlRenderingControl::SetHorizontalKeystone(const ui4& InstanceID, const i2& DesiredHorizontalKeystone)
 {
-    Action* pAction = _pService->getAction("SetHorizontalKeystone")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetHorizontalKeystone")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<i2>("DesiredHorizontalKeystone", DesiredHorizontalKeystone);
     _pService->sendAction(pAction);
@@ -922,7 +922,7 @@ CtlRenderingControl::SetHorizontalKeystone(const ui4& InstanceID, const i2& Desi
 void
 CtlRenderingControl::GetVerticalKeystone(const ui4& InstanceID, i2& CurrentVerticalKeystone)
 {
-    Action* pAction = _pService->getAction("GetVerticalKeystone")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetVerticalKeystone")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     _pService->sendAction(pAction);
     CurrentVerticalKeystone = pAction->getArgument<i2>("CurrentVerticalKeystone");
@@ -931,7 +931,7 @@ CtlRenderingControl::GetVerticalKeystone(const ui4& InstanceID, i2& CurrentVerti
 void
 CtlRenderingControl::SetVerticalKeystone(const ui4& InstanceID, const i2& DesiredVerticalKeystone)
 {
-    Action* pAction = _pService->getAction("SetVerticalKeystone")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetVerticalKeystone")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<i2>("DesiredVerticalKeystone", DesiredVerticalKeystone);
     _pService->sendAction(pAction);
@@ -940,7 +940,7 @@ CtlRenderingControl::SetVerticalKeystone(const ui4& InstanceID, const i2& Desire
 void
 CtlRenderingControl::GetMute(const ui4& InstanceID, const std::string& Channel, bool& CurrentMute)
 {
-    Action* pAction = _pService->getAction("GetMute")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetMute")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     _pService->sendAction(pAction);
@@ -950,7 +950,7 @@ CtlRenderingControl::GetMute(const ui4& InstanceID, const std::string& Channel, 
 void
 CtlRenderingControl::SetMute(const ui4& InstanceID, const std::string& Channel, const bool& DesiredMute)
 {
-    Action* pAction = _pService->getAction("SetMute")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetMute")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     pAction->setArgument<bool>("DesiredMute", DesiredMute);
@@ -960,7 +960,7 @@ CtlRenderingControl::SetMute(const ui4& InstanceID, const std::string& Channel, 
 void
 CtlRenderingControl::GetVolume(const ui4& InstanceID, const std::string& Channel, ui2& CurrentVolume)
 {
-    Action* pAction = _pService->getAction("GetVolume")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetVolume")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     _pService->sendAction(pAction);
@@ -970,7 +970,7 @@ CtlRenderingControl::GetVolume(const ui4& InstanceID, const std::string& Channel
 void
 CtlRenderingControl::SetVolume(const ui4& InstanceID, const std::string& Channel, const ui2& DesiredVolume)
 {
-    Action* pAction = _pService->getAction("SetVolume")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetVolume")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     pAction->setArgument<ui2>("DesiredVolume", DesiredVolume);
@@ -980,7 +980,7 @@ CtlRenderingControl::SetVolume(const ui4& InstanceID, const std::string& Channel
 void
 CtlRenderingControl::GetVolumeDB(const ui4& InstanceID, const std::string& Channel, i2& CurrentVolume)
 {
-    Action* pAction = _pService->getAction("GetVolumeDB")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetVolumeDB")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     _pService->sendAction(pAction);
@@ -990,7 +990,7 @@ CtlRenderingControl::GetVolumeDB(const ui4& InstanceID, const std::string& Chann
 void
 CtlRenderingControl::SetVolumeDB(const ui4& InstanceID, const std::string& Channel, const i2& DesiredVolume)
 {
-    Action* pAction = _pService->getAction("SetVolumeDB")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetVolumeDB")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     pAction->setArgument<i2>("DesiredVolume", DesiredVolume);
@@ -1000,7 +1000,7 @@ CtlRenderingControl::SetVolumeDB(const ui4& InstanceID, const std::string& Chann
 void
 CtlRenderingControl::GetVolumeDBRange(const ui4& InstanceID, const std::string& Channel, i2& MinValue, i2& MaxValue)
 {
-    Action* pAction = _pService->getAction("GetVolumeDBRange")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetVolumeDBRange")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     _pService->sendAction(pAction);
@@ -1011,7 +1011,7 @@ CtlRenderingControl::GetVolumeDBRange(const ui4& InstanceID, const std::string& 
 void
 CtlRenderingControl::GetLoudness(const ui4& InstanceID, const std::string& Channel, bool& CurrentLoudness)
 {
-    Action* pAction = _pService->getAction("GetLoudness")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetLoudness")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     _pService->sendAction(pAction);
@@ -1021,7 +1021,7 @@ CtlRenderingControl::GetLoudness(const ui4& InstanceID, const std::string& Chann
 void
 CtlRenderingControl::SetLoudness(const ui4& InstanceID, const std::string& Channel, const bool& DesiredLoudness)
 {
-    Action* pAction = _pService->getAction("SetLoudness")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetLoudness")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     pAction->setArgument<bool>("DesiredLoudness", DesiredLoudness);
@@ -1038,7 +1038,7 @@ CtlRenderingControl::_getLastChange()
 void
 CtlRenderingControl::_reqListPresets(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("ListPresets")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("ListPresets")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadListPresets, pAction);
     thread.start();
@@ -1047,7 +1047,7 @@ CtlRenderingControl::_reqListPresets(const ui4& InstanceID)
 void
 CtlRenderingControl::_reqSelectPreset(const ui4& InstanceID, const std::string& PresetName)
 {
-    Action* pAction = _pService->getAction("SelectPreset")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SelectPreset")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("PresetName", PresetName);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadSelectPreset, pAction);
@@ -1057,7 +1057,7 @@ CtlRenderingControl::_reqSelectPreset(const ui4& InstanceID, const std::string& 
 void
 CtlRenderingControl::_reqGetBrightness(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetBrightness")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetBrightness")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetBrightness, pAction);
     thread.start();
@@ -1066,7 +1066,7 @@ CtlRenderingControl::_reqGetBrightness(const ui4& InstanceID)
 void
 CtlRenderingControl::_reqSetBrightness(const ui4& InstanceID, const ui2& DesiredBrightness)
 {
-    Action* pAction = _pService->getAction("SetBrightness")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetBrightness")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredBrightness", DesiredBrightness);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadSetBrightness, pAction);
@@ -1076,7 +1076,7 @@ CtlRenderingControl::_reqSetBrightness(const ui4& InstanceID, const ui2& Desired
 void
 CtlRenderingControl::_reqGetContrast(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetContrast")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetContrast")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetContrast, pAction);
     thread.start();
@@ -1085,7 +1085,7 @@ CtlRenderingControl::_reqGetContrast(const ui4& InstanceID)
 void
 CtlRenderingControl::_reqSetContrast(const ui4& InstanceID, const ui2& DesiredContrast)
 {
-    Action* pAction = _pService->getAction("SetContrast")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetContrast")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredContrast", DesiredContrast);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadSetContrast, pAction);
@@ -1095,7 +1095,7 @@ CtlRenderingControl::_reqSetContrast(const ui4& InstanceID, const ui2& DesiredCo
 void
 CtlRenderingControl::_reqGetSharpness(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetSharpness")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetSharpness")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetSharpness, pAction);
     thread.start();
@@ -1104,7 +1104,7 @@ CtlRenderingControl::_reqGetSharpness(const ui4& InstanceID)
 void
 CtlRenderingControl::_reqSetSharpness(const ui4& InstanceID, const ui2& DesiredSharpness)
 {
-    Action* pAction = _pService->getAction("SetSharpness")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetSharpness")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredSharpness", DesiredSharpness);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadSetSharpness, pAction);
@@ -1114,7 +1114,7 @@ CtlRenderingControl::_reqSetSharpness(const ui4& InstanceID, const ui2& DesiredS
 void
 CtlRenderingControl::_reqGetRedVideoGain(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetRedVideoGain")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetRedVideoGain")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetRedVideoGain, pAction);
     thread.start();
@@ -1123,7 +1123,7 @@ CtlRenderingControl::_reqGetRedVideoGain(const ui4& InstanceID)
 void
 CtlRenderingControl::_reqSetRedVideoGain(const ui4& InstanceID, const ui2& DesiredRedVideoGain)
 {
-    Action* pAction = _pService->getAction("SetRedVideoGain")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetRedVideoGain")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredRedVideoGain", DesiredRedVideoGain);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadSetRedVideoGain, pAction);
@@ -1133,7 +1133,7 @@ CtlRenderingControl::_reqSetRedVideoGain(const ui4& InstanceID, const ui2& Desir
 void
 CtlRenderingControl::_reqGetGreenVideoGain(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetGreenVideoGain")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetGreenVideoGain")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetGreenVideoGain, pAction);
     thread.start();
@@ -1142,7 +1142,7 @@ CtlRenderingControl::_reqGetGreenVideoGain(const ui4& InstanceID)
 void
 CtlRenderingControl::_reqSetGreenVideoGain(const ui4& InstanceID, const ui2& DesiredGreenVideoGain)
 {
-    Action* pAction = _pService->getAction("SetGreenVideoGain")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetGreenVideoGain")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredGreenVideoGain", DesiredGreenVideoGain);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadSetGreenVideoGain, pAction);
@@ -1152,7 +1152,7 @@ CtlRenderingControl::_reqSetGreenVideoGain(const ui4& InstanceID, const ui2& Des
 void
 CtlRenderingControl::_reqGetBlueVideoGain(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetBlueVideoGain")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetBlueVideoGain")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetBlueVideoGain, pAction);
     thread.start();
@@ -1161,7 +1161,7 @@ CtlRenderingControl::_reqGetBlueVideoGain(const ui4& InstanceID)
 void
 CtlRenderingControl::_reqSetBlueVideoGain(const ui4& InstanceID, const ui2& DesiredBlueVideoGain)
 {
-    Action* pAction = _pService->getAction("SetBlueVideoGain")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetBlueVideoGain")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredBlueVideoGain", DesiredBlueVideoGain);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadSetBlueVideoGain, pAction);
@@ -1171,7 +1171,7 @@ CtlRenderingControl::_reqSetBlueVideoGain(const ui4& InstanceID, const ui2& Desi
 void
 CtlRenderingControl::_reqGetRedVideoBlackLevel(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetRedVideoBlackLevel")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetRedVideoBlackLevel")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetRedVideoBlackLevel, pAction);
     thread.start();
@@ -1180,7 +1180,7 @@ CtlRenderingControl::_reqGetRedVideoBlackLevel(const ui4& InstanceID)
 void
 CtlRenderingControl::_reqSetRedVideoBlackLevel(const ui4& InstanceID, const ui2& DesiredRedVideoBlackLevel)
 {
-    Action* pAction = _pService->getAction("SetRedVideoBlackLevel")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetRedVideoBlackLevel")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredRedVideoBlackLevel", DesiredRedVideoBlackLevel);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadSetRedVideoBlackLevel, pAction);
@@ -1190,7 +1190,7 @@ CtlRenderingControl::_reqSetRedVideoBlackLevel(const ui4& InstanceID, const ui2&
 void
 CtlRenderingControl::_reqGetGreenVideoBlackLevel(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetGreenVideoBlackLevel")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetGreenVideoBlackLevel")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetGreenVideoBlackLevel, pAction);
     thread.start();
@@ -1199,7 +1199,7 @@ CtlRenderingControl::_reqGetGreenVideoBlackLevel(const ui4& InstanceID)
 void
 CtlRenderingControl::_reqSetGreenVideoBlackLevel(const ui4& InstanceID, const ui2& DesiredGreenVideoBlackLevel)
 {
-    Action* pAction = _pService->getAction("SetGreenVideoBlackLevel")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetGreenVideoBlackLevel")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredGreenVideoBlackLevel", DesiredGreenVideoBlackLevel);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadSetGreenVideoBlackLevel, pAction);
@@ -1209,7 +1209,7 @@ CtlRenderingControl::_reqSetGreenVideoBlackLevel(const ui4& InstanceID, const ui
 void
 CtlRenderingControl::_reqGetBlueVideoBlackLevel(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetBlueVideoBlackLevel")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetBlueVideoBlackLevel")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetBlueVideoBlackLevel, pAction);
     thread.start();
@@ -1218,7 +1218,7 @@ CtlRenderingControl::_reqGetBlueVideoBlackLevel(const ui4& InstanceID)
 void
 CtlRenderingControl::_reqSetBlueVideoBlackLevel(const ui4& InstanceID, const ui2& DesiredBlueVideoBlackLevel)
 {
-    Action* pAction = _pService->getAction("SetBlueVideoBlackLevel")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetBlueVideoBlackLevel")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredBlueVideoBlackLevel", DesiredBlueVideoBlackLevel);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadSetBlueVideoBlackLevel, pAction);
@@ -1228,7 +1228,7 @@ CtlRenderingControl::_reqSetBlueVideoBlackLevel(const ui4& InstanceID, const ui2
 void
 CtlRenderingControl::_reqGetColorTemperature (const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetColorTemperature ")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetColorTemperature ")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetColorTemperature , pAction);
     thread.start();
@@ -1237,7 +1237,7 @@ CtlRenderingControl::_reqGetColorTemperature (const ui4& InstanceID)
 void
 CtlRenderingControl::_reqSetColorTemperature(const ui4& InstanceID, const ui2& DesiredColorTemperature)
 {
-    Action* pAction = _pService->getAction("SetColorTemperature")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetColorTemperature")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<ui2>("DesiredColorTemperature", DesiredColorTemperature);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadSetColorTemperature, pAction);
@@ -1247,7 +1247,7 @@ CtlRenderingControl::_reqSetColorTemperature(const ui4& InstanceID, const ui2& D
 void
 CtlRenderingControl::_reqGetHorizontalKeystone(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetHorizontalKeystone")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetHorizontalKeystone")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetHorizontalKeystone, pAction);
     thread.start();
@@ -1256,7 +1256,7 @@ CtlRenderingControl::_reqGetHorizontalKeystone(const ui4& InstanceID)
 void
 CtlRenderingControl::_reqSetHorizontalKeystone(const ui4& InstanceID, const i2& DesiredHorizontalKeystone)
 {
-    Action* pAction = _pService->getAction("SetHorizontalKeystone")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetHorizontalKeystone")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<i2>("DesiredHorizontalKeystone", DesiredHorizontalKeystone);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadSetHorizontalKeystone, pAction);
@@ -1266,7 +1266,7 @@ CtlRenderingControl::_reqSetHorizontalKeystone(const ui4& InstanceID, const i2& 
 void
 CtlRenderingControl::_reqGetVerticalKeystone(const ui4& InstanceID)
 {
-    Action* pAction = _pService->getAction("GetVerticalKeystone")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetVerticalKeystone")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetVerticalKeystone, pAction);
     thread.start();
@@ -1275,7 +1275,7 @@ CtlRenderingControl::_reqGetVerticalKeystone(const ui4& InstanceID)
 void
 CtlRenderingControl::_reqSetVerticalKeystone(const ui4& InstanceID, const i2& DesiredVerticalKeystone)
 {
-    Action* pAction = _pService->getAction("SetVerticalKeystone")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetVerticalKeystone")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<i2>("DesiredVerticalKeystone", DesiredVerticalKeystone);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadSetVerticalKeystone, pAction);
@@ -1285,7 +1285,7 @@ CtlRenderingControl::_reqSetVerticalKeystone(const ui4& InstanceID, const i2& De
 void
 CtlRenderingControl::_reqGetMute(const ui4& InstanceID, const std::string& Channel)
 {
-    Action* pAction = _pService->getAction("GetMute")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetMute")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetMute, pAction);
@@ -1295,7 +1295,7 @@ CtlRenderingControl::_reqGetMute(const ui4& InstanceID, const std::string& Chann
 void
 CtlRenderingControl::_reqSetMute(const ui4& InstanceID, const std::string& Channel, const bool& DesiredMute)
 {
-    Action* pAction = _pService->getAction("SetMute")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetMute")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     pAction->setArgument<bool>("DesiredMute", DesiredMute);
@@ -1306,7 +1306,7 @@ CtlRenderingControl::_reqSetMute(const ui4& InstanceID, const std::string& Chann
 void
 CtlRenderingControl::_reqGetVolume(const ui4& InstanceID, const std::string& Channel)
 {
-    Action* pAction = _pService->getAction("GetVolume")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetVolume")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetVolume, pAction);
@@ -1316,7 +1316,7 @@ CtlRenderingControl::_reqGetVolume(const ui4& InstanceID, const std::string& Cha
 void
 CtlRenderingControl::_reqSetVolume(const ui4& InstanceID, const std::string& Channel, const ui2& DesiredVolume)
 {
-    Action* pAction = _pService->getAction("SetVolume")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetVolume")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     pAction->setArgument<ui2>("DesiredVolume", DesiredVolume);
@@ -1327,7 +1327,7 @@ CtlRenderingControl::_reqSetVolume(const ui4& InstanceID, const std::string& Cha
 void
 CtlRenderingControl::_reqGetVolumeDB(const ui4& InstanceID, const std::string& Channel)
 {
-    Action* pAction = _pService->getAction("GetVolumeDB")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetVolumeDB")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetVolumeDB, pAction);
@@ -1337,7 +1337,7 @@ CtlRenderingControl::_reqGetVolumeDB(const ui4& InstanceID, const std::string& C
 void
 CtlRenderingControl::_reqSetVolumeDB(const ui4& InstanceID, const std::string& Channel, const i2& DesiredVolume)
 {
-    Action* pAction = _pService->getAction("SetVolumeDB")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetVolumeDB")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     pAction->setArgument<i2>("DesiredVolume", DesiredVolume);
@@ -1348,7 +1348,7 @@ CtlRenderingControl::_reqSetVolumeDB(const ui4& InstanceID, const std::string& C
 void
 CtlRenderingControl::_reqGetVolumeDBRange(const ui4& InstanceID, const std::string& Channel)
 {
-    Action* pAction = _pService->getAction("GetVolumeDBRange")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetVolumeDBRange")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetVolumeDBRange, pAction);
@@ -1358,7 +1358,7 @@ CtlRenderingControl::_reqGetVolumeDBRange(const ui4& InstanceID, const std::stri
 void
 CtlRenderingControl::_reqGetLoudness(const ui4& InstanceID, const std::string& Channel)
 {
-    Action* pAction = _pService->getAction("GetLoudness")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetLoudness")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     ActionThread<CtlRenderingControl> thread(this, &CtlRenderingControl::_threadGetLoudness, pAction);
@@ -1368,7 +1368,7 @@ CtlRenderingControl::_reqGetLoudness(const ui4& InstanceID, const std::string& C
 void
 CtlRenderingControl::_reqSetLoudness(const ui4& InstanceID, const std::string& Channel, const bool& DesiredLoudness)
 {
-    Action* pAction = _pService->getAction("SetLoudness")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("SetLoudness")->clone();
     pAction->setArgument<ui4>("InstanceID", InstanceID);
     pAction->setArgument<std::string>("Channel", Channel);
     pAction->setArgument<bool>("DesiredLoudness", DesiredLoudness);
@@ -1377,7 +1377,7 @@ CtlRenderingControl::_reqSetLoudness(const ui4& InstanceID, const std::string& C
 }
 
 void
-CtlRenderingControl::_threadListPresets(Action* pAction)
+CtlRenderingControl::_threadListPresets(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1386,7 +1386,7 @@ CtlRenderingControl::_threadListPresets(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSelectPreset(Action* pAction)
+CtlRenderingControl::_threadSelectPreset(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1395,7 +1395,7 @@ CtlRenderingControl::_threadSelectPreset(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetBrightness(Action* pAction)
+CtlRenderingControl::_threadGetBrightness(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1404,7 +1404,7 @@ CtlRenderingControl::_threadGetBrightness(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetBrightness(Action* pAction)
+CtlRenderingControl::_threadSetBrightness(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1413,7 +1413,7 @@ CtlRenderingControl::_threadSetBrightness(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetContrast(Action* pAction)
+CtlRenderingControl::_threadGetContrast(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1422,7 +1422,7 @@ CtlRenderingControl::_threadGetContrast(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetContrast(Action* pAction)
+CtlRenderingControl::_threadSetContrast(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1431,7 +1431,7 @@ CtlRenderingControl::_threadSetContrast(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetSharpness(Action* pAction)
+CtlRenderingControl::_threadGetSharpness(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1440,7 +1440,7 @@ CtlRenderingControl::_threadGetSharpness(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetSharpness(Action* pAction)
+CtlRenderingControl::_threadSetSharpness(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1449,7 +1449,7 @@ CtlRenderingControl::_threadSetSharpness(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetRedVideoGain(Action* pAction)
+CtlRenderingControl::_threadGetRedVideoGain(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1458,7 +1458,7 @@ CtlRenderingControl::_threadGetRedVideoGain(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetRedVideoGain(Action* pAction)
+CtlRenderingControl::_threadSetRedVideoGain(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1467,7 +1467,7 @@ CtlRenderingControl::_threadSetRedVideoGain(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetGreenVideoGain(Action* pAction)
+CtlRenderingControl::_threadGetGreenVideoGain(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1476,7 +1476,7 @@ CtlRenderingControl::_threadGetGreenVideoGain(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetGreenVideoGain(Action* pAction)
+CtlRenderingControl::_threadSetGreenVideoGain(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1485,7 +1485,7 @@ CtlRenderingControl::_threadSetGreenVideoGain(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetBlueVideoGain(Action* pAction)
+CtlRenderingControl::_threadGetBlueVideoGain(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1494,7 +1494,7 @@ CtlRenderingControl::_threadGetBlueVideoGain(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetBlueVideoGain(Action* pAction)
+CtlRenderingControl::_threadSetBlueVideoGain(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1503,7 +1503,7 @@ CtlRenderingControl::_threadSetBlueVideoGain(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetRedVideoBlackLevel(Action* pAction)
+CtlRenderingControl::_threadGetRedVideoBlackLevel(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1512,7 +1512,7 @@ CtlRenderingControl::_threadGetRedVideoBlackLevel(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetRedVideoBlackLevel(Action* pAction)
+CtlRenderingControl::_threadSetRedVideoBlackLevel(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1521,7 +1521,7 @@ CtlRenderingControl::_threadSetRedVideoBlackLevel(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetGreenVideoBlackLevel(Action* pAction)
+CtlRenderingControl::_threadGetGreenVideoBlackLevel(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1530,7 +1530,7 @@ CtlRenderingControl::_threadGetGreenVideoBlackLevel(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetGreenVideoBlackLevel(Action* pAction)
+CtlRenderingControl::_threadSetGreenVideoBlackLevel(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1539,7 +1539,7 @@ CtlRenderingControl::_threadSetGreenVideoBlackLevel(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetBlueVideoBlackLevel(Action* pAction)
+CtlRenderingControl::_threadGetBlueVideoBlackLevel(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1548,7 +1548,7 @@ CtlRenderingControl::_threadGetBlueVideoBlackLevel(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetBlueVideoBlackLevel(Action* pAction)
+CtlRenderingControl::_threadSetBlueVideoBlackLevel(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1557,7 +1557,7 @@ CtlRenderingControl::_threadSetBlueVideoBlackLevel(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetColorTemperature (Action* pAction)
+CtlRenderingControl::_threadGetColorTemperature (Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1566,7 +1566,7 @@ CtlRenderingControl::_threadGetColorTemperature (Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetColorTemperature(Action* pAction)
+CtlRenderingControl::_threadSetColorTemperature(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1575,7 +1575,7 @@ CtlRenderingControl::_threadSetColorTemperature(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetHorizontalKeystone(Action* pAction)
+CtlRenderingControl::_threadGetHorizontalKeystone(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1584,7 +1584,7 @@ CtlRenderingControl::_threadGetHorizontalKeystone(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetHorizontalKeystone(Action* pAction)
+CtlRenderingControl::_threadSetHorizontalKeystone(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1593,7 +1593,7 @@ CtlRenderingControl::_threadSetHorizontalKeystone(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetVerticalKeystone(Action* pAction)
+CtlRenderingControl::_threadGetVerticalKeystone(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1602,7 +1602,7 @@ CtlRenderingControl::_threadGetVerticalKeystone(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetVerticalKeystone(Action* pAction)
+CtlRenderingControl::_threadSetVerticalKeystone(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1611,7 +1611,7 @@ CtlRenderingControl::_threadSetVerticalKeystone(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetMute(Action* pAction)
+CtlRenderingControl::_threadGetMute(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1621,7 +1621,7 @@ CtlRenderingControl::_threadGetMute(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetMute(Action* pAction)
+CtlRenderingControl::_threadSetMute(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1631,7 +1631,7 @@ CtlRenderingControl::_threadSetMute(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetVolume(Action* pAction)
+CtlRenderingControl::_threadGetVolume(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1641,7 +1641,7 @@ CtlRenderingControl::_threadGetVolume(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetVolume(Action* pAction)
+CtlRenderingControl::_threadSetVolume(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1651,7 +1651,7 @@ CtlRenderingControl::_threadSetVolume(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetVolumeDB(Action* pAction)
+CtlRenderingControl::_threadGetVolumeDB(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1661,7 +1661,7 @@ CtlRenderingControl::_threadGetVolumeDB(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetVolumeDB(Action* pAction)
+CtlRenderingControl::_threadSetVolumeDB(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1671,7 +1671,7 @@ CtlRenderingControl::_threadSetVolumeDB(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetVolumeDBRange(Action* pAction)
+CtlRenderingControl::_threadGetVolumeDBRange(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1682,7 +1682,7 @@ CtlRenderingControl::_threadGetVolumeDBRange(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadGetLoudness(Action* pAction)
+CtlRenderingControl::_threadGetLoudness(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1692,7 +1692,7 @@ CtlRenderingControl::_threadGetLoudness(Action* pAction)
 }
 
 void
-CtlRenderingControl::_threadSetLoudness(Action* pAction)
+CtlRenderingControl::_threadSetLoudness(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 InstanceID = pAction->getArgument<ui4>("InstanceID");
@@ -1705,7 +1705,7 @@ CtlRenderingControl::_threadSetLoudness(Action* pAction)
 void
 CtlContentDirectory::GetSearchCapabilities(std::string& SearchCaps)
 {
-    Action* pAction = _pService->getAction("GetSearchCapabilities")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetSearchCapabilities")->clone();
     _pService->sendAction(pAction);
     SearchCaps = pAction->getArgument<std::string>("SearchCaps");
 }
@@ -1713,7 +1713,7 @@ CtlContentDirectory::GetSearchCapabilities(std::string& SearchCaps)
 void
 CtlContentDirectory::GetSortCapabilities(std::string& SortCaps)
 {
-    Action* pAction = _pService->getAction("GetSortCapabilities")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetSortCapabilities")->clone();
     _pService->sendAction(pAction);
     SortCaps = pAction->getArgument<std::string>("SortCaps");
 }
@@ -1721,7 +1721,7 @@ CtlContentDirectory::GetSortCapabilities(std::string& SortCaps)
 void
 CtlContentDirectory::GetSystemUpdateID(ui4& Id)
 {
-    Action* pAction = _pService->getAction("GetSystemUpdateID")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetSystemUpdateID")->clone();
     _pService->sendAction(pAction);
     Id = pAction->getArgument<ui4>("Id");
 }
@@ -1729,7 +1729,7 @@ CtlContentDirectory::GetSystemUpdateID(ui4& Id)
 void
 CtlContentDirectory::Browse(const std::string& ObjectID, const std::string& BrowseFlag, const std::string& Filter, const ui4& StartingIndex, const ui4& RequestedCount, const std::string& SortCriteria, std::string& Result, ui4& NumberReturned, ui4& TotalMatches, ui4& UpdateID)
 {
-    Action* pAction = _pService->getAction("Browse")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Browse")->clone();
     pAction->setArgument<std::string>("ObjectID", ObjectID);
     pAction->setArgument<std::string>("BrowseFlag", BrowseFlag);
     pAction->setArgument<std::string>("Filter", Filter);
@@ -1746,7 +1746,7 @@ CtlContentDirectory::Browse(const std::string& ObjectID, const std::string& Brow
 void
 CtlContentDirectory::Search(const std::string& ContainerID, const std::string& SearchCriteria, const std::string& Filter, const ui4& StartingIndex, const ui4& RequestedCount, const std::string& SortCriteria, std::string& Result, ui4& NumberReturned, ui4& TotalMatches, ui4& UpdateID)
 {
-    Action* pAction = _pService->getAction("Search")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Search")->clone();
     pAction->setArgument<std::string>("ContainerID", ContainerID);
     pAction->setArgument<std::string>("SearchCriteria", SearchCriteria);
     pAction->setArgument<std::string>("Filter", Filter);
@@ -1763,7 +1763,7 @@ CtlContentDirectory::Search(const std::string& ContainerID, const std::string& S
 void
 CtlContentDirectory::CreateObject(const std::string& ContainerID, const std::string& Elements, std::string& ObjectID, std::string& Result)
 {
-    Action* pAction = _pService->getAction("CreateObject")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("CreateObject")->clone();
     pAction->setArgument<std::string>("ContainerID", ContainerID);
     pAction->setArgument<std::string>("Elements", Elements);
     _pService->sendAction(pAction);
@@ -1774,7 +1774,7 @@ CtlContentDirectory::CreateObject(const std::string& ContainerID, const std::str
 void
 CtlContentDirectory::DestroyObject(const std::string& ObjectID)
 {
-    Action* pAction = _pService->getAction("DestroyObject")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("DestroyObject")->clone();
     pAction->setArgument<std::string>("ObjectID", ObjectID);
     _pService->sendAction(pAction);
 }
@@ -1782,7 +1782,7 @@ CtlContentDirectory::DestroyObject(const std::string& ObjectID)
 void
 CtlContentDirectory::UpdateObject(const std::string& ObjectID, const std::string& CurrentTagValue, const std::string& NewTagValue)
 {
-    Action* pAction = _pService->getAction("UpdateObject")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("UpdateObject")->clone();
     pAction->setArgument<std::string>("ObjectID", ObjectID);
     pAction->setArgument<std::string>("CurrentTagValue", CurrentTagValue);
     pAction->setArgument<std::string>("NewTagValue", NewTagValue);
@@ -1792,7 +1792,7 @@ CtlContentDirectory::UpdateObject(const std::string& ObjectID, const std::string
 void
 CtlContentDirectory::ImportResource(const uri& SourceURI, const uri& DestinationURI, ui4& TransferID)
 {
-    Action* pAction = _pService->getAction("ImportResource")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("ImportResource")->clone();
     pAction->setArgument<uri>("SourceURI", SourceURI);
     pAction->setArgument<uri>("DestinationURI", DestinationURI);
     _pService->sendAction(pAction);
@@ -1802,7 +1802,7 @@ CtlContentDirectory::ImportResource(const uri& SourceURI, const uri& Destination
 void
 CtlContentDirectory::GetTransferProgress(const ui4& TransferID, std::string& TransferStatus, std::string& TransferLength, std::string& TransferTotal)
 {
-    Action* pAction = _pService->getAction("GetTransferProgress")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetTransferProgress")->clone();
     pAction->setArgument<ui4>("TransferID", TransferID);
     _pService->sendAction(pAction);
     TransferStatus = pAction->getArgument<std::string>("TransferStatus");
@@ -1813,7 +1813,7 @@ CtlContentDirectory::GetTransferProgress(const ui4& TransferID, std::string& Tra
 void
 CtlContentDirectory::DeleteResource(const uri& ResourceURI)
 {
-    Action* pAction = _pService->getAction("DeleteResource")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("DeleteResource")->clone();
     pAction->setArgument<uri>("ResourceURI", ResourceURI);
     _pService->sendAction(pAction);
 }
@@ -1821,7 +1821,7 @@ CtlContentDirectory::DeleteResource(const uri& ResourceURI)
 void
 CtlContentDirectory::CreateReference(const std::string& ContainerID, const std::string& ObjectID, std::string& NewID)
 {
-    Action* pAction = _pService->getAction("CreateReference")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("CreateReference")->clone();
     pAction->setArgument<std::string>("ContainerID", ContainerID);
     pAction->setArgument<std::string>("ObjectID", ObjectID);
     _pService->sendAction(pAction);
@@ -1850,7 +1850,7 @@ CtlContentDirectory::_getContainerUpdateIDs()
 void
 CtlContentDirectory::_reqGetSearchCapabilities()
 {
-    Action* pAction = _pService->getAction("GetSearchCapabilities")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetSearchCapabilities")->clone();
     ActionThread<CtlContentDirectory> thread(this, &CtlContentDirectory::_threadGetSearchCapabilities, pAction);
     thread.start();
 }
@@ -1858,7 +1858,7 @@ CtlContentDirectory::_reqGetSearchCapabilities()
 void
 CtlContentDirectory::_reqGetSortCapabilities()
 {
-    Action* pAction = _pService->getAction("GetSortCapabilities")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetSortCapabilities")->clone();
     ActionThread<CtlContentDirectory> thread(this, &CtlContentDirectory::_threadGetSortCapabilities, pAction);
     thread.start();
 }
@@ -1866,7 +1866,7 @@ CtlContentDirectory::_reqGetSortCapabilities()
 void
 CtlContentDirectory::_reqGetSystemUpdateID()
 {
-    Action* pAction = _pService->getAction("GetSystemUpdateID")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetSystemUpdateID")->clone();
     ActionThread<CtlContentDirectory> thread(this, &CtlContentDirectory::_threadGetSystemUpdateID, pAction);
     thread.start();
 }
@@ -1874,7 +1874,7 @@ CtlContentDirectory::_reqGetSystemUpdateID()
 void
 CtlContentDirectory::_reqBrowse(const std::string& ObjectID, const std::string& BrowseFlag, const std::string& Filter, const ui4& StartingIndex, const ui4& RequestedCount, const std::string& SortCriteria)
 {
-    Action* pAction = _pService->getAction("Browse")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Browse")->clone();
     pAction->setArgument<std::string>("ObjectID", ObjectID);
     pAction->setArgument<std::string>("BrowseFlag", BrowseFlag);
     pAction->setArgument<std::string>("Filter", Filter);
@@ -1888,7 +1888,7 @@ CtlContentDirectory::_reqBrowse(const std::string& ObjectID, const std::string& 
 void
 CtlContentDirectory::_reqSearch(const std::string& ContainerID, const std::string& SearchCriteria, const std::string& Filter, const ui4& StartingIndex, const ui4& RequestedCount, const std::string& SortCriteria)
 {
-    Action* pAction = _pService->getAction("Search")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("Search")->clone();
     pAction->setArgument<std::string>("ContainerID", ContainerID);
     pAction->setArgument<std::string>("SearchCriteria", SearchCriteria);
     pAction->setArgument<std::string>("Filter", Filter);
@@ -1902,7 +1902,7 @@ CtlContentDirectory::_reqSearch(const std::string& ContainerID, const std::strin
 void
 CtlContentDirectory::_reqCreateObject(const std::string& ContainerID, const std::string& Elements)
 {
-    Action* pAction = _pService->getAction("CreateObject")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("CreateObject")->clone();
     pAction->setArgument<std::string>("ContainerID", ContainerID);
     pAction->setArgument<std::string>("Elements", Elements);
     ActionThread<CtlContentDirectory> thread(this, &CtlContentDirectory::_threadCreateObject, pAction);
@@ -1912,7 +1912,7 @@ CtlContentDirectory::_reqCreateObject(const std::string& ContainerID, const std:
 void
 CtlContentDirectory::_reqDestroyObject(const std::string& ObjectID)
 {
-    Action* pAction = _pService->getAction("DestroyObject")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("DestroyObject")->clone();
     pAction->setArgument<std::string>("ObjectID", ObjectID);
     ActionThread<CtlContentDirectory> thread(this, &CtlContentDirectory::_threadDestroyObject, pAction);
     thread.start();
@@ -1921,7 +1921,7 @@ CtlContentDirectory::_reqDestroyObject(const std::string& ObjectID)
 void
 CtlContentDirectory::_reqUpdateObject(const std::string& ObjectID, const std::string& CurrentTagValue, const std::string& NewTagValue)
 {
-    Action* pAction = _pService->getAction("UpdateObject")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("UpdateObject")->clone();
     pAction->setArgument<std::string>("ObjectID", ObjectID);
     pAction->setArgument<std::string>("CurrentTagValue", CurrentTagValue);
     pAction->setArgument<std::string>("NewTagValue", NewTagValue);
@@ -1932,7 +1932,7 @@ CtlContentDirectory::_reqUpdateObject(const std::string& ObjectID, const std::st
 void
 CtlContentDirectory::_reqImportResource(const uri& SourceURI, const uri& DestinationURI)
 {
-    Action* pAction = _pService->getAction("ImportResource")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("ImportResource")->clone();
     pAction->setArgument<uri>("SourceURI", SourceURI);
     pAction->setArgument<uri>("DestinationURI", DestinationURI);
     ActionThread<CtlContentDirectory> thread(this, &CtlContentDirectory::_threadImportResource, pAction);
@@ -1942,7 +1942,7 @@ CtlContentDirectory::_reqImportResource(const uri& SourceURI, const uri& Destina
 void
 CtlContentDirectory::_reqGetTransferProgress(const ui4& TransferID)
 {
-    Action* pAction = _pService->getAction("GetTransferProgress")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("GetTransferProgress")->clone();
     pAction->setArgument<ui4>("TransferID", TransferID);
     ActionThread<CtlContentDirectory> thread(this, &CtlContentDirectory::_threadGetTransferProgress, pAction);
     thread.start();
@@ -1951,7 +1951,7 @@ CtlContentDirectory::_reqGetTransferProgress(const ui4& TransferID)
 void
 CtlContentDirectory::_reqDeleteResource(const uri& ResourceURI)
 {
-    Action* pAction = _pService->getAction("DeleteResource")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("DeleteResource")->clone();
     pAction->setArgument<uri>("ResourceURI", ResourceURI);
     ActionThread<CtlContentDirectory> thread(this, &CtlContentDirectory::_threadDeleteResource, pAction);
     thread.start();
@@ -1960,7 +1960,7 @@ CtlContentDirectory::_reqDeleteResource(const uri& ResourceURI)
 void
 CtlContentDirectory::_reqCreateReference(const std::string& ContainerID, const std::string& ObjectID)
 {
-    Action* pAction = _pService->getAction("CreateReference")->clone();
+    Poco::AutoPtr<Action> pAction = _pService->getAction("CreateReference")->clone();
     pAction->setArgument<std::string>("ContainerID", ContainerID);
     pAction->setArgument<std::string>("ObjectID", ObjectID);
     ActionThread<CtlContentDirectory> thread(this, &CtlContentDirectory::_threadCreateReference, pAction);
@@ -1968,7 +1968,7 @@ CtlContentDirectory::_reqCreateReference(const std::string& ContainerID, const s
 }
 
 void
-CtlContentDirectory::_threadGetSearchCapabilities(Action* pAction)
+CtlContentDirectory::_threadGetSearchCapabilities(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     std::string SearchCaps = pAction->getArgument<std::string>("SearchCaps");
@@ -1976,7 +1976,7 @@ CtlContentDirectory::_threadGetSearchCapabilities(Action* pAction)
 }
 
 void
-CtlContentDirectory::_threadGetSortCapabilities(Action* pAction)
+CtlContentDirectory::_threadGetSortCapabilities(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     std::string SortCaps = pAction->getArgument<std::string>("SortCaps");
@@ -1984,7 +1984,7 @@ CtlContentDirectory::_threadGetSortCapabilities(Action* pAction)
 }
 
 void
-CtlContentDirectory::_threadGetSystemUpdateID(Action* pAction)
+CtlContentDirectory::_threadGetSystemUpdateID(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 Id = pAction->getArgument<ui4>("Id");
@@ -1992,7 +1992,7 @@ CtlContentDirectory::_threadGetSystemUpdateID(Action* pAction)
 }
 
 void
-CtlContentDirectory::_threadBrowse(Action* pAction)
+CtlContentDirectory::_threadBrowse(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     std::string ObjectID = pAction->getArgument<std::string>("ObjectID");
@@ -2009,7 +2009,7 @@ CtlContentDirectory::_threadBrowse(Action* pAction)
 }
 
 void
-CtlContentDirectory::_threadSearch(Action* pAction)
+CtlContentDirectory::_threadSearch(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     std::string ContainerID = pAction->getArgument<std::string>("ContainerID");
@@ -2026,7 +2026,7 @@ CtlContentDirectory::_threadSearch(Action* pAction)
 }
 
 void
-CtlContentDirectory::_threadCreateObject(Action* pAction)
+CtlContentDirectory::_threadCreateObject(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     std::string ContainerID = pAction->getArgument<std::string>("ContainerID");
@@ -2037,7 +2037,7 @@ CtlContentDirectory::_threadCreateObject(Action* pAction)
 }
 
 void
-CtlContentDirectory::_threadDestroyObject(Action* pAction)
+CtlContentDirectory::_threadDestroyObject(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     std::string ObjectID = pAction->getArgument<std::string>("ObjectID");
@@ -2045,7 +2045,7 @@ CtlContentDirectory::_threadDestroyObject(Action* pAction)
 }
 
 void
-CtlContentDirectory::_threadUpdateObject(Action* pAction)
+CtlContentDirectory::_threadUpdateObject(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     std::string ObjectID = pAction->getArgument<std::string>("ObjectID");
@@ -2055,7 +2055,7 @@ CtlContentDirectory::_threadUpdateObject(Action* pAction)
 }
 
 void
-CtlContentDirectory::_threadImportResource(Action* pAction)
+CtlContentDirectory::_threadImportResource(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     uri SourceURI = pAction->getArgument<uri>("SourceURI");
@@ -2065,7 +2065,7 @@ CtlContentDirectory::_threadImportResource(Action* pAction)
 }
 
 void
-CtlContentDirectory::_threadGetTransferProgress(Action* pAction)
+CtlContentDirectory::_threadGetTransferProgress(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     ui4 TransferID = pAction->getArgument<ui4>("TransferID");
@@ -2076,7 +2076,7 @@ CtlContentDirectory::_threadGetTransferProgress(Action* pAction)
 }
 
 void
-CtlContentDirectory::_threadDeleteResource(Action* pAction)
+CtlContentDirectory::_threadDeleteResource(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     uri ResourceURI = pAction->getArgument<uri>("ResourceURI");
@@ -2084,7 +2084,7 @@ CtlContentDirectory::_threadDeleteResource(Action* pAction)
 }
 
 void
-CtlContentDirectory::_threadCreateReference(Action* pAction)
+CtlContentDirectory::_threadCreateReference(Poco::AutoPtr<Action> pAction)
 {
     _pService->sendAction(pAction);
     std::string ContainerID = pAction->getArgument<std::string>("ContainerID");

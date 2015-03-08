@@ -196,7 +196,6 @@ public:
 
     SsdpMessage(const std::string& buf, const Poco::Net::SocketAddress& sender = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
     /// map the received HTTP header in buf to an SsdpMessage object in memory
-    ~SsdpMessage();
 
 //    void setRequestMethod(TRequestMethod requestMethod);
     TRequestMethod getRequestMethod() const;
@@ -241,6 +240,8 @@ public:
 
     Poco::Net::SocketAddress getSender() const;
 
+protected:
+    ~SsdpMessage();
 
 private:
     void initMessageMap();
@@ -394,7 +395,7 @@ class ActionResponseWriter
 public:
     ActionResponseWriter(std::string& responseBody);
     // TODO: couldn't cope with the const argument stuff here ...
-    void action(Action& action);
+    void action(Action* pAction);
 private:
     std::string*    _responseBody;
 };
@@ -403,7 +404,7 @@ private:
 class ActionRequestWriter
 {
 public:
-    void action(Action* action);
+    void action(Poco::AutoPtr<Action>& pAction);
     void write(std::string& actionMessage);
 
 private:

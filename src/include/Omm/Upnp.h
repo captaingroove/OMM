@@ -227,6 +227,7 @@ class Container
 public:
     typedef typename std::map<std::string, E*>::iterator KeyIterator;
     typedef typename std::vector<E*>::iterator Iterator;
+    typedef typename std::vector<E*>::const_iterator ConstIterator;
     typedef typename std::vector<std::string>::iterator PosIterator;
 
     E& get(std::string key)
@@ -308,7 +309,7 @@ public:
         (*it).second = pElement;
     }
 
-    template<typename T> T getValue(const std::string& key)
+    template<typename T> T getValue(const std::string& key) const
     {
         Variant* e = (*_elementMap.find(key)).second;
         if (e) {
@@ -415,7 +416,7 @@ public:
 
 protected:
     void registerHttpRequestHandler(std::string path, UpnpRequestHandler* requestHandler);
-    void handleNetworkInterfaceChangedNotification(Net::NetworkInterfaceNotification* pNotification);
+    void handleNetworkInterfaceChangedNotification(const Poco::AutoPtr<Net::NetworkInterfaceNotification>& pNotification);
 
     virtual void handleSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pMessage) {}
 

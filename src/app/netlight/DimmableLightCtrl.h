@@ -54,9 +54,9 @@ protected:
     virtual void _changedLoadLevelStatus(const Omm::ui1& val) = 0;
 
 private:
-    void _threadSetLoadLevelTarget(Omm::Action* pAction);
-    void _threadGetLoadLevelTarget(Omm::Action* pAction);
-    void _threadGetLoadLevelStatus(Omm::Action* pAction);
+    void _threadSetLoadLevelTarget(Poco::AutoPtr<Omm::Action> pAction);
+    void _threadGetLoadLevelTarget(Poco::AutoPtr<Omm::Action> pAction);
+    void _threadGetLoadLevelStatus(Poco::AutoPtr<Omm::Action> pAction);
 
     Omm::Service* _pService;
 };
@@ -84,9 +84,9 @@ protected:
     virtual void _changedStatus(const bool& val) = 0;
 
 private:
-    void _threadSetTarget(Omm::Action* pAction);
-    void _threadGetTarget(Omm::Action* pAction);
-    void _threadGetStatus(Omm::Action* pAction);
+    void _threadSetTarget(Poco::AutoPtr<Omm::Action> pAction);
+    void _threadGetTarget(Poco::AutoPtr<Omm::Action> pAction);
+    void _threadGetStatus(Poco::AutoPtr<Omm::Action> pAction);
 
     Omm::Service* _pService;
 };

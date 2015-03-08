@@ -32,7 +32,7 @@
 void
 DimmingController::SetLoadLevelTarget(const Omm::ui1& newLoadlevelTarget)
 {
-    Omm::Action* pAction = _pService->getAction("SetLoadLevelTarget")->clone();
+    Poco::AutoPtr<Omm::Action> pAction = _pService->getAction("SetLoadLevelTarget")->clone();
     pAction->setArgument<Omm::ui1>("newLoadlevelTarget", newLoadlevelTarget);
     _pService->sendAction(pAction);
 }
@@ -40,7 +40,7 @@ DimmingController::SetLoadLevelTarget(const Omm::ui1& newLoadlevelTarget)
 void
 DimmingController::GetLoadLevelTarget(Omm::ui1& retLoadlevelTarget)
 {
-    Omm::Action* pAction = _pService->getAction("GetLoadLevelTarget")->clone();
+    Poco::AutoPtr<Omm::Action> pAction = _pService->getAction("GetLoadLevelTarget")->clone();
     _pService->sendAction(pAction);
     retLoadlevelTarget = pAction->getArgument<Omm::ui1>("retLoadlevelTarget");
 }
@@ -48,7 +48,7 @@ DimmingController::GetLoadLevelTarget(Omm::ui1& retLoadlevelTarget)
 void
 DimmingController::GetLoadLevelStatus(Omm::ui1& retLoadlevelStatus)
 {
-    Omm::Action* pAction = _pService->getAction("GetLoadLevelStatus")->clone();
+    Poco::AutoPtr<Omm::Action> pAction = _pService->getAction("GetLoadLevelStatus")->clone();
     _pService->sendAction(pAction);
     retLoadlevelStatus = pAction->getArgument<Omm::ui1>("retLoadlevelStatus");
 }
@@ -60,49 +60,49 @@ DimmingController::_getLoadLevelStatus()
 }
 
 
-void 
+void
 DimmingController::_reqSetLoadLevelTarget(const Omm::ui1& newLoadlevelTarget)
 {
-    Omm::Action* pAction = _pService->getAction("SetLoadLevelTarget")->clone();
+    Poco::AutoPtr<Omm::Action> pAction = _pService->getAction("SetLoadLevelTarget")->clone();
     pAction->setArgument<Omm::ui1>("newLoadlevelTarget", newLoadlevelTarget);
     Omm::ActionThread<DimmingController> thread(this, &DimmingController::_threadSetLoadLevelTarget, pAction);
     thread.start();
 }
 
-void 
+void
 DimmingController::_reqGetLoadLevelTarget()
 {
-    Omm::Action* pAction = _pService->getAction("GetLoadLevelTarget")->clone();
+    Poco::AutoPtr<Omm::Action> pAction = _pService->getAction("GetLoadLevelTarget")->clone();
     Omm::ActionThread<DimmingController> thread(this, &DimmingController::_threadGetLoadLevelTarget, pAction);
     thread.start();
 }
 
-void 
+void
 DimmingController::_reqGetLoadLevelStatus()
 {
-    Omm::Action* pAction = _pService->getAction("GetLoadLevelStatus")->clone();
+    Poco::AutoPtr<Omm::Action> pAction = _pService->getAction("GetLoadLevelStatus")->clone();
     Omm::ActionThread<DimmingController> thread(this, &DimmingController::_threadGetLoadLevelStatus, pAction);
     thread.start();
 }
 
-void 
-DimmingController::_threadSetLoadLevelTarget(Omm::Action* pAction)
+void
+DimmingController::_threadSetLoadLevelTarget(Poco::AutoPtr<Omm::Action> pAction)
 {
     _pService->sendAction(pAction);
     Omm::ui1 newLoadlevelTarget = pAction->getArgument<Omm::ui1>("newLoadlevelTarget");
     _ansSetLoadLevelTarget(newLoadlevelTarget);
 }
 
-void 
-DimmingController::_threadGetLoadLevelTarget(Omm::Action* pAction)
+void
+DimmingController::_threadGetLoadLevelTarget(Poco::AutoPtr<Omm::Action> pAction)
 {
     _pService->sendAction(pAction);
     Omm::ui1 retLoadlevelTarget = pAction->getArgument<Omm::ui1>("retLoadlevelTarget");
     _ansGetLoadLevelTarget(retLoadlevelTarget);
 }
 
-void 
-DimmingController::_threadGetLoadLevelStatus(Omm::Action* pAction)
+void
+DimmingController::_threadGetLoadLevelStatus(Poco::AutoPtr<Omm::Action> pAction)
 {
     _pService->sendAction(pAction);
     Omm::ui1 retLoadlevelStatus = pAction->getArgument<Omm::ui1>("retLoadlevelStatus");
@@ -114,7 +114,7 @@ DimmingController::_threadGetLoadLevelStatus(Omm::Action* pAction)
 void
 SwitchPowerController::SetTarget(const bool& NewTargetValue)
 {
-    Omm::Action* pAction = _pService->getAction("SetTarget")->clone();
+    Poco::AutoPtr<Omm::Action> pAction = _pService->getAction("SetTarget")->clone();
     pAction->setArgument<bool>("NewTargetValue", NewTargetValue);
     _pService->sendAction(pAction);
 }
@@ -122,7 +122,7 @@ SwitchPowerController::SetTarget(const bool& NewTargetValue)
 void
 SwitchPowerController::GetTarget(bool& RetTargetValue)
 {
-    Omm::Action* pAction = _pService->getAction("GetTarget")->clone();
+    Poco::AutoPtr<Omm::Action> pAction = _pService->getAction("GetTarget")->clone();
     _pService->sendAction(pAction);
     RetTargetValue = pAction->getArgument<bool>("RetTargetValue");
 }
@@ -130,7 +130,7 @@ SwitchPowerController::GetTarget(bool& RetTargetValue)
 void
 SwitchPowerController::GetStatus(bool& ResultStatus)
 {
-    Omm::Action* pAction = _pService->getAction("GetStatus")->clone();
+    Poco::AutoPtr<Omm::Action> pAction = _pService->getAction("GetStatus")->clone();
     _pService->sendAction(pAction);
     ResultStatus = pAction->getArgument<bool>("ResultStatus");
 }
@@ -142,49 +142,49 @@ SwitchPowerController::_getStatus()
 }
 
 
-void 
+void
 SwitchPowerController::_reqSetTarget(const bool& NewTargetValue)
 {
-    Omm::Action* pAction = _pService->getAction("SetTarget")->clone();
+    Poco::AutoPtr<Omm::Action> pAction = _pService->getAction("SetTarget")->clone();
     pAction->setArgument<bool>("NewTargetValue", NewTargetValue);
     Omm::ActionThread<SwitchPowerController> thread(this, &SwitchPowerController::_threadSetTarget, pAction);
     thread.start();
 }
 
-void 
+void
 SwitchPowerController::_reqGetTarget()
 {
-    Omm::Action* pAction = _pService->getAction("GetTarget")->clone();
+    Poco::AutoPtr<Omm::Action> pAction = _pService->getAction("GetTarget")->clone();
     Omm::ActionThread<SwitchPowerController> thread(this, &SwitchPowerController::_threadGetTarget, pAction);
     thread.start();
 }
 
-void 
+void
 SwitchPowerController::_reqGetStatus()
 {
-    Omm::Action* pAction = _pService->getAction("GetStatus")->clone();
+    Poco::AutoPtr<Omm::Action> pAction = _pService->getAction("GetStatus")->clone();
     Omm::ActionThread<SwitchPowerController> thread(this, &SwitchPowerController::_threadGetStatus, pAction);
     thread.start();
 }
 
-void 
-SwitchPowerController::_threadSetTarget(Omm::Action* pAction)
+void
+SwitchPowerController::_threadSetTarget(Poco::AutoPtr<Omm::Action> pAction)
 {
     _pService->sendAction(pAction);
     bool NewTargetValue = pAction->getArgument<bool>("NewTargetValue");
     _ansSetTarget(NewTargetValue);
 }
 
-void 
-SwitchPowerController::_threadGetTarget(Omm::Action* pAction)
+void
+SwitchPowerController::_threadGetTarget(Poco::AutoPtr<Omm::Action> pAction)
 {
     _pService->sendAction(pAction);
     bool RetTargetValue = pAction->getArgument<bool>("RetTargetValue");
     _ansGetTarget(RetTargetValue);
 }
 
-void 
-SwitchPowerController::_threadGetStatus(Omm::Action* pAction)
+void
+SwitchPowerController::_threadGetStatus(Poco::AutoPtr<Omm::Action> pAction)
 {
     _pService->sendAction(pAction);
     bool ResultStatus = pAction->getArgument<bool>("ResultStatus");
@@ -212,7 +212,7 @@ DimmableLightController::eventHandler(Omm::StateVar* pStateVar)
 DimmableLightController::DimmableLightController(Omm::Device* pDevice, SwitchPowerController* pSwitchPowerController, DimmingController* pDimmingController) :
 CtlDeviceCode(pDevice),
 _pDevice(pDevice),
-_pSwitchPowerController(pSwitchPowerController), 
+_pSwitchPowerController(pSwitchPowerController),
 _pDimmingController(pDimmingController)
 {
     _pSwitchPowerController->_pService = _pDevice->getServiceForTypeFullString("urn:schemas-upnp-org:service:SwitchPower:1");

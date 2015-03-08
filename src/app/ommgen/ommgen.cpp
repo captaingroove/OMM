@@ -1233,7 +1233,7 @@ CtlDeviceH::actionEnd(const Action& action)
         << ") = 0;"
         << std::endl;
     _threadAction
-        << "Action* pAction);"
+        << "Poco::AutoPtr<Action> pAction);"
         << std::endl;
 
     _reqActionArgs.str("");
@@ -1468,7 +1468,7 @@ CtlDeviceCpp::action(const Action& action)
     _threadAction
         << "void " << std::endl
         << "Ctl" + _currentService << "::_thread" << action.getName() << "("
-        << "Action* pAction"
+        << "Poco::AutoPtr<Action> pAction"
         ;
 }
 
@@ -1479,7 +1479,7 @@ CtlDeviceCpp::actionEnd(const Action& action)
     _out
         << ")" << std::endl
         << "{" << std::endl
-        << indent(1) << "Action* pAction = _pService->getAction(\""
+        << indent(1) << "Poco::AutoPtr<Action> pAction = _pService->getAction(\""
         << action.getName() << "\")->clone();" << std::endl
         << _inArgSetter.str()
         << indent(1) << "_pService->sendAction(pAction);" << std::endl
@@ -1496,7 +1496,7 @@ CtlDeviceCpp::actionEnd(const Action& action)
         << reqActionArgs
         << ")" << std::endl
         << "{" << std::endl
-        << indent(1) << "Action* pAction = _pService->getAction(\""
+        << indent(1) << "Poco::AutoPtr<Action> pAction = _pService->getAction(\""
         << action.getName() << "\")->clone();" << std::endl
         << _inArgSetter.str()
         << indent(1) << "ActionThread<"
