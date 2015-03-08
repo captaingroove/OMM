@@ -1,5 +1,14 @@
+#find_package(Qt5 5.0 COMPONENTS QtCore QtGui QtWidgets QtSvg)
+#find_package(Qt5Core)
+#find_package(Qt5Gui)
+#find_package(Qt5Widgets)
+#if(NOT QT5CORE_FOUND)
 find_package(Qt4 4.4 COMPONENTS QtCore QtGui QtSvg)
+#endif(NOT QT5CORE_FOUND)
+
 if(QT4_FOUND)
+#if(QT5CORE_FOUND)
+#if(QT4_FOUND OR QT5_FOUND)
 
 # FIXME: on windows, debug builds of Qt sample fail. The plugin is linked
 # against debug and non-debug versions of Qt libs at the same time.
@@ -7,7 +16,7 @@ if(WINDOWS)
 set(CMAKE_BUILD_TYPE "")
 endif(WINDOWS)
 
-message (STATUS "Qt4 use file: ${QT_USE_FILE}")
+message (STATUS "Qt use file: ${QT_USE_FILE}")
 include(
 ${QT_USE_FILE}
 )
@@ -65,3 +74,5 @@ ARCHIVE DESTINATION lib
 )
 
 endif(QT4_FOUND)
+#endif(QT5CORE_FOUND)
+#endif(QT4_FOUND OR QT5_FOUND)

@@ -1,7 +1,12 @@
-#SET( OMMTEST_SSDP_SRCS
-#Ssdp.cpp
-#)
-#
+include_directories(
+../lib/Upnp
+../include/Omm
+)
+
+SET(OMMTEST_SSDP_SRCS
+Ssdp.cpp
+)
+
 #SET( OMMTEST_DEVICE_SRCS
 #device.cpp
 #)
@@ -12,17 +17,17 @@
 # network_light_application.cpp
 # )
 
-SET( OMMTEST_OMMLIGHT_CTRL_SRCS
+SET(OMMTEST_OMMLIGHT_CTRL_SRCS
 netlight_ctrl.cpp
 netlight_ctrl_impl.cpp
 netlight_ctrl_appl.cpp
 )
 
-SET( OMMTEST_CONTROLLER_SRCS
+SET(OMMTEST_CONTROLLER_SRCS
 controller.cpp
 )
 
-SET( OMMTEST_MEDIAOBJECT_SRCS
+SET(OMMTEST_MEDIAOBJECT_SRCS
 MediaObjectTest.cpp
 )
 
@@ -30,9 +35,9 @@ MediaObjectTest.cpp
 # HttpFileServerTest.cpp
 # )
 
-# ADD_EXECUTABLE( ssdptest
-# ${OMMTEST_SSDP_SRCS}
-# )
+ ADD_EXECUTABLE(ssdplistener
+ ${OMMTEST_SSDP_SRCS}
+ )
 
 # ADD_EXECUTABLE( device_test
 # ${OMMTEST_DEVICE_SRCS}
@@ -59,11 +64,11 @@ MediaObjectTest.cpp
 # )
 
 
-# TARGET_LINK_LIBRARIES( ssdp_test
-# ${OMM}
-# ${POCO_UTIL}
-# )
-#
+ TARGET_LINK_LIBRARIES(ssdplistener
+ ${OMM}
+ ${POCO_UTIL}
+ )
+
 # TARGET_LINK_LIBRARIES( device_test
 # ${OMM}
 # ${POCO_UTIL}
@@ -156,7 +161,7 @@ ${OMM_AV}
 )
 
 
-install(TARGETS upnpavstress
+install(TARGETS ssdplistener upnpavstress tagtest
 RUNTIME DESTINATION bin
 LIBRARY DESTINATION lib
 )

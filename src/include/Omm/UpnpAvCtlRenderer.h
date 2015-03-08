@@ -97,7 +97,7 @@ public:
 private:
     virtual void init();
 
-    void mediaItemSelectedHandler(MediaObjectSelectedNotification* pMediaItemNotification);
+    void mediaItemSelectedHandler(const Poco::AutoPtr<MediaObjectSelectedNotification>& pMediaItemNotification);
 };
 
 

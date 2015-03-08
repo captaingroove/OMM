@@ -19,15 +19,17 @@
 |  along with this program.  If not, see <http://www.gnu.org/licenses/>.    |
  ***************************************************************************/
 
+#include <iostream>
 
 #include <Poco/Util/ServerApplication.h>
 #include <Poco/Util/Option.h>
 #include <Poco/Util/OptionSet.h>
 #include <Poco/Util/HelpFormatter.h>
+#include <Poco/NObserver.h>
 
 
 #include "Omm/Upnp.h"
-#include "Omm/UpnpPrivate.h"
+#include "UpnpPrivate.h"
 
 using Poco::Util::ServerApplication;
 using Poco::Util::Application;
@@ -36,14 +38,14 @@ using Poco::Util::OptionSet;
 using Poco::Util::HelpFormatter;
 
 
-class SsdpTest: public Poco::Util::ServerApplication
+class SsdpListener: public Poco::Util::ServerApplication
 {
 public:
-    SsdpTest(): _helpRequested(false)
+    SsdpListener(): _helpRequested(false)
     {
     }
 
-    ~SsdpTest()
+    ~SsdpListener()
     {
     }
 
@@ -86,18 +88,11 @@ protected:
         helpFormatter.format(std::cout);
     }
 
-/*    void handleSsdpMessage(const AutoPtr<SsdpMessage>& pNf)
-//     void handleSsdpMessage(AutoPtr<SsdpMessage> pNf)
-    {
-        std::cout << "SsdpTest::handleSsdpMessage() receives message:" << std::endl;
-        pNf->toString();
-//         std::cout << pNf->toString();
-    }*/
-
-    void handleSsdpMessage(Omm::SsdpMessage* pNf)
+    void handleSsdpMessage(const Poco::AutoPtr<Omm::SsdpMessage>& pNf)
     {
         std::cout << "SSDP message from " << pNf->getSender().toString() << std::endl;
         std::cout << pNf->toString();
+        pNf->release();
     }
 
     int main(const std::vector<std::string>& args)
@@ -108,13 +103,9 @@ protected:
         }
         else
         {
-        // get parameters from configuration file
-//             unsigned short port = (unsigned short) config().getInt("EchoServer.port", 9977);
-
-        // set-up a server socket
-//             SsdpSocket s(NObserver<SsdpTest, SsdpMessage>(*this, &SsdpTest::handleSsdpMessage));
             Omm::SsdpSocket s;
-            s.addObserver(Poco::Observer<SsdpTest, Omm::SsdpMessage>(*this, &SsdpTest::handleSsdpMessage));
+            s.addObserver(Poco::NObserver<SsdpListener, Omm::SsdpMessage>(*this, &SsdpListener::handleSsdpMessage));
+            s.init();
             s.startListen();
             waitForTerminationRequest();
         }
@@ -128,6 +119,6 @@ private:
 
 int main(int argc, char** argv)
 {
-    SsdpTest app;
+    SsdpListener app;
     return app.run(argc, argv);
 }

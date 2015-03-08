@@ -22,7 +22,7 @@
 #include <iostream>
 
 #include <Poco/NotificationCenter.h>
-#include <Poco/Observer.h>
+#include <Poco/NObserver.h>
 #include <Poco/UUIDGenerator.h>
 #include <Poco/StreamCopier.h>
 #include <Poco/NamedMutex.h>
@@ -179,7 +179,7 @@ _featureShowNetworkActivity(true)
         setConfiguration("[0,0] Media,Video {800;480} {" + Poco::NumberFormatter::format(1.00) + "} {" + Poco::NumberFormatter::format(1.00) + "}");
     }
 
-    Poco::NotificationCenter::defaultCenter().addObserver(Poco::Observer<ControllerWidget, Av::StreamTypeNotification>(*this, &ControllerWidget::newStreamType));
+    Poco::NotificationCenter::defaultCenter().addObserver(Poco::NObserver<ControllerWidget, Av::StreamTypeNotification>(*this, &ControllerWidget::newStreamType));
 //    Poco::NotificationCenter::defaultCenter().addObserver(Poco::Observer<ControllerWidget, TransportStateNotification>(*this, &ControllerWidget::newTransportState));
 //    Poco::NotificationCenter::defaultCenter().addObserver(Poco::Observer<ControllerWidget, TrackNotification>(*this, &ControllerWidget::newTrack));
 //    Poco::NotificationCenter::defaultCenter().addObserver(Poco::Observer<ControllerWidget, PlaylistNotification>(*this, &ControllerWidget::newPlaylist));
@@ -269,8 +269,9 @@ ControllerWidget::setDefaultRenderer(Omm::Av::MediaRenderer* pRenderer)
 
 
 void
-ControllerWidget::newStreamType(Av::StreamTypeNotification* pNotification)
+ControllerWidget::newStreamType(const Poco::AutoPtr<Av::StreamTypeNotification>& pNotification)
 {
+//    Poco::AutoPtr<Av::StreamTypeNotification> pANotification(pNotification);
     LOGNS(Gui, gui, debug, "controller widget stream type notification, instance id: "
         + Poco::NumberFormatter::format(pNotification->_instanceId) + ", transport state: " + pNotification->_transportState + ", stream type: " + pNotification->_streamType);
     if (pNotification->_streamType == Av::Engine::StreamTypeVideo && pNotification->_transportState == Av::AvTransportArgument::TRANSPORT_STATE_PLAYING) {
@@ -281,6 +282,7 @@ ControllerWidget::newStreamType(Av::StreamTypeNotification* pNotification)
         setRendererVisualVisible(false);
         showMainMenu();
     }
+//    pNotification->release();
 }
 
 

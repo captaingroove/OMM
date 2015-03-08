@@ -19,6 +19,8 @@
 |  along with this program.  If not, see <http://www.gnu.org/licenses/>.    |
 ***************************************************************************/
 
+#include <Poco/NObserver.h>
+
 #include "../UpnpPrivate.h"
 #include "UpnpAvCtlRenderer.h"
 #include "UpnpAvCtlServer.h"
@@ -360,12 +362,12 @@ MediaRendererGroupDelegate::init()
     LOG(upnpav, debug, "media renderer delegate init");
     Controller* pController = _pDeviceGroup->getController();
 //    pController->registerDeviceNotificationHandler(Poco::Observer<MediaRendererGroupDelegate, MediaItemNotification>(*this, &MediaRendererGroupDelegate::mediaItemSelectedHandler));
-    pController->registerDeviceNotificationHandler(Poco::Observer<MediaRendererGroupDelegate, MediaObjectSelectedNotification>(*this, &MediaRendererGroupDelegate::mediaItemSelectedHandler));
+    pController->registerDeviceNotificationHandler(Poco::NObserver<MediaRendererGroupDelegate, MediaObjectSelectedNotification>(*this, &MediaRendererGroupDelegate::mediaItemSelectedHandler));
 }
 
 
 void
-MediaRendererGroupDelegate::mediaItemSelectedHandler(MediaObjectSelectedNotification* pMediaItemNotification)
+MediaRendererGroupDelegate::mediaItemSelectedHandler(const Poco::AutoPtr<MediaObjectSelectedNotification>& pMediaItemNotification)
 {
 //    CtlMediaObject* pItem = pMediaItemNotification->getMediaItem();
     LOG(upnpav, debug, "media renderer delegate got media item notification: " + pMediaItemNotification->_pObject->getTitle());

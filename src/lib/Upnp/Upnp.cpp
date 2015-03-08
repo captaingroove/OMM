@@ -27,7 +27,6 @@
 #include <Poco/File.h>
 #include <Poco/Message.h>
 #include <Poco/NObserver.h>
-#include <Poco/Observer.h>
 #include <Poco/StreamCopier.h>
 #include <Poco/LineEndingConverter.h>
 #include <Poco/DateTimeFormat.h>
@@ -305,6 +304,8 @@ SsdpSocket::init()
     // listen to UDP multicast
     LOG(ssdp, debug, "create listener socket ...");
     _pSsdpListenerSocket = new Poco::Net::MulticastSocket(Poco::Net::SocketAddress("0.0.0.0", SSDP_PORT), true);
+
+    setupSockets();
 }
 
 
@@ -364,7 +365,7 @@ SsdpSocket::startListen()
 
     if (_mode & LocalProcess) {
         LOG(ssdp, information, "starting SSDP local listener ...");
-        Poco::NotificationCenter::defaultCenter().addObserver(Poco::Observer<SsdpSocket, SsdpMessage>(*this, &SsdpSocket::onLocalSsdpMessage));
+        Poco::NotificationCenter::defaultCenter().addObserver(Poco::NObserver<SsdpSocket, SsdpMessage>(*this, &SsdpSocket::onLocalSsdpMessage));
     }
 
     LOG(ssdp, information, "SSDP listener started.");
@@ -391,7 +392,7 @@ SsdpSocket::stopListen()
 
     if (_mode & LocalProcess) {
         LOG(ssdp, information, "stopping SSDP local listener ...");
-        Poco::NotificationCenter::defaultCenter().removeObserver(Poco::Observer<SsdpSocket, SsdpMessage>(*this, &SsdpSocket::onLocalSsdpMessage));
+        Poco::NotificationCenter::defaultCenter().removeObserver(Poco::NObserver<SsdpSocket, SsdpMessage>(*this, &SsdpSocket::onLocalSsdpMessage));
     }
 
     LOG(ssdp, information, "SSDP listener stopped.");
@@ -399,9 +400,9 @@ SsdpSocket::stopListen()
 
 
 void
-SsdpSocket::sendMessage(SsdpMessage& message, const Poco::Net::SocketAddress& receiver)
+SsdpSocket::sendMessage(const Poco::AutoPtr<SsdpMessage>& pMessage, const Poco::Net::SocketAddress& receiver) const
 {
-    std::string m = message.toString();
+    std::string m = pMessage->toString();
 
     int bytesSent = 0;
     LOG(ssdp, debug, "sending SSDP message to address: " + receiver.toString() + " ..." + Poco::LineEnding::NEWLINE_DEFAULT + m);
@@ -412,7 +413,7 @@ SsdpSocket::sendMessage(SsdpMessage& message, const Poco::Net::SocketAddress& re
         }
         if (_mode & LocalProcess) {
             LOG(ssdp, debug, "sending SSDP message through default notification center ...");
-            Poco::NotificationCenter::defaultCenter().postNotification(&message);
+            Poco::NotificationCenter::defaultCenter().postNotification(pMessage);
         }
     }
     catch(Poco::Net::NetException& e) {
@@ -534,7 +535,7 @@ SsdpSocket::onMulticastSsdpMessage(Poco::Net::ReadableNotification* pNotificatio
 
 
 void
-SsdpSocket::onLocalSsdpMessage(SsdpMessage* pMessage)
+SsdpSocket::onLocalSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pMessage)
 {
     LOG(ssdp, debug, "received message through default notification center ");
     _ssdpSocketNotificationCenter.postNotification(pMessage);
@@ -3031,7 +3032,6 @@ void
 Socket::initSockets()
 {
     _ssdpSocket.init();
-    _ssdpSocket.setupSockets();
     _httpSocket.init();
 }
 
@@ -3107,9 +3107,9 @@ Socket::getHttpServerUri()
 
 
 void
-Socket::sendSsdpMessage(SsdpMessage& ssdpMessage, const Poco::Net::SocketAddress& receiver)
+Socket::sendSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pSsdpMessage, const Poco::Net::SocketAddress& receiver)
 {
-    _ssdpSocket.sendMessage(ssdpMessage, receiver);
+    _ssdpSocket.sendMessage(pSsdpMessage, receiver);
 }
 
 
@@ -3290,7 +3290,7 @@ DeviceManager::init()
 //    LOG(upnp, debug, "device root network interface manager installed");
 
     _pSocket->initSockets();
-    _pSocket->registerSsdpMessageHandler(Poco::Observer<DeviceManager, SsdpMessage>(*this, &DeviceManager::handleSsdpMessage));
+    _pSocket->registerSsdpMessageHandler(Poco::NObserver<DeviceManager, SsdpMessage>(*this, &DeviceManager::handleSsdpMessage));
     Net::NetworkInterfaceManager::instance()->registerInterfaceChangeHandler(Poco::Observer<DeviceManager, Net::NetworkInterfaceNotification>(*this, &DeviceManager::handleNetworkInterfaceChangedNotification));
 }
 
@@ -4228,9 +4228,8 @@ SsdpMessageSet::clear()
     if (_continuous) {
         _sendTimer.stop();
     }
-    for (std::vector<SsdpMessage*>::iterator i = _ssdpMessages.begin(); i != _ssdpMessages.end(); ++i) {
-        delete *i;
-    }
+    // Poco::AutoPtr automatically handles deletion of the object it points to,
+    // when it is deleted by the container
     _ssdpMessages.clear();
 }
 
@@ -4305,8 +4304,8 @@ SsdpMessageSet::onTimer(Poco::Timer& timer)
     while (r--) {
         LOG(ssdp, debug, "#message sets left to send: " + Poco::NumberFormatter::format(r+1));
 
-        for (std::vector<SsdpMessage*>::const_iterator i = _ssdpMessages.begin(); i != _ssdpMessages.end(); ++i) {
-            _pSsdpSocket->sendMessage(**i, _receiver);
+        for (MessageSetT::const_iterator i = _ssdpMessages.begin(); i != _ssdpMessages.end(); ++i) {
+            _pSsdpSocket->sendMessage(*i, _receiver);
         }
     }
     if (_continuous && _cacheDuration) {
@@ -4415,9 +4414,9 @@ Controller::sendMSearch(const std::string& searchTarget)
     // FIXME: network exception in controller when sending MSearch after network device removal
     LOG(upnp, debug, "controller sends M-SEARCH");
 
-    SsdpMessage m(SsdpMessage::REQUEST_SEARCH);
-    m.setSearchTarget(searchTarget);
-    _pSocket->sendSsdpMessage(m);
+    Poco::AutoPtr<SsdpMessage> pM = new SsdpMessage(SsdpMessage::REQUEST_SEARCH);
+    pM->setSearchTarget(searchTarget);
+    _pSocket->sendSsdpMessage(pM);
 }
 
 
@@ -4477,7 +4476,7 @@ Controller::deleteDeviceContainers()
 
 
 void
-Controller::handleSsdpMessage(SsdpMessage* pMessage)
+Controller::handleSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pMessage)
 {
     if (getState() == Transitioning) {
         return;
@@ -4696,7 +4695,7 @@ DeviceServer::stopSsdp()
 
 
 void
-DeviceServer::handleSsdpMessage(SsdpMessage* pMessage)
+DeviceServer::handleSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pMessage)
 {
     if (pMessage->getRequestMethod() == SsdpMessage::REQUEST_SEARCH) {
         LOG(ssdp, debug, "device server reply to m-search");
@@ -4935,6 +4934,7 @@ SsdpMessage::SsdpMessage(const std::string& buf, const Poco::Net::SocketAddress&
 void
 SsdpMessage::initMessageMap()
 {
+    _messageMap[REQUEST_UNKNOWN]           = "";
     _messageMap[REQUEST_NOTIFY]            = "NOTIFY * HTTP/1.1";
     _messageMap[REQUEST_NOTIFY_ALIVE]      = "dummy1";
     _messageMap[REQUEST_NOTIFY_BYEBYE]     = "dummy2";
@@ -4951,39 +4951,63 @@ SsdpMessage::initMessageMap()
 }
 
 
+std::string
+SsdpMessage::getTypeHeader(const TRequestMethod method) const
+{
+    std::map<TRequestMethod,std::string>::const_iterator pos = _messageMap.find(method);
+    if (pos != _messageMap.end()) {
+        return pos->second;
+    }
+    else {
+        return "";
+    }
+}
+
+
+SsdpMessage::TRequestMethod
+SsdpMessage::getTypeHeaderConst(const std::string& method) const
+{
+    std::map<std::string,TRequestMethod>::const_iterator pos = _messageConstMap.find(method);
+    if (pos != _messageConstMap.end()) {
+        return pos->second;
+    }
+    else {
+        return REQUEST_UNKNOWN;
+    }
+}
+
+
+std::string
+SsdpMessage::getHeader(const std::string& header) const
+{
+    std::map<std::string,std::string>::const_iterator pos = _messageHeader.find(header);
+    if (pos != _messageHeader.end()) {
+        return pos->second;
+    }
+    else {
+        return "";
+    }
+}
+
+
 SsdpMessage::~SsdpMessage()
 {
 }
 
 
 std::string
-SsdpMessage::toString()
+SsdpMessage::toString() const
 {
-    std::ostringstream os;
-
-    os << _messageMap[_requestMethod] << "\r\n";
-    for (std::map<std::string,std::string>::iterator i = _messageHeader.begin(); i != _messageHeader.end(); ++i) {
-        os << (*i).first << ": " << (*i).second << "\r\n";
+    std::string res = getTypeHeader(_requestMethod) + Poco::LineEnding::NEWLINE_DEFAULT;
+    for (std::map<std::string,std::string>::const_iterator i = _messageHeader.begin(); i != _messageHeader.end(); ++i) {
+        res += (*i).first + ": " + (*i).second + Poco::LineEnding::NEWLINE_DEFAULT;
     }
-//     _messageHeader.write(os);
-    os << "\r\n";
-
-    return os.str();
+    return res + Poco::LineEnding::NEWLINE_DEFAULT;
 }
 
 
-//void
-//SsdpMessage::setRequestMethod(TRequestMethod requestMethod)
-//{
-//    _requestMethod = requestMethod;
-////     if (_requestMethod == REQUEST_NOTIFY_ALIVE || _requestMethod == REQUEST_NOTIFY_BYEBYE) {
-////         requestMethod = REQUEST_NOTIFY;
-////     }
-//}
-
-
 SsdpMessage::TRequestMethod
-SsdpMessage::getRequestMethod()
+SsdpMessage::getRequestMethod() const
 {
     return _requestMethod;
 }
@@ -4992,17 +5016,16 @@ SsdpMessage::getRequestMethod()
 void
 SsdpMessage::setCacheControl(int duration)
 {
-//     _messageHeader.set("CACHE-CONTROL", "max-age = " + NumberFormatter::format(duration));
     _messageHeader["CACHE-CONTROL"] = "max-age = " + Poco::NumberFormatter::format(duration);
 }
 
 
 int
-SsdpMessage::getCacheControl()
+SsdpMessage::getCacheControl() const
 {
     int res = SSDP_CACHE_DURATION; // if no valid number is given, return minimum required value
     try {
-        std::string value = _messageHeader["CACHE-CONTROL"];
+        std::string value = getHeader("CACHE-CONTROL");
         res = Poco::NumberParser::parse(value.substr(value.find('=')+1));
     }
     catch (Poco::NotFoundException) {
@@ -5018,62 +5041,57 @@ SsdpMessage::getCacheControl()
 void
 SsdpMessage::setNotificationType(const std::string& searchTarget)
 {
-//     _messageHeader.set("NT", searchTarget);
     _messageHeader["NT"] =  searchTarget;
 }
 
 
 std::string
-SsdpMessage::getNotificationType()
+SsdpMessage::getNotificationType() const
 {
-    return _messageHeader["NT"];
+    return getHeader("NT");
 }
 
 
 void
 SsdpMessage::setNotificationSubtype(TRequestMethod notificationSubtype)
 {
-//     _messageHeader.set("NTS", _messageMap[notificationSubtype]);
     _messageHeader["NTS"] = _messageMap[notificationSubtype];
     _notificationSubtype = notificationSubtype;
 }
 
 
 SsdpMessage::TRequestMethod
-SsdpMessage::getNotificationSubtype()
+SsdpMessage::getNotificationSubtype() const
 {
-    _notificationSubtype = _messageConstMap[_messageHeader["NTS"]];
-    return _notificationSubtype;
+    return getTypeHeaderConst(getHeader("NTS"));
 }
 
 
 void
 SsdpMessage::setSearchTarget(const std::string& searchTarget)
 {
-//     _messageHeader.set("ST", searchTarget);
     _messageHeader["ST"] = searchTarget;
 }
 
 
 std::string
-SsdpMessage::getSearchTarget()
+SsdpMessage::getSearchTarget() const
 {
-    return _messageHeader["ST"];
+    return getHeader("ST");
 }
 
 
 void
 SsdpMessage::setUniqueServiceName(const std::string& serviceName)
 {
-//     _messageHeader.set("USN", serviceName);
     _messageHeader["USN"] = serviceName;
 }
 
 
 std::string
-SsdpMessage::getUniqueServiceName()
+SsdpMessage::getUniqueServiceName() const
 {
-    return _messageHeader["USN"];
+    return getHeader("USN");
 }
 
 
@@ -5086,10 +5104,10 @@ SsdpMessage::setLocation(const std::string& location)
 
 
 std::string
-SsdpMessage::getLocation()
+SsdpMessage::getLocation() const
 {
     try {
-        return _messageHeader["LOCATION"];
+        return getHeader("LOCATION");
     }
     catch (Poco::NotFoundException) {
         LOG(ssdp, error, "LOCATION field not found");
@@ -5123,7 +5141,7 @@ SsdpMessage::setHttpExtensionConfirmed()
 
 
 bool
-SsdpMessage::getHttpExtensionConfirmed()
+SsdpMessage::getHttpExtensionConfirmed() const
 {
 //     return _messageHeader.has("EXT");
     return true;
@@ -5147,9 +5165,9 @@ SsdpMessage::setServer(const std::string& productNameVersion)
 
 
 std::string
-SsdpMessage::getServerOperatingSystem()
+SsdpMessage::getServerOperatingSystem() const
 {
-    std::string value = _messageHeader["SERVER"];
+    std::string value = getHeader("SERVER");
     std::vector<std::string> elements;
     Poco::Net::MessageHeader::splitElements(value, elements);
     return elements[0];
@@ -5157,9 +5175,9 @@ SsdpMessage::getServerOperatingSystem()
 
 
 std::string
-SsdpMessage::getServerUpnpVersion()
+SsdpMessage::getServerUpnpVersion() const
 {
-    std::string value = _messageHeader["SERVER"];
+    std::string value = getHeader("SERVER");
     std::vector<std::string> elements;
     Poco::Net::MessageHeader::splitElements(value, elements);
     std::string upnpVersion = elements[1];
@@ -5168,9 +5186,9 @@ SsdpMessage::getServerUpnpVersion()
 
 
 std::string
-SsdpMessage::getServerProductNameVersion()
+SsdpMessage::getServerProductNameVersion() const
 {
-    std::string value = _messageHeader["SERVER"];
+    std::string value = getHeader("SERVER");
     std::vector<std::string> elements;
     Poco::Net::MessageHeader::splitElements(value, elements);
     return elements[2];
@@ -5186,10 +5204,10 @@ SsdpMessage::setMaximumWaitTime(int waitTime)
 
 
 int
-SsdpMessage::getMaximumWaitTime()
+SsdpMessage::getMaximumWaitTime() const
 {
     try {
-        return Poco::NumberParser::parse(_messageHeader["MX"]);
+        return Poco::NumberParser::parse(getHeader("MX"));
     }
     catch (Poco::NotFoundException) {
         LOG(ssdp, error, "missing MX in SSDP header");
@@ -5212,9 +5230,9 @@ SsdpMessage::setDate()
 
 
 Poco::DateTime
-SsdpMessage::getDate()
+SsdpMessage::getDate() const
 {
-    std::string value = _messageHeader["DATE"];
+    std::string value = getHeader("DATE");
     int timeZoneDifferentail;
     try {
         return Poco::DateTimeParser::parse(Poco::DateTimeFormat::HTTP_FORMAT, value, timeZoneDifferentail);
@@ -5227,7 +5245,7 @@ SsdpMessage::getDate()
 
 
 Poco::Net::SocketAddress
-SsdpMessage::getSender()
+SsdpMessage::getSender() const
 {
     return _sender;
 }

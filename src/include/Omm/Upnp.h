@@ -30,6 +30,7 @@
 #ifdef POCO_VERSION_HEADER_FOUND
 #include <Poco/Version.h>
 #endif
+#include <Poco/AutoPtr.h>
 #include <Poco/NumberFormatter.h>
 #include <Poco/NumberParser.h>
 #include <Poco/URI.h>
@@ -416,7 +417,7 @@ protected:
     void registerHttpRequestHandler(std::string path, UpnpRequestHandler* requestHandler);
     void handleNetworkInterfaceChangedNotification(Net::NetworkInterfaceNotification* pNotification);
 
-    virtual void handleSsdpMessage(SsdpMessage* pMessage) {}
+    virtual void handleSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pMessage) {}
 
     virtual void startSsdp();
     virtual void stopSsdp();
@@ -474,7 +475,7 @@ protected:
 
 private:
     virtual void startSsdp();
-    void handleSsdpMessage(SsdpMessage* pMessage);
+    virtual void handleSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pMessage);
 //    void handleNetworkInterfaceChangedNotification(Net::NetworkInterfaceNotification* pNotification);
     void discoverDeviceContainer(const std::string& location);
 //    void update();
@@ -587,7 +588,7 @@ private:
     virtual void startSsdp();
     virtual void stopSsdp();
 
-    virtual void handleSsdpMessage(SsdpMessage* pMessage);
+    virtual void handleSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pMessage);
 };
 
 

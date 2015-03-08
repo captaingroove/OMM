@@ -79,6 +79,8 @@ public:
     SsdpSocket();
     ~SsdpSocket();
 
+    void init();
+//    void deinit();
 //    void addInterface(const std::string& name);
 //    void removeInterface(const std::string& name);
     void addObserver(const Poco::AbstractObserver& observer);
@@ -86,17 +88,15 @@ public:
     void stopListen();
     void setMode(unsigned int mode = NotConfigured);
 
-    void sendMessage(SsdpMessage& message, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+    void sendMessage(const Poco::AutoPtr<SsdpMessage>& pMessage,\
+        const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS)) const;
 
 private:
-
-    void init();
-//    void deinit();
     void setupSockets();
 //    void resetSockets();
 
     void onMulticastSsdpMessage(Poco::Net::ReadableNotification* pNotification);
-    void onLocalSsdpMessage(SsdpMessage* pMessage);
+    void onLocalSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pMessage);
 
     unsigned int                        _mode;
     Poco::Net::MulticastSocket*         _pSsdpListenerSocket;
@@ -158,7 +158,7 @@ public:
     void stopHttp();
 
     std::string getHttpServerUri();
-    void sendSsdpMessage(SsdpMessage& ssdpMessage, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+    void sendSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pSsdpMessage, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
     void sendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet, int repeat = 1, long delay = 0, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
     void startSendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet);
     void stopSendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet);
@@ -176,6 +176,7 @@ class SsdpMessage : public Poco::Notification
 {
 public:
     typedef enum {
+        REQUEST_UNKNOWN         = 0,
         REQUEST_NOTIFY          = 1,
         REQUEST_NOTIFY_ALIVE    = 2,
         REQUEST_NOTIFY_BYEBYE   = 3,
@@ -193,56 +194,59 @@ public:
     /// with all headers that can be filled without knowing context
     /// information like device uuid, service type, device type etc.
 
-    // map the received HTTP header to an SsdpMessage object in memory
     SsdpMessage(const std::string& buf, const Poco::Net::SocketAddress& sender = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+    /// map the received HTTP header in buf to an SsdpMessage object in memory
     ~SsdpMessage();
 
 //    void setRequestMethod(TRequestMethod requestMethod);
-    TRequestMethod getRequestMethod();
+    TRequestMethod getRequestMethod() const;
 
     // HTTP message envelope
-    std::string toString();
+    std::string toString() const;
 
     // set and get the fields of the HTTP message header
     void setCacheControl(int duration = SSDP_CACHE_DURATION);  // duration of device advertisement in sec.
-    int getCacheControl();
+    int getCacheControl() const;
 
     void setNotificationType(const std::string& searchTarget);
-    std::string getNotificationType();
+    std::string getNotificationType() const;
 
     void setNotificationSubtype(TRequestMethod notificationSubtype);
-    TRequestMethod getNotificationSubtype();
+    TRequestMethod getNotificationSubtype() const;
 
     void setSearchTarget(const std::string& searchTarget);
-    std::string getSearchTarget();
+    std::string getSearchTarget() const;
 
     void setUniqueServiceName(const std::string& serviceName);
-    std::string getUniqueServiceName();
+    std::string getUniqueServiceName() const;
 
     void setLocation(const std::string& location);
-    std::string getLocation();
+    std::string getLocation() const;
 
     void setHost();
     void setHttpExtensionNamespace();
     void setHttpExtensionConfirmed();
-    bool getHttpExtensionConfirmed();
+    bool getHttpExtensionConfirmed() const;
 
     void setServer(const std::string& productNameVersion);
-    std::string getServerOperatingSystem();
-    std::string getServerUpnpVersion();
-    std::string getServerProductNameVersion();
+    std::string getServerOperatingSystem() const;
+    std::string getServerUpnpVersion() const;
+    std::string getServerProductNameVersion() const;
 
     void setMaximumWaitTime(int waitTime = SSDP_DEFAULT_WAIT_TIME);  // max time to delay response, between 1 and 120 seconds.
-    int getMaximumWaitTime();
+    int getMaximumWaitTime() const;
 
     void setDate();
-    Poco::DateTime getDate();
+    Poco::DateTime getDate() const;
 
-    Poco::Net::SocketAddress getSender();
+    Poco::Net::SocketAddress getSender() const;
 
 
 private:
     void initMessageMap();
+    std::string getTypeHeader(const TRequestMethod method) const;
+    TRequestMethod getTypeHeaderConst(const std::string& method) const;
+    std::string getHeader(const std::string& header) const;
 
     TRequestMethod                          _requestMethod;
     TRequestMethod                          _notificationSubtype;
@@ -275,11 +279,13 @@ private:
     void stopSendContinuous();
     void onTimer(Poco::Timer& timer);
 
+    typedef std::vector< Poco::AutoPtr<SsdpMessage> > MessageSetT;
+
     Poco::FastMutex                     _sendTimerLock;
     Poco::Random                        _randomTimeGenerator;
     Poco::Timer                         _sendTimer;
     SsdpSocket*                         _pSsdpSocket;
-    std::vector<SsdpMessage*>           _ssdpMessages;
+    MessageSetT                         _ssdpMessages;
     int                                 _repeat;
     Poco::UInt32                        _delay;
     Poco::UInt16                        _cacheDuration;
