@@ -54,6 +54,7 @@
 #include <Omm/X/EnginePhonon.h>
 #include <Poco/StringTokenizer.h>
 #include <Poco/Net/NameValueCollection.h>
+#include <Poco/NObserver.h>
 #endif
 
 namespace Omm {
@@ -323,6 +324,8 @@ GuiUpnpApplication::initLocalDevices()
 //#ifndef __IPHONE__
     if (_enableRenderer && _pLocalMediaRenderer && !_showRendererVisualOnly) {
         _pControllerWidget->setDefaultRenderer(_pLocalMediaRenderer);
+        _pLocalMediaRenderer->getEngine()->registerStreamTypeNotificationHandler(Poco::NObserver<ControllerWidget,\
+                Av::StreamTypeNotification>(*_pControllerWidget, &ControllerWidget::newStreamType));
     }
 //#endif
    LOGNS(Av, upnpav, debug, "omm gui application init local devices done.");

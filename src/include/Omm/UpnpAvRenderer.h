@@ -23,6 +23,7 @@
 #define UpnpAvRenderer_INCLUDED
 
 #include <Poco/Timer.h>
+#include <Poco/NotificationCenter.h>
 
 #include "Sys/Visual.h"
 #include "Upnp.h"
@@ -38,6 +39,18 @@ class DevAVTransportRendererImpl;
 class DevRenderingControlRendererImpl;
 class Visual;
 class ProtocolInfo;
+
+
+class StreamTypeNotification : public Poco::Notification
+{
+public:
+    StreamTypeNotification(ui4 instanceId, const std::string& transportState, const std::string& streamType) : _instanceId(instanceId), _transportState(transportState), _streamType(streamType) {}
+
+    ui4                 _instanceId;
+    std::string         _transportState;
+    std::string         _streamType;
+};
+
 
 class Engine //: public Util::ConfigurablePlugin
 {
@@ -61,9 +74,7 @@ public:
     virtual void createPlayer()  = 0;
 
     // UPnP AV methods
-    /*
-      AVTransport
-    */
+    //  AVTransport
     virtual bool preferStdStream() { return false; }
 
     void setUriEngine(const std::string& uri, const ProtocolInfo& protInfo = ProtocolInfo());
@@ -98,14 +109,14 @@ public:
     virtual std::string getStreamType() { return StreamTypeOther; }
     const std::string transportState();
 
-    /*
-      Rendering Control
-    */
+    // Rendering Control
     virtual void setVolume(const std::string& channel, float vol) = 0;
     virtual float getVolume(const std::string& channel) = 0;
 
     virtual void setMute(const std::string& channel, bool mute) = 0;
     virtual bool getMute(const std::string& channel) = 0;
+
+    void registerStreamTypeNotificationHandler(const Poco::AbstractObserver& observer);
 
 protected:
     virtual TransportState getTransportState() = 0;
@@ -130,17 +141,11 @@ protected:
     Poco::Timer*                        _pEndOfStreamTimer;
     Omm::r8                             _duration;  // length of media in seconds
     Poco::UInt64                        _size;      // length of media in bytes
-};
-
-
-class StreamTypeNotification : public Poco::Notification
-{
-public:
-    StreamTypeNotification(ui4 instanceId, const std::string& transportState, const std::string& streamType) : _instanceId(instanceId), _transportState(transportState), _streamType(streamType) {}
-
-    ui4                 _instanceId;
-    std::string         _transportState;
-    std::string         _streamType;
+    // Need a separate NotificationCenter for notifications from a loadable plugin
+    // because with some compilers (mingw) the notification is posted
+    // to a local copy of the default notification center and nothing is delivered
+    // to the registered observers.
+    Poco::NotificationCenter            _engineNotificationCenter;
 };
 
 

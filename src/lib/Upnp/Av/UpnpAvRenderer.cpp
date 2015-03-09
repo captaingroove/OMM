@@ -231,6 +231,13 @@ Engine::seekTime(r8 second)
 }
 
 
+void
+Engine::registerStreamTypeNotificationHandler(const Poco::AbstractObserver& observer)
+{
+    _engineNotificationCenter.addObserver(observer);
+}
+
+
 const std::string
 Engine::transportState()
 {
@@ -279,7 +286,7 @@ Engine::transportStateChanged()
     if (newTransportState == AvTransportArgument::TRANSPORT_STATE_PLAYING) {
         streamType = getStreamType();
     }
-    Poco::NotificationCenter::defaultCenter().postNotification(new StreamTypeNotification(_instanceId, newTransportState, streamType));
+    _engineNotificationCenter.postNotification(new StreamTypeNotification(_instanceId, newTransportState, streamType));
 }
 
 
