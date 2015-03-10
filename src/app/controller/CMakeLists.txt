@@ -1,4 +1,4 @@
-add_executable(ommcontroller
+add_executable(ommcontroller WIN32
 ControllerApplication.cpp
 )
 

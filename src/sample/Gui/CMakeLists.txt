@@ -1,4 +1,4 @@
-add_executable(plain
+add_executable(plain WIN32
 Plain.cpp
 )
 
@@ -7,7 +7,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(label
+add_executable(label WIN32
 Label.cpp
 )
 
@@ -16,7 +16,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(buttonsubclass
+add_executable(buttonsubclass WIN32
 ButtonSubclass.cpp
 )
 
@@ -25,7 +25,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(buttoncontroller
+add_executable(buttoncontroller WIN32
 ButtonController.cpp
 )
 
@@ -34,7 +34,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(group
+add_executable(group WIN32
 Group.cpp
 )
 
@@ -43,7 +43,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(layout
+add_executable(layout WIN32
 Layout.cpp
 )
 
@@ -52,7 +52,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(group1tonmodel
+add_executable(group1tonmodel WIN32
 Group1toNModel.cpp
 )
 
@@ -61,7 +61,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(stringlist
+add_executable(stringlist WIN32
 StringList.cpp
 )
 
@@ -70,7 +70,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(list
+add_executable(list WIN32
 List.cpp
 )
 
@@ -79,7 +79,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(itemlist
+add_executable(itemlist WIN32
 ItemList.cpp
 )
 
@@ -88,7 +88,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(drag
+add_executable(drag WIN32
 Drag.cpp
 )
 
@@ -97,7 +97,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(draglist
+add_executable(draglist WIN32
 DragList.cpp
 )
 
@@ -106,7 +106,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(lazylist
+add_executable(lazylist WIN32
 LazyList.cpp
 )
 
@@ -115,7 +115,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(lazylistbidir
+add_executable(lazylistbidir WIN32
 LazyListBidir.cpp
 )
 
@@ -124,7 +124,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(navigator
+add_executable(navigator WIN32
 Navigator.cpp
 )
 
@@ -133,7 +133,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(slider
+add_executable(slider WIN32
 Slider.cpp
 )
 
@@ -142,7 +142,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(scrollarea
+add_executable(scrollarea WIN32
 ScrollArea.cpp
 )
 
@@ -151,7 +151,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(image
+add_executable(image WIN32
 Image.cpp
 )
 
@@ -160,7 +160,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(web
+add_executable(web WIN32
 Web.cpp
 )
 
@@ -169,7 +169,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(splitter
+add_executable(splitter WIN32
 Splitter.cpp
 )
 
@@ -178,7 +178,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(cluster
+add_executable(cluster WIN32
 Cluster.cpp
 )
 
@@ -187,7 +187,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(selector
+add_executable(selector WIN32
 Selector.cpp
 )
 
@@ -196,7 +196,7 @@ ${OMM_GUI}
 )
 
 
-add_executable(switch
+add_executable(switch WIN32
 Switch.cpp
 )
 

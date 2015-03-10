@@ -44,7 +44,7 @@ QT4_WRAP_CPP(
 LOGAN_QTUI_MOC_CPP ${LOGAN_QTUI_MOC}
 )
 
-add_executable( logan
+add_executable(logan WIN32
 ${LOGAN_QTUI_SRCS}
 ${LOGAN_QTUI}
 ${LOGAN_QTUI_MOC_CPP}

@@ -4,7 +4,7 @@ if(WINDOWS)
 set(OMM_RC_FILE omm.rc)
 endif(WINDOWS)
 
-add_executable(omm
+add_executable(omm WIN32
 ${OMM_RC_FILE}
 OmmApplication.cpp
 )

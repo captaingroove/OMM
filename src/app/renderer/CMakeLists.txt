@@ -1,4 +1,4 @@
-add_executable(ommrenderer
+add_executable(ommrenderer WIN32
 RendererApplication.cpp
 )
 

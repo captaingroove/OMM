@@ -19,8 +19,9 @@ set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} -liphlpapi -lw
 
 # option -mwindows turns console app into windows app (w/o console window)
 # this should also be achievable with option WIN32 in cmake command add_executable
-set(CMAKE_C_FLAGS "-mwindows" CACHE STRING "additional cross compiling c flags" FORCE)
-set(CMAKE_CXX_FLAGS "-mwindows" CACHE STRING "additional cross compiling cxx flags" FORCE)
+# (currently commented out, because WIN32 is used for all gui executables)
+#set(CMAKE_C_FLAGS "-mwindows" CACHE STRING "additional cross compiling c flags" FORCE)
+#set(CMAKE_CXX_FLAGS "-mwindows" CACHE STRING "additional cross compiling cxx flags" FORCE)
 
 set(CMAKE_FIND_ROOT_PATH "${SDKROOT}" "${CMAKE_INSTALL_PREFIX}")
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH)

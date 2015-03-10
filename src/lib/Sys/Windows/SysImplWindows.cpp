@@ -42,11 +42,13 @@ SysImpl::getPath(SysPath::Location loc)
     switch (loc) {
         case SysPath::Home:
             if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, path))) {
+//            if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, path))) {
                 return std::string(path);
             }
             return "";
         case SysPath::Cache:
             if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_COMMON_APPDATA, NULL, 0, path))) {
+//            if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, path))) {
                 return std::string(path);
             }
             return "";
