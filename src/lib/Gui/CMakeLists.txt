@@ -4,7 +4,7 @@ descend_directories()
 include(AddResources)
 
 add_resources(GuiImages
-"img/right_arrow.gif"
+"img/right_arrow.png"
 )
 
 if(LIB_OMMGUI_PLATFORM)

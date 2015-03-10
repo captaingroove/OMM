@@ -12,8 +12,10 @@ include(
 ${QT_USE_FILE}
 )
 
-set(OMMGUI_QT_RES
-QtGui.qrc
+include(AddResources)
+
+add_resources(QtGuiImages
+"img/right_arrow.png"
 )
 
 set(OMMGUI_QT_SRC
@@ -37,6 +39,7 @@ SplitterImpl.cpp
 SelectorImpl.cpp
 SwitchImpl.cpp
 GraphicImpl.cpp
+${QtGuiImages_CPP}
 )
 
 set(OMMGUI_QT_MOC
@@ -49,10 +52,6 @@ QtTextLineImpl.h
 QtImageImpl.h
 QtSelectorImpl.h
 QtSwitchImpl.h
-)
-
-QT4_ADD_RESOURCES(
-OMMGUI_RES_SRC ${OMMGUI_QT_RES}
 )
 
 QT4_WRAP_CPP(

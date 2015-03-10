@@ -22,6 +22,7 @@
 #include <QtGui>
 #include <Poco/NumberFormatter.h>
 
+#include "QtGuiImages.h"
 #include "NavigatorImpl.h"
 #include "QtNavigatorPanel.h"
 #include "Gui/Navigator.h"
@@ -37,13 +38,11 @@ QtNavigatorPanelButton::QtNavigatorPanelButton(View* pView) :
 _pView(pView)
 {
     setFlat(true);
-    setIcon(QIcon(QString(":/images/right_arrow.gif")));
-//    setIcon(QIcon(QString(":images/right_arrow.gif")));
-//    setStyle(new QCleanlooksStyle);
-//    setStyle(new QPlastiqueStyle);
-//    setIcon(style()->standardIcon(QStyle::SP_ArrowRight));
-//    setIcon(style()->standardIcon(QStyle::SP_ArrowForward));
-//    setIcon(style()->standardIcon(QStyle::PE_IndicatorArrowRight));
+
+    std::string pixmapData = QtGuiImages::instance()->getResource("right_arrow.png");
+    QPixmap pixmap;
+    pixmap.loadFromData((const uchar*)pixmapData.data(), pixmapData.length(), 0);
+    setIcon(QIcon(pixmap));
 }
 
 

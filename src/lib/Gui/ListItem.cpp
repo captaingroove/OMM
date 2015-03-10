@@ -136,7 +136,7 @@ _pRightView(0)
 
     if (!_pArrowModel) {
         _pArrowModel = new ImageModel;
-        _pArrowModel->setData(GuiImages::instance()->getResource("right_arrow.gif"));
+        _pArrowModel->setData(GuiImages::instance()->getResource("right_arrow.png"));
     }
     _pArrowView->setModel(_pArrowModel);
     _pArrowView->hide(false);
