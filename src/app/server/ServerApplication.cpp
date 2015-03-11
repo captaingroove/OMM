@@ -26,6 +26,6 @@ int main(int argc, char** argv)
 {
     Omm::UpnpApplication app(argc, argv);
     app.setLockInstance(false);
-    app.setIgnoreConfig(true);
+    app.setIgnoreConfigFile(true);
     return app.run(argc, argv);
 }

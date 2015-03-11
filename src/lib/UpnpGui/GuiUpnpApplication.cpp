@@ -270,7 +270,7 @@ GuiUpnpApplication::initConfig()
 void
 GuiUpnpApplication::saveConfig()
 {
-    if (!_ignoreConfig) {
+    if (!_ignoreConfigFile) {
         LOGNS(Av, upnpav, information, "saving config file ...");
         _pConf->setInt("application.width", width());
         _pConf->setInt("application.height", height());

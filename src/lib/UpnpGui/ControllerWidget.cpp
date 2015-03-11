@@ -114,14 +114,14 @@ _featureShowNetworkActivity(true)
 {
     LOGNS(Gui, gui, debug, "controller widget ctor ...");
 
-    if (!_pApplication->getIgnoreConfig() && !Poco::Util::Application::instance().config().getBool("application.fullscreen", false)) {
+    if (!_pApplication->getIgnoreConfigFile() && !Poco::Util::Application::instance().config().getBool("application.fullscreen", false)) {
         LOGNS(Gui, gui, debug, "controller widget create setup view ...");
         _pSetup = new GuiSetup(_pApplication);
         _pSetup->setName("Setup");
         insertView(_pSetup, "Setup");
     }
 
-    if (!_pApplication->getIgnoreConfig()) {
+    if (!_pApplication->getIgnoreConfigFile()) {
         LOGNS(Gui, gui, debug, "controller widget create visual ...");
         _pVisual = new GuiVisual;
         insertView(_pVisual, "Video");
@@ -164,7 +164,7 @@ _featureShowNetworkActivity(true)
     setCurrentViewIndex(getIndexFromView(_pMediaServerGroupWidget));
 //    setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "[0,0] Media,Setup [0,1] Player [1,0] List [1,1] Video"));
     if (!Poco::Util::Application::instance().config().getBool("application.fullscreen", false)) {
-        if (_pApplication->getIgnoreConfig()) {
+        if (_pApplication->getIgnoreConfigFile()) {
             setConfiguration("col [0,0] Media [1,0] Player {800;480} {" +\
                     Poco::NumberFormatter::format(0.5) + ";" + Poco::NumberFormatter::format(0.5) + "} {" + Poco::NumberFormatter::format(1.0) + "} {" +\
                     Poco::NumberFormatter::format(1.0) + "}");

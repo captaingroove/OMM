@@ -50,6 +50,7 @@
 #include <Omm/X/EnginePhonon.h>
 #include <Poco/StringTokenizer.h>
 #include <Poco/Net/NameValueCollection.h>
+#include <Poco/File.h>
 #endif
 
 namespace Omm {
@@ -132,7 +133,7 @@ _argc(argc),
 _argv(argv),
 _helpRequested(false),
 _lockInstance(true),
-_ignoreConfig(false),
+_ignoreConfigFile(false),
 //#ifdef __IPHONE__
 //    _rendererName("iPhone Renderer"),
 //#else
@@ -291,9 +292,9 @@ UpnpApplication::main(const std::vector<std::string>& args)
         if (_featureCheckInstance && instanceAlreadyRunning()) {
             LOG(upnp, information, "omm application instance running, starting in controller mode");
             setLockInstance(false);
-            setIgnoreConfig(true);
+            setIgnoreConfigFile(true);
         }
-        loadConfig();
+//        loadConfig();
         initConfig();
 
         ret = runEventLoop(_argc, _argv);
@@ -348,16 +349,16 @@ UpnpApplication::setLockInstance(bool lock)
 
 
 void
-UpnpApplication::setIgnoreConfig(bool ignore)
+UpnpApplication::setIgnoreConfigFile(bool ignore)
 {
-    _ignoreConfig = ignore;
+    _ignoreConfigFile = ignore;
 }
 
 
 bool
-UpnpApplication::getIgnoreConfig()
+UpnpApplication::getIgnoreConfigFile()
 {
-    return _ignoreConfig;
+    return _ignoreConfigFile;
 }
 
 
@@ -382,7 +383,9 @@ UpnpApplication::printConfig()
         std::vector<std::string> serverConfigKeys;
         config().keys("server." + *it, serverConfigKeys);
         for (std::vector<std::string>::iterator cit = serverConfigKeys.begin(); cit != serverConfigKeys.end(); ++cit) {
-            LOGNS(Av, upnpav, debug, "omm config server." + *it + "." + *cit + ": " + config().getString("server." + *it + "." + *cit, ""));
+            if (*it != "new") {
+                LOGNS(Av, upnpav, debug, "omm config server." + *it + "." + *cit + ": " + config().getString("server." + *it + "." + *cit, ""));
+            }
         }
     }
 
@@ -473,9 +476,9 @@ UpnpApplication::defaultConfig()
 
 
 void
-UpnpApplication::loadConfig()
+UpnpApplication::initConfig()
 {
-    if (!_ignoreConfig) {
+    if (!_ignoreConfigFile) {
         LOGNS(Av, upnpav, information, "reading config file ...");
 
         _confFilePath = Omm::Util::Home::instance()->getConfigDirPath("/") + "omm.properties";
@@ -483,21 +486,33 @@ UpnpApplication::loadConfig()
         try {
             _pConf->load(_confFilePath);
             LOGNS(Av, upnpav, information, "reading config file done.");
+
+            // check omm version that created the config file
+            std::string version(_pConf->getString("application.version", ""));
+            if (version == "") {
+                // discard old config file
+                LOGNS(Av, upnpav, information, "removing deprecated config file and setting default configuration.");
+                _pConf->release();
+                Poco::File(_confFilePath).remove();
+                _pConf = new Poco::Util::PropertyFileConfiguration;
+                defaultConfig();
+            }
         }
         catch (Poco::Exception& e) {
             LOGNS(Av, upnpav, warning, "could not read config file: " + e.displayText());
             defaultConfig();
         }
-    //        config().addWriteable(_pConf, -200);
+
+        // add configuration file as writeable layer to the app's configuration
+        // so we can write properties and not only read them
         config().addWriteable(_pConf, 0);
+
+        _pConf->setString("application.version", __OMM_VERSION_STRING__);
+        _pConf->setString("application.commit", __OMM_COMMIT_STRING__);
     }
     printConfig();
-}
 
-
-void
-UpnpApplication::initConfig()
-{
+    // init web configuration server
     _pWebSetup = new WebSetup(this);
 }
 
@@ -505,7 +520,7 @@ UpnpApplication::initConfig()
 void
 UpnpApplication::saveConfig()
 {
-    if (!_ignoreConfig) {
+    if (!_ignoreConfigFile) {
         try {
             _pConf->save(_confFilePath);
             LOGNS(Av, upnpav, information, "saving config file done.");
@@ -572,7 +587,10 @@ UpnpApplication::restartLocalDeviceContainer()
     // delete local devices
 //        delete _pLocalDeviceContainer;
     _pLocalDeviceContainer = new DeviceContainer;
-    initConfig();
+
+//    initConfig();
+//    _pWebSetup = new WebSetup(this);  // only code in initConfig() before COMMIT 20150311.0
+
     initLocalDevices();
     _pLocalDeviceServer->setState(DeviceManager::Public);
 //    _pLocalDeviceServer->setState(DeviceManager::Local);

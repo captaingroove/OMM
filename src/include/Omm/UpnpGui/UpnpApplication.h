@@ -68,8 +68,8 @@ public:
     void stopApp();
 
     void setLockInstance(bool lock = true);
-    void setIgnoreConfig(bool ignore = true);
-    bool getIgnoreConfig();
+    void setIgnoreConfigFile(bool ignore = true);
+    bool getIgnoreConfigFile();
     std::string getAppHttpUri();
     std::string getConfigHttpUri();
     Poco::Util::PropertyFileConfiguration* getFileConfiguration();
@@ -94,12 +94,12 @@ protected:
 
     virtual std::stringstream* getPlaylistResource();
 
-    bool                                        _helpRequested;
-    bool                                        _ignoreConfig;
-    Poco::Util::PropertyFileConfiguration*      _pConf;
-    DeviceContainer*                            _pLocalDeviceContainer;
-    bool                                        _enableLocalDeviceServer;
-    bool                                        _featureCheckInstance;
+    bool                                                    _helpRequested;
+    bool                                                    _ignoreConfigFile;
+    Poco::AutoPtr<Poco::Util::PropertyFileConfiguration>    _pConf;
+    DeviceContainer*                                        _pLocalDeviceContainer;
+    bool                                                    _enableLocalDeviceServer;
+    bool                                                    _featureCheckInstance;
 
 private:
     // Poco::Util::Application interface
@@ -109,7 +109,7 @@ private:
     void displayHelp();
     void printConfig();
     void printForm(const Poco::Net::HTMLForm& form);
-    void loadConfig();
+//    void loadConfig();
 
     // local devices
     void addLocalServer(const std::string& id);
