@@ -198,9 +198,9 @@ private:
     virtual bool eventFilter(QObject* pObject, QEvent* pEvent)
     {
         if (pEvent->type() == QEvent::KeyPress) {
-            QKeyEvent* pKeyEvent = static_cast<QKeyEvent*>(pEvent);
-            _pViewImpl->keyPressed(pKeyEvent->key());
-            return true;
+//            QKeyEvent* pKeyEvent = static_cast<QKeyEvent*>(pEvent);
+//            _pViewImpl->keyPressed(pKeyEvent->key());
+            return true; // don't propagate the key press event on a single view
         }
         else {
             return false;
@@ -221,9 +221,13 @@ public:
 private:
     virtual bool eventFilter(QObject* pObject, QEvent* pEvent)
     {
+        pEvent->accept();
         if (pEvent->type() == QEvent::KeyPress) {
             QKeyEvent* pKeyEvent = static_cast<QKeyEvent*>(pEvent);
-            return !_pViewImpl->keyPressedNonFullscreen(pKeyEvent->key(), pKeyEvent->modifiers());
+//            if (pKeyEvent->isAutoRepeat()) {
+//                LOG(gui, debug, "key event is autorepeat");
+//            }
+            return !_pViewImpl->keyPressed(pKeyEvent->key(), pKeyEvent->modifiers());
         }
         else {
             return false;

@@ -1014,8 +1014,8 @@ ColumnClusterViewImpl::layoutViews(ClusterConfiguration& targetConfiguration)
     if (targetConfiguration._colWidth.size()) {
         _pSplitter->setSizes(targetConfiguration._colWidth);
     }
-    for (int col = 0; col < _grid.size(); ++col) {
-        if (targetConfiguration._clusterHeight.size() && targetConfiguration._clusterHeight[col].size()) {
+    for (int col = 0; col < _grid.size() && col < targetConfiguration._clusterHeight.size(); ++col) {
+        if (targetConfiguration._clusterHeight[col].size()) {
             _grid[col]->setSizes(targetConfiguration._clusterHeight[col]);
         }
         for (int cluster = 0; cluster < _grid[col]->getSize(); ++cluster) {

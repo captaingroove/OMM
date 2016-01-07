@@ -50,6 +50,8 @@ public:
     void showRendererVisualOnly(bool show = true);
     Av::MediaRenderer* getLocalRenderer();
 
+    void setFullscreen(bool fullscreen = true);
+
 protected:
     // Poco::Util::Application interface
     virtual void defineOptions(Poco::Util::OptionSet& options);

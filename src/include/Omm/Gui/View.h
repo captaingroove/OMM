@@ -134,7 +134,7 @@ public:
     bool getEnableRedraw();
     void setEnableRedraw(bool enable = true);
 
-    void triggerKeyEvent(Controller::KeyCode key);
+    void triggerKeyEvent(Controller::KeyCode key, Controller::Modifiers modifiers, bool propagate);
     void setDragMode(int dragMode);
     void setAcceptDrops(bool accept = true);
     void setEnableHover(bool enable = true);

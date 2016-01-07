@@ -39,10 +39,34 @@ _pMainWindow(0),
 _visible(true),
 _width(800),
 _height(480),
-_pFullscreenStyleSheet(0),
 _fullscreen(false)
 {
     LOG(gui, debug, "application impl ctor");
+    _pFullscreenStyleSheet = new QString(
+        "* { \
+            font-size: 36pt; \
+            color: #5f5f5f; \
+        } \
+        QTabWidget { \
+            border-width: 0; \
+        } \
+        QScrollArea { \
+            background-color: black; \
+            color: #afafaf; \
+        } \
+        QLabel { \
+            background-color: black; \
+            color: #afafaf; \
+        } \
+        QSlider { \
+            background-color: black; \
+            color: #afafaf; \
+        } \
+        QButton { \
+            background-color: black; \
+            color: #afafaf; \
+        }"
+    );
 }
 
 
@@ -99,74 +123,15 @@ ApplicationImpl::setFullscreen(bool fullscreen)
 {
     _fullscreen = fullscreen;
     if (fullscreen) {
-//            _pFullscreenStyleSheet = new QString(
-//            "* { \
-//                 font-size: 36pt; \
-//            }"
-//            );
-
-        _pFullscreenStyleSheet = new QString(
-            "* { \
-                font-size: 36pt; \
-                color: #5f5f5f; \
-            } \
-            QTabWidget { \
-                border-width: 0; \
-            } \
-            QScrollArea { \
-                background-color: black; \
-                color: #afafaf; \
-            } \
-            QLabel { \
-                background-color: black; \
-                color: #afafaf; \
-            } \
-            QSlider { \
-                background-color: black; \
-                color: #afafaf; \
-            } \
-            QButton { \
-                background-color: black; \
-                color: #afafaf; \
-            }"
-            );
-
-
-//                 foreground-color: black;
-//        _pFullscreenStyleSheet = new QString(
-//            "* { \
-//                 font-size: 36pt; \
-//                 background-color: black; \
-//                 border-color: black; \
-//                 border-width: 0; \
-//                 color: darkred; \
-//                 selection-color: white; \
-//                 selection-background-color: darkblue; \
-//            } \
-//            QWidget { \
-//                 background-color: blue; \
-//                 color: #afafaf; \
-//            } \
-//            QScrollArea { \
-//                 background-color: black; \
-//                 color: #afafaf; \
-//            } \
-//            QLabel { \
-//                 background-color: black; \
-//                 color: #afafaf; \
-//            } \
-//            QSlider { \
-//                 background-color: black; \
-//                 color: #afafaf; \
-//            } \
-//            QButton { \
-//                 background-color: black; \
-//                 color: #afafaf; \
-//            }"
-//            );
+        _pQtApplication->setStyleSheet(*_pFullscreenStyleSheet);
+        _pMainWindow->setCursor(QCursor(Qt::BlankCursor));
+        _pMainWindow->showFullScreen();
     }
-//    showToolBar(!fullscreen);
-//    showStatusBar(!fullscreen);
+    else {
+        _pQtApplication->setStyleSheet(*_pDefaultStyleSheet);
+        _pMainWindow->setCursor(QCursor(Qt::ArrowCursor));
+        _pMainWindow->showNormal();
+    }
 }
 
 
@@ -204,10 +169,8 @@ ApplicationImpl::run(int argc, char** argv)
 #endif
     _pQtApplication = new QApplication(argc, argv);
     _pMainWindow = new QMainWindow;
-    if (_pFullscreenStyleSheet) {
-        _pQtApplication->setStyleSheet(*_pFullscreenStyleSheet);
-        _pMainWindow->setCursor(QCursor(Qt::BlankCursor));
-    }
+    _pDefaultStyleSheet = new QString(_pQtApplication->styleSheet());
+
     _pApplication->_pMainView = _pApplication->createMainView();
     _pMainWindow->setCentralWidget(static_cast<QWidget*>(_pApplication->_pMainView->getNativeView()));
     _pApplication->createdMainView();
@@ -217,13 +180,12 @@ ApplicationImpl::run(int argc, char** argv)
     _pMainWindow->resize(_width, _height);
     _pApplication->presentedMainView();
 
-    _pEventFilter = new QtEventFilter(_pApplication->_pMainView->getViewImpl());
+//    _pEventFilter = new QtEventFilter(_pApplication->_pMainView->getViewImpl());
     // FIXME: search field needs focus or global keys must be enabled
     // for now key navigation is only enabled in fullscreen mode
-    if (_fullscreen) {
-        _pQtApplication->installEventFilter(_pEventFilter);
-        showControlPanels(false);
-    }
+//    if (_fullscreen) {
+//        _pQtApplication->installEventFilter(_pEventFilter);
+//    }
     _pPermanentEventFilter = new QtPermanentEventFilter(_pApplication->_pMainView->getViewImpl());
     _pQtApplication->installEventFilter(_pPermanentEventFilter);
 

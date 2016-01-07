@@ -83,6 +83,8 @@ public:
     void showPlaylistEditor(bool show = true);
     void setFeatureShowNetworkActivity(bool on = true);
 
+    void setLayoutConfiguration(bool fullscreen = true);
+
 private:
     void playlistNotification(PlaylistNotification* pNotification);
 
@@ -106,8 +108,8 @@ public:
     KeyController(ControllerWidget* pControllerWidget) : _pControllerWidget(pControllerWidget), _volStep(5) {}
 
 private:
-    virtual void keyPressed(KeyCode key);
-    virtual void keyPressedNonFullscreen(KeyCode key, Modifiers mod, bool& propagate);
+//    virtual void keyPressed(KeyCode key);
+    virtual void keyPressed(KeyCode key, Modifiers mod, bool& propagate);
 
     ControllerWidget*   _pControllerWidget;
     ui2                 _volStep;

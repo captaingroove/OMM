@@ -147,7 +147,7 @@ GuiUpnpApplication::handleOption(const std::string& name, const std::string& val
         }
     }
     else if (name == "fullscreen") {
-        config().setString("application.fullscreen", "true");
+        config().setBool("application.fullscreen", true);
     }
     else if (name == "controller") {
         std::map<std::string,std::string> params;
@@ -202,15 +202,12 @@ GuiUpnpApplication::presentedMainView()
         }
     }
     else {
-        if (config().getBool("application.fullscreen", false)) {
-            _pControllerWidget->setHandlesHidden(true);
-    //        _pControllerWidget->showOnlyBasicDeviceGroups(true);
-        }
-        else {
-            _pControllerWidget->setRendererVisualVisible(false);
-        }
         _pControllerWidget->init();
     }
+    GuiUpnpApplication::setFullscreen(config().getBool("application.fullscreen", false));
+    resizeMainView(config().getInt("application.width", 800), config().getInt("application.height", 480));
+    scaleMainView(config().getDouble("application.scale", 1.0));
+
     initLocalDevices();
 }
 
@@ -261,9 +258,9 @@ GuiUpnpApplication::initConfig()
 {
     UpnpApplication::initConfig();
 
-    setFullscreen(config().getBool("application.fullscreen", false));
-    resizeMainView(config().getInt("application.width", 800), config().getInt("application.height", 480));
-    scaleMainView(config().getDouble("application.scale", 1.0));
+//    GuiUpnpApplication::setFullscreen(config().getBool("application.fullscreen", false));
+//    resizeMainView(config().getInt("application.width", 800), config().getInt("application.height", 480));
+//    scaleMainView(config().getDouble("application.scale", 1.0));
 }
 
 
@@ -272,9 +269,11 @@ GuiUpnpApplication::saveConfig()
 {
     if (!_ignoreConfigFile) {
         LOGNS(Av, upnpav, information, "saving config file ...");
-        _pConf->setInt("application.width", width());
-        _pConf->setInt("application.height", height());
-        if (!config().getBool("application.fullscreen", false)) {
+//        if (!config().getBool("application.fullscreen", false)) {
+        config().setBool("application.fullscreen", isFullscreen());
+        if (!isFullscreen()) {
+            _pConf->setInt("application.width", width());
+            _pConf->setInt("application.height", height());
             _pConf->setString("application.cluster", _pControllerWidget->getConfiguration());
         }
         _pConf->setInt("renderer.volume", _pLocalMediaRenderer->getEngine()->getVolume(Omm::Av::AvChannel::MASTER));
@@ -299,6 +298,18 @@ GuiUpnpApplication::showRendererVisualOnly(bool show)
 {
     _showRendererVisualOnly = show;
     _enableController = false;
+}
+
+
+void
+GuiUpnpApplication::setFullscreen(bool fullscreen)
+{
+    Gui::Application::setFullscreen(fullscreen);
+    _pControllerWidget->setLayoutConfiguration(fullscreen);
+    _pControllerWidget->updateLayout();
+    _pControllerWidget->setHandlesHidden(fullscreen);
+    _pControllerWidget->setRendererVisualVisible(!fullscreen);
+    showControlPanels(!fullscreen);
 }
 
 

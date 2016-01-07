@@ -92,8 +92,8 @@ private:
     void selected();
     void released();
     void activated();
-    void keyPressed(int key);
-    bool keyPressedNonFullscreen(int key, int modifiers);
+//    void keyPressed(int key);
+    bool keyPressed(int key, int modifiers);
     Controller::KeyCode keyTranslateNativeCode(int key);
     Controller::Modifiers keyTranslateNativeModifiers(int modifiers);
     void mouseHovered(const Position& pos);

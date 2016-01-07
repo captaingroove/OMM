@@ -35,6 +35,7 @@ Application::Application() :
 _pImpl(new ApplicationImpl(this)),
 _pMainView(0),
 _scaleFactor(1.0),
+_fullscreen(false),
 _argc(0),
 _argv(0)
 {
@@ -74,7 +75,15 @@ Application::scaleMainView(float factor)
 void
 Application::setFullscreen(bool fullscreen)
 {
+    _fullscreen = fullscreen;
     _pImpl->setFullscreen(fullscreen);
+}
+
+
+bool
+Application::isFullscreen()
+{
+    return _fullscreen;
 }
 
 

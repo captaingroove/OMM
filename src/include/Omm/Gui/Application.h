@@ -49,6 +49,7 @@ public:
     void resizeMainView(int width, int height);
     void scaleMainView(float factor);
     void setFullscreen(bool fullscreen);
+    bool isFullscreen();
     View* getMainView();
     int width();
     int height();
@@ -71,6 +72,7 @@ private:
     ApplicationImpl*           _pImpl;
     View*                      _pMainView;
     float                      _scaleFactor;
+    bool                       _fullscreen;
     int                        _argc;
     char**                     _argv;
 };

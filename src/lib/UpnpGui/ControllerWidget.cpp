@@ -36,6 +36,7 @@
 
 #include "Gui/GuiLogger.h"
 #include "Gui/View.h"
+#include "Gui/Controller.h"
 
 #include "UpnpGui/ActivityIndicator.h"
 #include "UpnpGui/DeviceGroup.h"
@@ -63,7 +64,7 @@ class MediaServerGroupController : public Omm::Gui::NavigatorController
     virtual void poppedToRoot()
     {
         LOGNS(Gui, gui, debug, "media server group popped to root");
-        if (_pController->_pPlaylistEditorView) {
+        if (_pController->_pPlaylistEditorView && _pController->_pPlaylistEditorView->isVisible()) {
             _pController->_pPlaylistEditorView->hide(false);
             _pController->_pMediaServerGroupWidget->finishEditPlaylist();
         }
@@ -141,14 +142,14 @@ _featureShowNetworkActivity(true)
     _pMediaServerGroupWidget->attachController(new MediaServerGroupController(this));
     registerDeviceGroup(_pMediaServerGroupWidget);
     pSplitterView->insertView(_pMediaServerGroupWidget, 0);
-    if (!Poco::Util::Application::instance().config().getBool("application.fullscreen", false)) {
-        _pPlaylistEditor = new PlaylistEditor(this);
-        _pPlaylistEditorView = new PlaylistEditorView(_pPlaylistEditor);
-        _pPlaylistEditorView->hide();
-        pSplitterView->insertView(_pPlaylistEditorView, 1);
-        Poco::NotificationCenter::defaultCenter().addObserver(Poco::Observer<ControllerWidget,
-        PlaylistNotification>(*this, &ControllerWidget::playlistNotification));
-    }
+
+    _pPlaylistEditor = new PlaylistEditor(this);
+    _pPlaylistEditorView = new PlaylistEditorView(_pPlaylistEditor);
+    _pPlaylistEditorView->hide();
+    pSplitterView->insertView(_pPlaylistEditorView, 1);
+    Poco::NotificationCenter::defaultCenter().addObserver(Poco::Observer<ControllerWidget,
+    PlaylistNotification>(*this, &ControllerWidget::playlistNotification));
+
     insertView(pSplitterView, "Media");
     std::vector<float> splitterSizes;
     splitterSizes.push_back(0.8);
@@ -162,22 +163,7 @@ _featureShowNetworkActivity(true)
 #endif
     _pActivityIndicator = new ActivityIndicator;
     setCurrentViewIndex(getIndexFromView(_pMediaServerGroupWidget));
-//    setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "[0,0] Media,Setup [0,1] Player [1,0] List [1,1] Video"));
-    if (!Poco::Util::Application::instance().config().getBool("application.fullscreen", false)) {
-        if (_pApplication->getIgnoreConfigFile()) {
-            setConfiguration("col [0,0] Media [1,0] Player {800;480} {" +\
-                    Poco::NumberFormatter::format(0.5) + ";" + Poco::NumberFormatter::format(0.5) + "} {" + Poco::NumberFormatter::format(1.0) + "} {" +\
-                    Poco::NumberFormatter::format(1.0) + "}");
-        }
-        else {
-            setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "col [0,0] Media [1,0] Player [1,1] Setup,Video {800;480} {" +\
-                    Poco::NumberFormatter::format(0.56) + ";" + Poco::NumberFormatter::format(0.43) + "} {" + Poco::NumberFormatter::format(1.00) + "} {" +\
-                    Poco::NumberFormatter::format(0.50) + ";" + Poco::NumberFormatter::format(0.50) + "}"));
-        }
-    }
-    else {
-        setConfiguration("[0,0] Media,Video {800;480} {" + Poco::NumberFormatter::format(1.00) + "} {" + Poco::NumberFormatter::format(1.00) + "}");
-    }
+    setLayoutConfiguration(Poco::Util::Application::instance().config().getBool("application.fullscreen", false));
 
 //    Poco::NotificationCenter::defaultCenter().addObserver(Poco::Observer<ControllerWidget, TransportStateNotification>(*this, &ControllerWidget::newTransportState));
 //    Poco::NotificationCenter::defaultCenter().addObserver(Poco::Observer<ControllerWidget, TrackNotification>(*this, &ControllerWidget::newTrack));
@@ -352,8 +338,22 @@ ControllerWidget::setRendererVisualVisible(bool show)
 void
 ControllerWidget::navigateListWithKey(Gui::Controller::KeyCode key)
 {
-    if (_pMediaServerGroupWidget->getVisibleView()) {
-        _pMediaServerGroupWidget->getVisibleView()->triggerKeyEvent(key);
+    LOGNS(Gui, gui, debug, "navigate list with key: " + Poco::NumberFormatter::format(key));
+    Gui::ListView* pListView = dynamic_cast<Gui::ListView*>(_pMediaServerGroupWidget->getVisibleView());
+    if (pListView) {
+        LOGNS(Gui, gui, debug, "triggerKeyEvent: " + Poco::NumberFormatter::format(key) + ", on view: " + _pMediaServerGroupWidget->getVisibleView()->getName());
+//        _pMediaServerGroupWidget->getVisibleView()->triggerKeyEvent(key, Gui::Controller::NoModifier, false);
+        switch (key) {
+            case Gui::Controller::KeyUp:
+                pListView->highlightUp();
+                break;
+            case Gui::Controller::KeyDown:
+                pListView->highlightDown();
+                break;
+            case Gui::Controller::KeyReturn:
+                pListView->activateHighlighted();
+                break;
+        }
     }
 }
 
@@ -415,6 +415,32 @@ ControllerWidget::setFeatureShowNetworkActivity(bool on)
 
 
 void
+ControllerWidget::setLayoutConfiguration(bool fullscreen)
+{
+//    setConfiguration("col [0,0] Media,Video {800;480} {" + Poco::NumberFormatter::format(1.00) + "} {" + Poco::NumberFormatter::format(1.00) + "}");
+
+    if (fullscreen) {
+        // simple fullscreen configuration with media browser and video view, only
+        setConfiguration("col [0,0] Media,Video {800;480} {" + Poco::NumberFormatter::format(1.00) + "} {" + Poco::NumberFormatter::format(1.00) + "}");
+    }
+    else {
+        // controller only, without local renderer and video view
+        if (_pApplication->getIgnoreConfigFile()) {
+            setConfiguration("col [0,0] Media [1,0] Player {800;480} {" +\
+                    Poco::NumberFormatter::format(0.5) + ";" + Poco::NumberFormatter::format(0.5) + "} {" + Poco::NumberFormatter::format(1.0) + "} {" +\
+                    Poco::NumberFormatter::format(1.0) + "}");
+        }
+        else {
+            // omm application with full configuration
+            setConfiguration(Poco::Util::Application::instance().config().getString("application.cluster", "col [0,0] Media [1,0] Player [1,1] Setup,Video {800;480} {" +\
+                    Poco::NumberFormatter::format(0.56) + ";" + Poco::NumberFormatter::format(0.43) + "} {" + Poco::NumberFormatter::format(1.00) + "} {" +\
+                    Poco::NumberFormatter::format(0.50) + ";" + Poco::NumberFormatter::format(0.50) + "}"));
+        }
+    }
+}
+
+
+void
 ControllerWidget::playlistNotification(PlaylistNotification* pNotification)
 {
     MediaObjectModel* pModel = pNotification->_pMediaObject;
@@ -448,94 +474,144 @@ ControllerWidget::playlistNotification(PlaylistNotification* pNotification)
 
 
 void
-KeyController::keyPressed(KeyCode key)
+KeyController::keyPressed(KeyCode key, Modifiers mod, bool& propagate)
 {
-    LOGNS(Gui, gui, debug, "key controller, key pressed: " + Poco::NumberFormatter::format(key));
+    LOGNS(Gui, gui, debug, "key controller, key pressed: " + Poco::NumberFormatter::format(key) + ", modifiers: 0x" + Poco::NumberFormatter::formatHex(mod));
     Av::CtlMediaRenderer* pRenderer = _pControllerWidget->getSelectedRenderer();
+    bool fullscreen = false;
 
-    switch (key) {
-        case Gui::Controller::KeyM:
-        case Gui::Controller::KeyMenu:
-            _pControllerWidget->showMainMenu();
-            break;
-        case Gui::Controller::KeyLeft:
-            if (_pControllerWidget->getCurrentViewIndex()) {
-                _pControllerWidget->setCurrentViewIndex(_pControllerWidget->getCurrentViewIndex() - 1);
-            }
-            break;
-        case Gui::Controller::KeyRight:
-            if (_pControllerWidget->getCurrentViewIndex() < _pControllerWidget->getViewCount() - 1) {
-                _pControllerWidget->setCurrentViewIndex(_pControllerWidget->getCurrentViewIndex() + 1);
-            }
-            break;
-        case Gui::Controller::KeyUp:
-        case Gui::Controller::KeyDown:
-        case Gui::Controller::KeyReturn:
-            _pControllerWidget->navigateListWithKey(key);
-            break;
-        case Gui::Controller::KeyBack:
-            _pControllerWidget->back();
-            break;
-        case Gui::Controller::KeyP:
-        case Gui::Controller::KeyPlay:
-            if (pRenderer) {
-                pRenderer->playPressed();
-            }
-            break;
-        case Gui::Controller::KeyS:
-        case Gui::Controller::KeyStop:
-            if (pRenderer) {
-                pRenderer->stopPressed();
-            }
-            break;
-        case Gui::Controller::KeyH:
-        case Gui::Controller::KeyMute:
-            if (pRenderer) {
-                pRenderer->setMute(!pRenderer->getMute());
-            }
-            break;
-        case Gui::Controller::KeyU:
-        case Gui::Controller::KeyVolUp:
-            if (pRenderer) {
-                ui2 vol = pRenderer->getVolume();
-                if (vol + _volStep <= 100) {
-                    pRenderer->volumeChanged(pRenderer->getVolume() + _volStep);
+    if (mod == Gui::Controller::NoModifier) {
+        switch (key) {
+            case Gui::Controller::KeyMenu:
+                _pControllerWidget->showMainMenu();
+                break;
+            case Gui::Controller::KeyLeft:
+                if (_pControllerWidget->getCurrentViewIndex()) {
+                    _pControllerWidget->setCurrentViewIndex(_pControllerWidget->getCurrentViewIndex() - 1);
                 }
-            }
-            break;
-        case Gui::Controller::KeyD:
-        case Gui::Controller::KeyVolDown:
-            if (pRenderer) {
-                ui2 vol = pRenderer->getVolume();
-                if (vol - _volStep >= 0) {
-                    pRenderer->volumeChanged(vol - _volStep);
+                break;
+            case Gui::Controller::KeyRight:
+                if (_pControllerWidget->getCurrentViewIndex() < _pControllerWidget->getViewCount() - 1) {
+                    _pControllerWidget->setCurrentViewIndex(_pControllerWidget->getCurrentViewIndex() + 1);
                 }
-            }
-            break;
+                break;
+            case Gui::Controller::KeyUp:
+            case Gui::Controller::KeyDown:
+            case Gui::Controller::KeyReturn:
+                _pControllerWidget->navigateListWithKey(key);
+                break;
+            case Gui::Controller::KeyBack:
+                _pControllerWidget->back();
+                break;
+            case Gui::Controller::KeyPlay:
+                if (pRenderer) {
+                    pRenderer->playPressed();
+                }
+                break;
+            case Gui::Controller::KeyStop:
+                if (pRenderer) {
+                    pRenderer->stopPressed();
+                }
+                break;
+            case Gui::Controller::KeyMute:
+                if (pRenderer) {
+                    pRenderer->setMute(!pRenderer->getMute());
+                }
+                break;
+            case Gui::Controller::KeyVolUp:
+                if (pRenderer) {
+                    ui2 vol = pRenderer->getVolume();
+                    if (vol + _volStep <= 100) {
+                        pRenderer->volumeChanged(pRenderer->getVolume() + _volStep);
+                    }
+                }
+                break;
+            case Gui::Controller::KeyVolDown:
+                if (pRenderer) {
+                    ui2 vol = pRenderer->getVolume();
+                    if (vol - _volStep >= 0) {
+                        pRenderer->volumeChanged(vol - _volStep);
+                    }
+                }
+                break;
+        }
     }
-}
 
-
-void
-KeyController::keyPressedNonFullscreen(KeyCode key, Modifiers mod, bool& propagate)
-{
-    LOGNS(Gui, gui, debug, "key controller, key pressed non fullscreen: " + Poco::NumberFormatter::format(key));
     if (mod == Gui::Controller::ControlModifier) {
-        if (key == Gui::Controller::KeyQ) {
-            propagate = false;
-            _pControllerWidget->_pApplication->quit();
-        }
-        else if (key == Gui::Controller::KeyS) {
-            propagate = false;
-            if (_pControllerWidget->getState() == DeviceManager::Stopped) {
-                _pControllerWidget->_pApplication->start();
-            }
-            else {
-                _pControllerWidget->_pApplication->stop();
-            }
+        switch (key) {
+            case Gui::Controller::KeyQ:
+                propagate = false;
+                _pControllerWidget->_pApplication->quit();
+                break;
+            case Gui::Controller::KeyS:
+                propagate = false;
+                if (_pControllerWidget->getState() == DeviceManager::Stopped) {
+                    _pControllerWidget->_pApplication->start();
+                }
+                else {
+                    _pControllerWidget->_pApplication->stop();
+                }
+                break;
+            case Gui::Controller::KeyF:
+                fullscreen = !Poco::Util::Application::instance().config().getBool("application.fullscreen", false);
+                _pControllerWidget->_pApplication->setFullscreen(fullscreen);
+                Poco::Util::Application::instance().config().setBool("application.fullscreen", fullscreen);
+                _pControllerWidget->_pApplication->getFileConfiguration()->setBool("application.fullscreen", fullscreen);
+                break;
+            case Gui::Controller::KeyM:
+                _pControllerWidget->showMainMenu();
+                break;
+//            case Gui::Controller::KeyP:
+//                if (pRenderer) {
+//                    pRenderer->playPressed();
+//                }
+//                break;
+//            case Gui::Controller::KeyS:
+//            case Gui::Controller::KeyStop:
+//                if (pRenderer) {
+//                    pRenderer->stopPressed();
+//                }
+//                break;
+            case Gui::Controller::KeyH:
+                if (pRenderer) {
+                    pRenderer->setMute(!pRenderer->getMute());
+                }
+                break;
+            case Gui::Controller::KeyU:
+                if (pRenderer) {
+                    ui2 vol = pRenderer->getVolume();
+                    if (vol + _volStep <= 100) {
+                        pRenderer->volumeChanged(pRenderer->getVolume() + _volStep);
+                    }
+                }
+                break;
+            case Gui::Controller::KeyD:
+                if (pRenderer) {
+                    ui2 vol = pRenderer->getVolume();
+                    if (vol - _volStep >= 0) {
+                        pRenderer->volumeChanged(vol - _volStep);
+                    }
+                }
+                break;
         }
     }
 
+    if (mod == Gui::Controller::ShiftModifier) {
+        switch (key) {
+            case Gui::Controller::KeyP:
+                propagate = false;
+                if (pRenderer) {
+                    pRenderer->playPressed();
+                }
+                break;
+            case Gui::Controller::KeyS:
+                propagate = false;
+                if (pRenderer) {
+                    pRenderer->stopPressed();
+                }
+                break;
+        }
+    }
 }
 
 

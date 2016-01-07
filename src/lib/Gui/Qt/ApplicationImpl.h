@@ -65,6 +65,7 @@ public:
     std::set<QToolBar*>     _pToolBars;
     QtEventFilter*          _pEventFilter;
     QtPermanentEventFilter* _pPermanentEventFilter;
+    QString*                _pDefaultStyleSheet;
     QString*                _pFullscreenStyleSheet;
     bool                    _visible;
     int                     _width;

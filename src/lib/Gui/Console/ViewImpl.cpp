@@ -250,14 +250,14 @@ ViewImpl::activated()
 }
 
 
-void
-ViewImpl::keyPressed(int key)
-{
-}
+//void
+//ViewImpl::keyPressed(int key)
+//{
+//}
 
 
 bool
-ViewImpl::keyPressedNonFullscreen(int key, int modifiers)
+ViewImpl::keyPressed(int key, int modifiers)
 {
     return false;
 }

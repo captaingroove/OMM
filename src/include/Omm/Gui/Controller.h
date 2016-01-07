@@ -57,6 +57,7 @@ public:
     typedef enum { NoModifier = 0x00000000,
             ShiftModifier = 0x02000000,
             ControlModifier = 0x04000000,
+            MediaModifier = 0x06000000,
             AltModifier = 0x08000000,
             MetaModifier = 0x10000000,
             KeypadModifier = 0x20000000,
@@ -75,8 +76,8 @@ public:
     virtual void selected() {}
     virtual void released() {}
     virtual void activated() {}
-    virtual void keyPressed(KeyCode key) {}
-    virtual void keyPressedNonFullscreen(KeyCode key, Modifiers mod, bool& propagate) {}
+//    virtual void keyPressed(KeyCode key) {}
+    virtual void keyPressed(KeyCode key, Modifiers mod, bool& propagate) {}
     virtual void mouseHovered(const Position& pos) {}
     virtual void mouseMoved(const Position& pos) {}
     virtual void dragStarted() {}

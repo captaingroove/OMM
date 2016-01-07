@@ -113,7 +113,7 @@ elif [ "${1}" = "config" ]
 then
     # configure build system
 
-    # resgen needs to be build first and executed on host platform, not target platform
+    # resgen needs to be configured and build first and executed on host platform (not target platform)
     cd ${BIN_DIR}/resgen
     ${CMAKE_CMD} -G"${CMAKE_GENERATOR}" -DCMAKE_MODULE_PATH=${SRC_DIR}/cmake ${SRC_DIR}/src/util/resgen
     # make resgen, which is needed for building the libraries
@@ -121,7 +121,7 @@ then
     RESGEN=${BIN_DIR}/resgen/resgen; \
     echo "resgen for host platform should be available: ${RESGEN}"
 
-    # configure again to honor resgen's presence
+    # now configure all sources and honor the presence of resgen's binary for the host platform
     cd ..
     ${CMAKE_CMD} -G"${CMAKE_GENERATOR}" ${CMAKE_OPTS} -DRESGEN=${RESGEN} ${SRC_DIR}
 else

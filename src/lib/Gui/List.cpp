@@ -181,14 +181,16 @@ ListScrollAreaController::keyPressed(KeyCode key)
     LOG(gui, debug, "list scroll area key pressed");
     switch (key) {
         case Controller::KeyUp:
-            _pListView->highlightItem(_pListView->_highlightedRow - 1, false);
+//            _pListView->highlightItem(_pListView->_highlightedRow - 1, false);
+            _pListView->highlightUp();
             break;
         case Controller::KeyDown:
-            _pListView->highlightItem(_pListView->_highlightedRow + 1, false);
+            _pListView->highlightDown();
             break;
         case Controller::KeyReturn:
 //            _pListView->selectHighlightedItem();
-            _pListView->activateHighlightedItem();
+//            _pListView->activateHighlightedItem();
+            _pListView->activateHighlighted();
             break;
     }
 }
@@ -241,6 +243,27 @@ void
 ListView::activateRow(int row)
 {
     activatedItem(row, true);
+}
+
+
+void
+ListView::highlightUp()
+{
+    highlightItem(_highlightedRow - 1, false);
+}
+
+
+void
+ListView::highlightDown()
+{
+    highlightItem(_highlightedRow + 1, false);
+}
+
+
+void
+ListView::activateHighlighted()
+{
+    activateHighlightedItem();
 }
 
 

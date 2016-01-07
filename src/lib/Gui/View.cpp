@@ -524,9 +524,9 @@ View::setEnableRedraw(bool enable)
 
 
 void
-View::triggerKeyEvent(Controller::KeyCode key)
+View::triggerKeyEvent(Controller::KeyCode key, Controller::Modifiers modifiers, bool propagate)
 {
-    NOTIFY_CONTROLLER(Controller, keyPressed, key);
+    NOTIFY_CONTROLLER(Controller, keyPressed, key, modifiers, propagate);
 }
 
 

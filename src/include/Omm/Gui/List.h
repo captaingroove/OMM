@@ -68,6 +68,9 @@ public:
     void setItemViewHeight(int height);
     void selectRow(int row);
     void activateRow(int row);
+    void highlightUp();
+    void highlightDown();
+    void activateHighlighted();
 
     void resetListView();
     void addTopView(View* pView);

@@ -57,8 +57,8 @@ ViewImpl::initViewImpl(View* pView, QWidget* pNative, SignalProxy* pSignalProxy)
 
     _pNativeView->setAutoFillBackground(true);
 
-//    _pEventFilter = new QtEventFilter(this);
-//    _pNativeView->installEventFilter(_pEventFilter);
+    _pEventFilter = new QtEventFilter(this);
+    _pNativeView->installEventFilter(_pEventFilter);
 
     if (pView->getParent()) {
         QWidget* pParentWidget = static_cast<QWidget*>(pView->getParent()->getNativeView());
@@ -353,20 +353,20 @@ ViewImpl::activated()
 }
 
 
-void
-ViewImpl::keyPressed(int key)
-{
-    LOG(gui, debug, "view impl key pressed: " + Poco::NumberFormatter::format(key));
-    IMPL_NOTIFY_CONTROLLER(Controller, keyPressed, keyTranslateNativeCode(key));
-}
+//void
+//ViewImpl::keyPressed(int key)
+//{
+//    LOG(gui, debug, "view impl key pressed: " + Poco::NumberFormatter::format(key));
+//    IMPL_NOTIFY_CONTROLLER(Controller, keyPressed, keyTranslateNativeCode(key));
+//}
 
 
 bool
-ViewImpl::keyPressedNonFullscreen(int key, int modifiers)
+ViewImpl::keyPressed(int key, int modifiers)
 {
-    LOG(gui, debug, "view impl key pressed non fullscreen: " + Poco::NumberFormatter::format(key) + ", modifiers: " + Poco::NumberFormatter::formatHex(modifiers));
+    LOG(gui, debug, "view impl key pressed: " + Poco::NumberFormatter::format(key) + ", modifiers: 0x" + Poco::NumberFormatter::formatHex(modifiers) + ", view: " + _pView->getName());
     bool propagate = true;
-    IMPL_NOTIFY_CONTROLLER(Controller, keyPressedNonFullscreen, keyTranslateNativeCode(key), keyTranslateNativeModifiers(modifiers), propagate);
+    IMPL_NOTIFY_CONTROLLER(Controller, keyPressed, keyTranslateNativeCode(key), keyTranslateNativeModifiers(modifiers), propagate);
     return propagate;
 }
 
