@@ -240,7 +240,7 @@ AvTypeConverter::writeDuration(const r8& duration)
 }
 
 
-time
+Omm::time
 AvTypeConverter::readTime(const std::string& timeString)
 {
     Poco::DateTime res;
@@ -258,7 +258,7 @@ AvTypeConverter::readTime(const std::string& timeString)
 
 
 std::string
-AvTypeConverter::writeTime(const time& timeVal)
+AvTypeConverter::writeTime(const Omm::time& timeVal)
 {
     return Poco::DateTimeFormatter::format(timeVal, Poco::DateTimeFormat::ISO8601_FORMAT, 0).substr(11);
 }

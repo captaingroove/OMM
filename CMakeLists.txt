@@ -102,6 +102,7 @@ include_directories(${POCO_INCLUDE_DIRS})
 
 # build what is available in the source tree (libs, plugins, apps, tests)
 add_subdirectory(src)
+add_subdirectory(binding)
 
 # CPack related for creating binary distribution packages
 include(ConfigurePackager)

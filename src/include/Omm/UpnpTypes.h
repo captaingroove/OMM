@@ -1,7 +1,7 @@
 /***************************************************************************|
 |  OMM - Open Multimedia                                                    |
 |                                                                           |
-|  Copyright (C) 2009, 2010, 2011                                                 |
+|  Copyright (C) 2009, 2010, 2011                                           |
 |  Jörg Bakker (jb'at'open-multimedia.org)                                  |
 |                                                                           |
 |  This file is part of OMM.                                                |
@@ -22,6 +22,7 @@
 #ifndef UpnpTypes_INCLUDED
 #define	UpnpTypes_INCLUDED
 
+#include <Poco/Types.h>
 #include <Poco/URI.h>
 #include <Poco/Timestamp.h>
 

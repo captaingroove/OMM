@@ -38,176 +38,176 @@ namespace Av {
 class DeviceType
 {
 public:
-    const static std::string MEDIA_RENDERER_1;
-    const static std::string MEDIA_SERVER_1;
+    static const std::string MEDIA_RENDERER_1;
+    static const std::string MEDIA_SERVER_1;
 };
 
 
 class ServiceType
 {
 public:
-    const static std::string RC_1;
-    const static std::string AVT_1;
-    const static std::string CM_1;
-    const static std::string CD_1;
+    static const std::string RC_1;
+    static const std::string AVT_1;
+    static const std::string CM_1;
+    static const std::string CD_1;
 };
 
 
 class AvTransportEventedStateVar
 {
 public:
-    const static std::string TRANSPORT_STATE;
-    const static std::string TRANSPORT_STATUS;
-    const static std::string PLAYBACK_STORAGE_MEDIUM;
-    const static std::string POSSIBLE_PLAYBACK_STORAGE_MEDIA;
-    const static std::string POSSIBLE_RECORD_STORAGE_MEDIA;
-    const static std::string CURRENT_PLAY_MODE;
-    const static std::string TRANSPORT_PLAY_SPEED;
-    const static std::string RECORD_MEDIUM_WRITE_STATUS;
-    const static std::string POSSIBLE_RECORD_QUALITY_MODES;
-    const static std::string CURRENT_RECORD_QUALITY_MODE;
-    const static std::string NUMBER_OF_TRACKS;
-    const static std::string CURRENT_TRACK;
-    const static std::string CURRENT_TRACK_DURATION;
-    const static std::string CURRENT_MEDIA_DURATION;
-    const static std::string CURRENT_TRACK_URI;
-    const static std::string CURRENT_TRACK_META_DATA;
-    const static std::string AVTRANSPORT_URI;
-    const static std::string AVTRANSPORT_URI_META_DATA;
-    const static std::string NEXT_AVTRANSPORT_URI;
-    const static std::string NEXT_AVTRANSPORT_URI_META_DATA;
-    const static std::string CURRENT_TRANSPORT_ACTIONS;
+    static const std::string TRANSPORT_STATE;
+    static const std::string TRANSPORT_STATUS;
+    static const std::string PLAYBACK_STORAGE_MEDIUM;
+    static const std::string POSSIBLE_PLAYBACK_STORAGE_MEDIA;
+    static const std::string POSSIBLE_RECORD_STORAGE_MEDIA;
+    static const std::string CURRENT_PLAY_MODE;
+    static const std::string TRANSPORT_PLAY_SPEED;
+    static const std::string RECORD_MEDIUM_WRITE_STATUS;
+    static const std::string POSSIBLE_RECORD_QUALITY_MODES;
+    static const std::string CURRENT_RECORD_QUALITY_MODE;
+    static const std::string NUMBER_OF_TRACKS;
+    static const std::string CURRENT_TRACK;
+    static const std::string CURRENT_TRACK_DURATION;
+    static const std::string CURRENT_MEDIA_DURATION;
+    static const std::string CURRENT_TRACK_URI;
+    static const std::string CURRENT_TRACK_META_DATA;
+    static const std::string AVTRANSPORT_URI;
+    static const std::string AVTRANSPORT_URI_META_DATA;
+    static const std::string NEXT_AVTRANSPORT_URI;
+    static const std::string NEXT_AVTRANSPORT_URI_META_DATA;
+    static const std::string CURRENT_TRANSPORT_ACTIONS;
 };
 
 
 class AvTransportArgument
 {
 public:
-    const static std::string TRANSPORT_STATE_STOPPED;
-    const static std::string TRANSPORT_STATE_PLAYING;
-    const static std::string TRANSPORT_STATE_TRANSITIONING;
-    const static std::string TRANSPORT_STATE_PAUSED_PLAYBACK;
-    const static std::string TRANSPORT_STATE_PAUSED_RECORDING;
-    const static std::string TRANSPORT_STATE_RECORDING;
-    const static std::string TRANSPORT_STATE_NO_MEDIA_PRESENT;
-    const static std::string TRANSPORT_STATUS_OK;
-    const static std::string TRANSPORT_STATUS_ERROR_OCCURRED;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_UNKNOWN;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_DV;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_MINI_DV;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_VHS;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_W_VHS;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_S_VHS;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_D_VHS;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_VHSC;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_VIDEO8;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_HI8;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_CD_ROM;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_CD_DA;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_CD_R;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_CD_RW;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_VIDEO_CD;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_SACD;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_MD_AUDIO;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_MD_PICTURE;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_DVD_ROM;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_DVD_VIDEO;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_DVD_R;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_DVD_PLUS_RW;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_DVD_RW;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_DVD_RAM;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_DVD_AUDIO;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_DAT;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_LD;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_HDD;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_MICRO_MV;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_NETWORK;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_NONE;
-    const static std::string PLAYBACK_STORAGE_MEDIUM_NOT_IMPLEMENTED;
-    const static std::string CURRENT_PLAY_MODE_NORMAL;
-    const static std::string CURRENT_PLAY_MODE_SHUFFLE;
-    const static std::string CURRENT_PLAY_MODE_REPEAT_ONE;
-    const static std::string CURRENT_PLAY_MODE_REPEAT_ALL;
-    const static std::string CURRENT_PLAY_MODE_RANDOM;
-    const static std::string CURRENT_PLAY_MODE_DIRECT_1;
-    const static std::string CURRENT_PLAY_MODE_INTRO;
-    const static std::string TRANSPORT_PLAY_SPEED_1;
-    const static std::string RECORD_MEDIUM_WRITE_STATUS_WRITABLE;
-    const static std::string RECORD_MEDIUM_WRITE_STATUS_PROTECTED;
-    const static std::string RECORD_MEDIUM_WRITE_STATUS_NOT_WRITABLE;
-    const static std::string RECORD_MEDIUM_WRITE_STATUS_UNKOWN;
-    const static std::string RECORD_MEDIUM_WRITE_STATUS_NOT_IMPLEMENTED;
-    const static std::string CURRENT_RECORD_QUALITY_MODE_0_EP;
-    const static std::string CURRENT_RECORD_QUALITY_MODE_1_LP;
-    const static std::string CURRENT_RECORD_QUALITY_MODE_2_SP;
-    const static std::string CURRENT_RECORD_QUALITY_MODE_0_BASIC;
-    const static std::string CURRENT_RECORD_QUALITY_MODE_1_MEDIUM;
-    const static std::string CURRENT_RECORD_QUALITY_MODE_2_HIGH;
-    const static std::string CURRENT_RECORD_QUALITY_MODE_NOT_IMPLEMENTED;
-    const static std::string CURRENT_TRACK_DURATION_0;
-    const static std::string CURRENT_TRACK_META_DATA_NOT_IMPLEMENTED;
-    const static std::string RELATIVE_TIME_POSITION_NOT_IMPLEMENTED;
-    const static std::string CURRENT_TRANSPORT_ACTIONS_NOT_IMPLEMENTED;
-    const static std::string SEEK_MODE_TRACK_NR;
-    const static std::string SEEK_MODE_ABS_TIME;
-    const static std::string SEEK_MODE_REL_TIME;
-    const static std::string SEEK_MODE_ABS_COUNT;
-    const static std::string SEEK_MODE_REL_COUNT;
-    const static std::string SEEK_MODE_CHANNEL_FREQ;
-    const static std::string SEEK_MODE_TAPE_INDEX;
-    const static std::string SEEK_MODE_FRAME;
-    const static i4 RELATIVE_COUNTER_POSITION_UNDEFINED;
+    static const std::string TRANSPORT_STATE_STOPPED;
+    static const std::string TRANSPORT_STATE_PLAYING;
+    static const std::string TRANSPORT_STATE_TRANSITIONING;
+    static const std::string TRANSPORT_STATE_PAUSED_PLAYBACK;
+    static const std::string TRANSPORT_STATE_PAUSED_RECORDING;
+    static const std::string TRANSPORT_STATE_RECORDING;
+    static const std::string TRANSPORT_STATE_NO_MEDIA_PRESENT;
+    static const std::string TRANSPORT_STATUS_OK;
+    static const std::string TRANSPORT_STATUS_ERROR_OCCURRED;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_UNKNOWN;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_DV;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_MINI_DV;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_VHS;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_W_VHS;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_S_VHS;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_D_VHS;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_VHSC;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_VIDEO8;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_HI8;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_CD_ROM;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_CD_DA;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_CD_R;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_CD_RW;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_VIDEO_CD;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_SACD;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_MD_AUDIO;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_MD_PICTURE;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_DVD_ROM;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_DVD_VIDEO;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_DVD_R;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_DVD_PLUS_RW;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_DVD_RW;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_DVD_RAM;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_DVD_AUDIO;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_DAT;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_LD;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_HDD;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_MICRO_MV;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_NETWORK;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_NONE;
+    static const std::string PLAYBACK_STORAGE_MEDIUM_NOT_IMPLEMENTED;
+    static const std::string CURRENT_PLAY_MODE_NORMAL;
+    static const std::string CURRENT_PLAY_MODE_SHUFFLE;
+    static const std::string CURRENT_PLAY_MODE_REPEAT_ONE;
+    static const std::string CURRENT_PLAY_MODE_REPEAT_ALL;
+    static const std::string CURRENT_PLAY_MODE_RANDOM;
+    static const std::string CURRENT_PLAY_MODE_DIRECT_1;
+    static const std::string CURRENT_PLAY_MODE_INTRO;
+    static const std::string TRANSPORT_PLAY_SPEED_1;
+    static const std::string RECORD_MEDIUM_WRITE_STATUS_WRITABLE;
+    static const std::string RECORD_MEDIUM_WRITE_STATUS_PROTECTED;
+    static const std::string RECORD_MEDIUM_WRITE_STATUS_NOT_WRITABLE;
+    static const std::string RECORD_MEDIUM_WRITE_STATUS_UNKOWN;
+    static const std::string RECORD_MEDIUM_WRITE_STATUS_NOT_IMPLEMENTED;
+    static const std::string CURRENT_RECORD_QUALITY_MODE_0_EP;
+    static const std::string CURRENT_RECORD_QUALITY_MODE_1_LP;
+    static const std::string CURRENT_RECORD_QUALITY_MODE_2_SP;
+    static const std::string CURRENT_RECORD_QUALITY_MODE_0_BASIC;
+    static const std::string CURRENT_RECORD_QUALITY_MODE_1_MEDIUM;
+    static const std::string CURRENT_RECORD_QUALITY_MODE_2_HIGH;
+    static const std::string CURRENT_RECORD_QUALITY_MODE_NOT_IMPLEMENTED;
+    static const std::string CURRENT_TRACK_DURATION_0;
+    static const std::string CURRENT_TRACK_META_DATA_NOT_IMPLEMENTED;
+    static const std::string RELATIVE_TIME_POSITION_NOT_IMPLEMENTED;
+    static const std::string CURRENT_TRANSPORT_ACTIONS_NOT_IMPLEMENTED;
+    static const std::string SEEK_MODE_TRACK_NR;
+    static const std::string SEEK_MODE_ABS_TIME;
+    static const std::string SEEK_MODE_REL_TIME;
+    static const std::string SEEK_MODE_ABS_COUNT;
+    static const std::string SEEK_MODE_REL_COUNT;
+    static const std::string SEEK_MODE_CHANNEL_FREQ;
+    static const std::string SEEK_MODE_TAPE_INDEX;
+    static const std::string SEEK_MODE_FRAME;
+    static const i4 RELATIVE_COUNTER_POSITION_UNDEFINED;
 };
 
 
 class RenderingControlEventedStateVar
 {
 public:
-    const static std::string PRESET_NAME_LIST;
-    const static std::string BRIGHTNESS;
-    const static std::string CONTRAST;
-    const static std::string SHARPNESS;
-    const static std::string RED_VIDEO_GAIN;
-    const static std::string GREEN_VIDEO_GAIN;
-    const static std::string BLUE_VIDEO_GAIN;
-    const static std::string RED_BLACK_LEVEL;
-    const static std::string GREEN_BLACK_LEVEL;
-    const static std::string BLUE_BLACK_LEVEL;
-    const static std::string COLOR_TEMPERATURE;
-    const static std::string HORIZONTAL_KEYSTONE;
-    const static std::string VERTICAL_KEYSTONE;
-    const static std::string MUTE;
-    const static std::string VOLUME;
-    const static std::string VOLUME_DB;
-    const static std::string LOUDNESS;
+    static const std::string PRESET_NAME_LIST;
+    static const std::string BRIGHTNESS;
+    static const std::string CONTRAST;
+    static const std::string SHARPNESS;
+    static const std::string RED_VIDEO_GAIN;
+    static const std::string GREEN_VIDEO_GAIN;
+    static const std::string BLUE_VIDEO_GAIN;
+    static const std::string RED_BLACK_LEVEL;
+    static const std::string GREEN_BLACK_LEVEL;
+    static const std::string BLUE_BLACK_LEVEL;
+    static const std::string COLOR_TEMPERATURE;
+    static const std::string HORIZONTAL_KEYSTONE;
+    static const std::string VERTICAL_KEYSTONE;
+    static const std::string MUTE;
+    static const std::string VOLUME;
+    static const std::string VOLUME_DB;
+    static const std::string LOUDNESS;
 };
 
 
 class AvChannel
 {
 public:
-    const static std::string MASTER;
-    const static std::string LF;
-    const static std::string RF;
-    const static std::string CF;
-    const static std::string LFE;
-    const static std::string LS;
-    const static std::string RS;
-    const static std::string LFC;
-    const static std::string RFC;
-    const static std::string SD;
-    const static std::string SL;
-    const static std::string SR;
-    const static std::string T;
-    const static std::string B;
+    static const std::string MASTER;
+    static const std::string LF;
+    static const std::string RF;
+    static const std::string CF;
+    static const std::string LFE;
+    static const std::string LS;
+    static const std::string RS;
+    static const std::string LFC;
+    static const std::string RFC;
+    static const std::string SD;
+    static const std::string SL;
+    static const std::string SR;
+    static const std::string T;
+    static const std::string B;
 };
 
 
 class PresetName
 {
 public:
-    const static std::string FACTORY_DEFAULTS;
-    const static std::string INSTALLATION_DEFAULTS;
+    static const std::string FACTORY_DEFAULTS;
+    static const std::string INSTALLATION_DEFAULTS;
 };
 
 

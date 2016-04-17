@@ -34,6 +34,7 @@
 #include <Poco/Thread.h>
 #include <Poco/RunnableAdapter.h>
 #include <Poco/Timestamp.h>
+#include <Poco/Channel.h>
 
 #define LOG(LOGGER, LEVEL, MESSAGE) Log::instance()->LOGGER().LEVEL(MESSAGE);
 #define LOGNS(NAMESPACE, LOGGER, LEVEL, MESSAGE) NAMESPACE::Log::instance()->LOGGER().LEVEL(MESSAGE);
