@@ -951,11 +951,6 @@ _childCount(mediaObject._childCount)
 }
 
 
-MemoryMediaObject::~MemoryMediaObject()
-{
-}
-
-
 AbstractMediaObject*
 MemoryMediaObject::createChildObject()
 {

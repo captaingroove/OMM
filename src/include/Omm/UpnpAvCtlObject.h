@@ -51,7 +51,7 @@ public:
     CtlMediaObject(const CtlMediaObject& mediaObject);
 
     // factory methods
-    virtual AbstractMediaObject* createChildObject();
+    virtual CtlMediaObject* createChildObject();
 
     CtlMediaServer* getServer() const;
     void setServer(CtlMediaServer* pServer);
@@ -63,9 +63,9 @@ public:
 
     int fetchChildren(ui4 count = 25);
     bool fetchedAllChildren();
-    AbstractMediaObject* getParent();
+    CtlMediaObject* getParent();
 
-    virtual AbstractMediaObject* getChildForRow(ui4 row, bool useBlockCache = true);
+    virtual CtlMediaObject* getChildForRow(ui4 row, bool useBlockCache = true);
     /// if you don't use the block cache, you have to fetch some children first with fetchChildren()
 
     Icon* getIcon();
@@ -82,7 +82,7 @@ private:
     CtlMediaServer*                  _pServer;
     CtlMediaServerCode*              _pServerCode;
     std::string                      _searchText;
-    AbstractMediaObject*             _pParent;
+    CtlMediaObject*                  _pParent;
 };
 
 

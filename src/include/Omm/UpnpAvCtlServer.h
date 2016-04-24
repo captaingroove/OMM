@@ -77,8 +77,18 @@ public:
 };
 
 
+class CtlMediaServerGroup : public DeviceGroup
+{
+public:
+    CtlMediaServerGroup();
+
+    CtlMediaServer* getDevice(int index) const;
+    CtlMediaServer* getDevice(const std::string& uuid);
+    CtlMediaServer* getSelectedDevice() const;
+    virtual CtlMediaServer* createDevice();
+};
+
 } // namespace Av
 } // namespace Omm
-
 
 #endif

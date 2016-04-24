@@ -233,6 +233,7 @@ public:
     CsvList(const std::string& csvListString = "");
     CsvList(const std::string& item1, const std::string& item2, const std::string& item3 = "", const std::string& item4 = "", const std::string& item5 = "");
     CsvList(const CsvList& csvList);
+    virtual ~CsvList() {}
 
     typedef std::list<std::string>::iterator Iterator;
     Iterator begin();
@@ -315,6 +316,7 @@ class ConnectionManager
 {
 public:
     ConnectionManager(Device* pDevice);
+    virtual ~ConnectionManager() {}
 
     typedef std::map<ui4, Connection*>::iterator ConnectionIterator;
     ConnectionIterator beginConnection();

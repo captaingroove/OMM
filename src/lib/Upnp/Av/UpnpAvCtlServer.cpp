@@ -200,6 +200,40 @@ MediaServerGroupDelegate::shortName()
 }
 
 
+CtlMediaServerGroup::CtlMediaServerGroup() :
+DeviceGroup(DeviceType::MEDIA_SERVER_1, "Media")
+{
+}
+
+
+CtlMediaServer*
+CtlMediaServerGroup::getDevice(int index) const
+{
+    return dynamic_cast<CtlMediaServer*>(DeviceGroup::getDevice(index));
+}
+
+
+CtlMediaServer*
+CtlMediaServerGroup::getDevice(const std::string& uuid)
+{
+    return dynamic_cast<CtlMediaServer*>(DeviceGroup::getDevice(uuid));
+}
+
+
+CtlMediaServer*
+CtlMediaServerGroup::getSelectedDevice() const
+{
+    return dynamic_cast<CtlMediaServer*>(DeviceGroup::getSelectedDevice());
+}
+
+
+CtlMediaServer*
+CtlMediaServerGroup::createDevice()
+{
+    return new CtlMediaServer;
+}
+
+
 } // namespace Av
 } // namespace Omm
 

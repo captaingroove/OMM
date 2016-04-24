@@ -1,4 +1,6 @@
 find_package(SWIG REQUIRED)
+set(SWIG_EXECUTABLE /usr/bin/swig3.0)
+message(STATUS "SWIG executable: " ${SWIG_EXECUTABLE})
 include(${SWIG_USE_FILE})
 
 #set(Python_ADDITIONAL_VERSIONS "3")
@@ -30,10 +32,10 @@ set(PY_MOD_UPNP upnp)
 set_source_files_properties(${PY_MOD_UPNP}.i PROPERTIES CPLUSPLUS ON)
 set_source_files_properties(${PY_MOD_UPNP}.i PROPERTIES SWIG_FLAGS "-threads")
 swig_add_module(${PY_MOD_UPNP} python ${PY_MOD_UPNP}.i)
-swig_link_libraries(${PY_MOD_UPNP} ${PYTHON_LIBRARIES} ${OMM} ${OMM_LOG} ${OMM_UTIL} ${OMM_NET} ${OMM_SYS})
-
-set(PY_MOD_UPNP upnpav)
-set_source_files_properties(${PY_MOD_UPNP}.i PROPERTIES CPLUSPLUS ON)
-set_source_files_properties(${PY_MOD_UPNP}.i PROPERTIES SWIG_FLAGS "-threads")
-swig_add_module(${PY_MOD_UPNP} python ${PY_MOD_UPNP}.i)
 swig_link_libraries(${PY_MOD_UPNP} ${PYTHON_LIBRARIES} ${OMM} ${OMM_AV} ${OMM_LOG} ${OMM_UTIL} ${OMM_NET} ${OMM_SYS})
+
+#set(PY_MOD_UPNP upnpav)
+#set_source_files_properties(${PY_MOD_UPNP}.i PROPERTIES CPLUSPLUS ON)
+#set_source_files_properties(${PY_MOD_UPNP}.i PROPERTIES SWIG_FLAGS "-threads")
+#swig_add_module(${PY_MOD_UPNP} python ${PY_MOD_UPNP}.i)
+#swig_link_libraries(${PY_MOD_UPNP} ${PYTHON_LIBRARIES} ${OMM} ${OMM_AV} ${OMM_LOG} ${OMM_UTIL} ${OMM_NET} ${OMM_SYS})

@@ -380,6 +380,39 @@ MediaRendererGroupDelegate::mediaItemSelectedHandler(const Poco::AutoPtr<MediaOb
 }
 
 
+CtlMediaRendererGroup::CtlMediaRendererGroup() :
+DeviceGroup(DeviceType::MEDIA_RENDERER_1, "Media")
+{
+}
+
+
+CtlMediaRenderer*
+CtlMediaRendererGroup::getDevice(int index) const
+{
+    return dynamic_cast<CtlMediaRenderer*>(DeviceGroup::getDevice(index));
+}
+
+
+CtlMediaRenderer*
+CtlMediaRendererGroup::getDevice(const std::string& uuid)
+{
+    return dynamic_cast<CtlMediaRenderer*>(DeviceGroup::getDevice(uuid));
+}
+
+
+CtlMediaRenderer*
+CtlMediaRendererGroup::getSelectedDevice() const
+{
+    return dynamic_cast<CtlMediaRenderer*>(DeviceGroup::getSelectedDevice());
+}
+
+
+CtlMediaRenderer*
+CtlMediaRendererGroup::createDevice()
+{
+    return new CtlMediaRenderer;
+}
+
 } // namespace Av
 } // namespace Omm
 

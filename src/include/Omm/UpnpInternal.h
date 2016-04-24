@@ -441,8 +441,8 @@ public:
     DevDeviceCode();
     ~DevDeviceCode();
 
-    std::string& deviceDescription();
-    std::map<std::string,std::string*>& serviceDescriptions();
+//    std::string& deviceDescription();
+//    std::map<std::string,std::string*>& serviceDescriptions();
 
 protected:
     virtual void actionHandler(Action* action) = 0;

@@ -50,7 +50,7 @@ _searchText(mediaObject._searchText)
 }
 
 
-AbstractMediaObject*
+CtlMediaObject*
 CtlMediaObject::createChildObject()
 {
     CtlMediaObject* pChildObject = _pServer->createMediaObject();
@@ -103,19 +103,19 @@ CtlMediaObject::fetchedAllChildren()
 }
 
 
-AbstractMediaObject*
+CtlMediaObject*
 CtlMediaObject::getChildForRow(ui4 row, bool useBlockCache)
 {
     if (useBlockCache) {
-        return BlockCache::getMediaObjectForRow(row);
+        return dynamic_cast<CtlMediaObject*>(BlockCache::getMediaObjectForRow(row));
     }
     else {
-        return MemoryMediaObject::getChildForRow(row);
+        return dynamic_cast<CtlMediaObject*>(MemoryMediaObject::getChildForRow(row));
     }
 }
 
 
-AbstractMediaObject*
+CtlMediaObject*
 CtlMediaObject::getParent()
 {
     return _pParent;

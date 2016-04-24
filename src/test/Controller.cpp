@@ -19,111 +19,50 @@
 |  along with this program.  If not, see <http://www.gnu.org/licenses/>.    |
  ***************************************************************************/
 
+#include <iostream>
 
 #include "Poco/Util/ServerApplication.h"
-#include "Poco/Util/Option.h"
-#include "Poco/Util/OptionSet.h"
-#include "Poco/Util/HelpFormatter.h"
 
+#include "Log.h"
 #include "Upnp.h"
-
-using Poco::Util::ServerApplication;
-using Poco::Util::Application;
-using Poco::Util::Option;
-using Poco::Util::OptionSet;
-using Poco::Util::HelpFormatter;
+//#include "UpnpAv.h"
+//#include "UpnpAvCtlServer.h"
 
 
-class MyController : public Omm::Controller
+class TestController : public Omm::Controller
 {
-    virtual void deviceAdded(Omm::DeviceContainer* device)
+    virtual void addDeviceContainer(Omm::DeviceContainer* pDeviceContainer, int index, bool begin)
     {
-        std::cerr << "MyController::deviceAdded() uuid: " << device->getRootDevice()->getUuid() << std::endl;
+        std::cout << "TestController device container added(), root device uuid: " + pDeviceContainer->getRootDevice()->getUuid() << std::endl;
     }
-    
-    virtual void deviceRemoved(Omm::DeviceContainer* device)
+
+    virtual void removeDeviceContainer(Omm::DeviceContainer* pDeviceContainer, int index, bool begin)
     {
-        std::cerr << "MyController::deviceRemoved() uuid: " << device->getRootDevice()->getUuid() << std::endl;
+        std::cout << "TestController device container removed(), root device uuid: " + pDeviceContainer->getRootDevice()->getUuid() << std::endl;
     }
-    
 };
 
 
-class ControllerTest: public Poco::Util::ServerApplication
+class ControllerApp: public Poco::Util::ServerApplication
 {
-public:
-    ControllerTest(): _helpRequested(false)
-    {
-    }
-    
-    ~ControllerTest()
-    {
-    }
-    
 protected:
-    void initialize(Application& self)
-    {
-        loadConfiguration(); // load default configuration files, if present
-        ServerApplication::initialize(self);
-    }
-    
-    void uninitialize()
-    {
-        ServerApplication::uninitialize();
-    }
-    
-    void defineOptions(OptionSet& options)
-    {
-        ServerApplication::defineOptions(options);
-        
-        options.addOption(
-                           Option("help", "h", "display help information on command line arguments")
-                           .required(false)
-                           .repeatable(false));
-    }
-    
-    void handleOption(const std::string& name, const std::string& value)
-    {
-        ServerApplication::handleOption(name, value);
-        
-        if (name == "help")
-            _helpRequested = true;
-    }
-    
-    void displayHelp()
-    {
-        HelpFormatter helpFormatter(options());
-        helpFormatter.setCommand(commandName());
-        helpFormatter.setUsage("OPTIONS");
-        helpFormatter.setHeader("A simple UPnP Controller.");
-        helpFormatter.format(std::cout);
-    }
-    
     int main(const std::vector<std::string>& args)
     {
-        if (_helpRequested)
-        {
-            displayHelp();
-        }
-        else
-        {
-        // get parameters from configuration file
-//             unsigned short port = (unsigned short) config().getInt("EchoServer.port", 9977);
-            MyController controller;
-            controller.start();
-            std::cerr << "ControllerTest::main() waiting for termination request" << std::endl;
-            waitForTerminationRequest();
-        }
+        TestController controller;
+//        Omm::Av::CtlMediaServerGroup deviceGroup;
+//        controller.registerDeviceGroup(&deviceGroup);
+        controller.init();
+        controller.setState(Omm::Controller::Public);
+        Omm::LOG(upnp, debug, "ControllerApp::main() waiting for termination request");
+        waitForTerminationRequest();
+        controller.setState(Omm::Controller::Stopped);
         return Application::EXIT_OK;
     }
-    
-private:
-    bool _helpRequested;
 };
 
 
 int main(int argc, char** argv)
 {
-    ControllerTest app;
+    ControllerApp app;
     return app.run(argc, argv);
 }

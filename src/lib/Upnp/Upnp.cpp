@@ -5384,7 +5384,8 @@ DeviceGroup::groupIcon()
 Device*
 DeviceGroup::createDevice()
 {
-    return 0;
+    LOG(upnp, warning, "factory method virtual Device* DeviceGroup::createDevice() possibly not implemented in subclass");
+    return new Device;
 }
 
 

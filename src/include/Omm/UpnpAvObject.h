@@ -312,6 +312,7 @@ class AbstractProperty
 {
 public:
     AbstractProperty(PropertyImpl* pPropertyImpl);
+    virtual ~AbstractProperty() {}
 
     virtual void setName(const std::string& name);
     virtual void setValue(const std::string& value);
@@ -423,7 +424,7 @@ class MemoryMediaObject : public AbstractMediaObject
 public:
     MemoryMediaObject();
     MemoryMediaObject(const MemoryMediaObject& mediaObject);
-    virtual ~MemoryMediaObject();
+    virtual ~MemoryMediaObject() {}
 
     // factory methods
     virtual AbstractMediaObject* createChildObject();
@@ -545,6 +546,7 @@ class BlockCache : public AbstractMediaObjectCache
 {
 public:
     BlockCache(ui4 blockSize = 25);
+    virtual ~BlockCache() {}
 
     virtual AbstractMediaObject* getMediaObjectForRow(ui4 row);
     virtual void erase(std::vector<AbstractMediaObject*>::iterator begin, std::vector<AbstractMediaObject*>::iterator end);

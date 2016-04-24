@@ -3,97 +3,81 @@ include_directories(
 ../include/Omm
 )
 
-SET(OMMTEST_SSDP_SRCS
-Ssdp.cpp
-)
-
-#SET( OMMTEST_DEVICE_SRCS
+#set( OMMTEST_DEVICE_SRCS
 #device.cpp
 #)
 
-# SET( OMMTEST_NETWORK_LIGHT_SRCS
+# set( OMMTEST_NETWORK_LIGHT_SRCS
 # network_light.cpp
 # network_light_implementation.cpp
 # network_light_application.cpp
 # )
 
-SET(OMMTEST_OMMLIGHT_CTRL_SRCS
-netlight_ctrl.cpp
-netlight_ctrl_impl.cpp
-netlight_ctrl_appl.cpp
-)
+#set(OMMTEST_OMMLIGHT_CTRL_SRCS
+#netlight_ctrl.cpp
+#netlight_ctrl_impl.cpp
+#netlight_ctrl_appl.cpp
+#)
 
-SET(OMMTEST_CONTROLLER_SRCS
-controller.cpp
-)
+#set(OMMTEST_MEDIAOBJECT_SRCS
+#MediaObjectTest.cpp
+#)
 
-SET(OMMTEST_MEDIAOBJECT_SRCS
-MediaObjectTest.cpp
-)
-
-# SET( OMMTEST_HTTPFILESERVER_SRCS
+# set( OMMTEST_HTTPFILESERVER_SRCS
 # HttpFileServerTest.cpp
 # )
 
- ADD_EXECUTABLE(ssdplistener
- ${OMMTEST_SSDP_SRCS}
+ add_executable(ssdplistener
+ Ssdp.cpp
  )
 
-# ADD_EXECUTABLE( device_test
+# add_executable(device_test
 # ${OMMTEST_DEVICE_SRCS}
 # )
 
-# ADD_EXECUTABLE( network_light
+# add_executable(network_light
 # ${OMMTEST_NETWORK_LIGHT_SRCS}
 # )
 
-# ADD_EXECUTABLE( netlight_ctrl
+# add_executable(netlight_ctrl
 # ${OMMTEST_OMMLIGHT_CTRL_SRCS}
 # )
 #
-# ADD_EXECUTABLE( controller_test
-# ${OMMTEST_CONTROLLER_SRCS}
-# )
-#
-# ADD_EXECUTABLE( media_object_test
+# add_executable(media_object_test
 # ${OMMTEST_MEDIAOBJECT_SRCS}
 # )
 
-# ADD_EXECUTABLE( file_server_test
+# add_executable(file_server_test
 # ${OMMTEST_HTTPFILESERVER_SRCS}
 # )
 
 
- TARGET_LINK_LIBRARIES(ssdplistener
+ target_link_libraries(ssdplistener
  ${OMM}
  ${POCO_UTIL}
  )
 
-# TARGET_LINK_LIBRARIES( device_test
+# target_link_libraries(device_test
 # ${OMM}
 # ${POCO_UTIL}
 # )
 
-# TARGET_LINK_LIBRARIES( network_light
+# target_link_libraries(network_light
 # ${OMM}
 # ${POCO_UTIL}
 # )
 
-# TARGET_LINK_LIBRARIES( netlight_ctrl
+# target_link_libraries(netlight_ctrl
 # ${OMM}
 # ${POCO_UTIL}
 # )
 #
-# TARGET_LINK_LIBRARIES( controller_test
-# ${OMM}
-# ${POCO_UTIL}
-# )
 #
-# TARGET_LINK_LIBRARIES( media_object_test
+# target_link_libraries(media_object_test
 # ${OMM_AV}
 # )
 
-# TARGET_LINK_LIBRARIES( file_server_test
+# target_link_libraries(file_server_test
 # ${OMM_AV}
 # ${POCO_UTIL}
 # )
@@ -117,7 +101,7 @@ add_executable(bytequeuestress
 ByteQueueStress.cpp
 )
 
-TARGET_LINK_LIBRARIES(bytequeuestress
+target_link_libraries(bytequeuestress
 ${POCO_UTIL}
 ${OMM_UTIL}
 ${OMM}
@@ -154,6 +138,23 @@ ${OMM_AV}
 add_executable(search
 SearchCriteria.cpp
 )
+
+target_link_libraries(search
+${OMM}
+${OMM_AV}
+)
+
+
+add_executable(controller
+Controller.cpp
+)
+
+target_link_libraries(controller
+${OMM}
+${OMM_AV}
+${POCO_UTIL}
+)
+
 
 target_link_libraries(search
 ${OMM}

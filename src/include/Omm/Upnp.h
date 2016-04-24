@@ -464,10 +464,10 @@ protected:
     virtual void addDeviceContainer(DeviceContainer* pDeviceContainer, int index, bool begin) {}
     virtual void removeDeviceContainer(DeviceContainer* pDeviceContainer, int index, bool begin) {}
 
-    virtual void addDeviceGroup(DeviceGroup* pDeviceGroup, bool begin) {}
-    /// called when a new device type is discovered.
-    virtual void removeDeviceGroup(DeviceGroup* pDeviceGroup, bool begin) {}
-    /// called when a last device of a certain type disappears.
+//    virtual void addDeviceGroup(DeviceGroup* pDeviceGroup, bool begin) {}
+//    /// called when a new device type is discovered (not implemented, yet)
+//    virtual void removeDeviceGroup(DeviceGroup* pDeviceGroup, bool begin) {}
+//    /// called when a last device of a certain type disappears (not implemented, yet)
 
     // next two methods should go into private api
     virtual void addDeviceContainer(DeviceContainer* pDeviceContainer);
@@ -685,6 +685,7 @@ class DeviceGroup
 public:
     DeviceGroup(const std::string& deviceType, const std::string& shortName);
     DeviceGroup(DeviceGroupDelegate* pDeviceGroupDelegate);
+    virtual ~DeviceGroup() {}
 
     int getDeviceCount() const;
     Device* getDevice(int index) const;

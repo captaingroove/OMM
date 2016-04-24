@@ -38,7 +38,6 @@ class AvController;
 class CtlMediaServerCode;
 class CtlMediaRendererCode;
 class CtlMediaObject;
-class CtlMediaObject;
 class MediaItemNotification;
 class MediaObjectSelectedNotification;
 class ConnectionManager;
@@ -52,7 +51,7 @@ public:
     virtual void addCtlDeviceCode();
     virtual void initController();
 
-    void setObject(CtlMediaObject* pObject, CtlMediaObject* pParentObject, ui4 row);
+    void setObject(CtlMediaObject* pObject, CtlMediaObject* pParentObject=0, ui4 row=0);
     CtlMediaObject* getObject();
     void playPressed();
     void stopPressed();
@@ -100,6 +99,17 @@ private:
     void mediaItemSelectedHandler(const Poco::AutoPtr<MediaObjectSelectedNotification>& pMediaItemNotification);
 };
 
+
+class CtlMediaRendererGroup : public DeviceGroup
+{
+public:
+    CtlMediaRendererGroup();
+
+    CtlMediaRenderer* getDevice(int index) const;
+    CtlMediaRenderer* getDevice(const std::string& uuid);
+    CtlMediaRenderer* getSelectedDevice() const;
+    virtual CtlMediaRenderer* createDevice();
+};
 
 } // namespace Av
 } // namespace Omm
