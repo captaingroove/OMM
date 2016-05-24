@@ -21,6 +21,9 @@
 
 #include <sstream>
 #include <fstream>
+#include <map>
+#include <list>
+#include <vector>
 
 #include <Poco/File.h>
 #include <Poco/StreamCopier.h>
@@ -31,18 +34,28 @@
 #include <Poco/Net/HTTPServerResponse.h>
 #include <Poco/Net/HTTPServerParams.h>
 #include <Poco/Net/HTTPClientSession.h>
-#include "Poco/Data/SQLite/Connector.h"
-#include "Poco/Data/RecordSet.h"
-
-#include <map>
-#include <list>
-#include <vector>
+#include <Poco/Data/SQLite/Connector.h>
+#include <Poco/Data/RecordSet.h>
+#include <Poco/Data/Binding.h>
 #include <Poco/LineEndingConverter.h>
 #include <Poco/UTF8Encoding.h>
 #include <Poco/TextConverter.h>
 #include <Poco/URI.h>
 #include <Poco/UUIDGenerator.h>
 #include <Poco/Path.h>
+#ifdef POCO_VERSION_HEADER_FOUND
+#include <Poco/Version.h>
+#endif
+
+#if (POCO_VERSION & 0xFFFFFFFF) < 0x01050000
+using Poco::Data::now;
+using Poco::Data::into;
+using Poco::Data::use;
+#else
+using Poco::Data::Keywords::now;
+using Poco::Data::Keywords::into;
+using Poco::Data::Keywords::use;
+#endif
 
 #include "UpnpAvServer.h"
 #include "UpnpInternal.h"
@@ -1646,7 +1659,7 @@ DatabaseCache::setCacheFilePath(const std::string& cacheFilePath)
     createTableString += ", xml VARCHAR)";
 
     try {
-        *_pSession << createTableString, Poco::Data::now;
+        *_pSession << createTableString, now;
     }
     catch (Poco::Exception& e) {
         LOG(upnpav, warning, "database cache creating object cache table failed: " + e.displayText());
@@ -1660,7 +1673,7 @@ DatabaseCache::rowCount()
 {
     ui4 totalCount = 0;
     try {
-        *_pSession << "SELECT COUNT(idx) FROM " + _cacheTableName, Poco::Data::into(totalCount), Poco::Data::now;
+        *_pSession << "SELECT COUNT(idx) FROM " + _cacheTableName, into(totalCount), now;
     }
     catch (Poco::Exception& e) {
         LOG(upnpav, warning, "database cache get row count failed: " + e.displayText());
@@ -1677,7 +1690,7 @@ DatabaseCache::getMediaObjectForIndex(ui4 index, bool isVirtual)
     std::vector<std::string> objectClass;
     std::vector<std::string> xml;
     try {
-        *_pSession << "SELECT class, xml FROM " + _cacheTableName + " WHERE idx = :index", Poco::Data::use(index), Poco::Data::into(objectClass), Poco::Data::into(xml), Poco::Data::now;
+        *_pSession << "SELECT class, xml FROM " + _cacheTableName + " WHERE idx = :index", use(index), into(objectClass), into(xml), now;
     }
     catch (Poco::Exception& e) {
         LOG(upnpav, error, "database cache get object for index failed: " + e.displayText());
@@ -1732,7 +1745,7 @@ DatabaseCache::getBlockAtRow(std::vector<ServerObject*>& block, ServerContainer*
             ui4 index = pParentContainer->_childrenPlaylistIndices[r];
             try {
                 *_pSession << "SELECT xml FROM " + _cacheTableName + " WHERE idx = " + Poco::NumberFormatter::format(index),
-                        Poco::Data::into(xml), Poco::Data::now;
+                        into(xml), now;
             }
             catch (Poco::Exception& e) {
                 LOG(upnpav, error, "database cache get object for index failed: " + e.displayText());
@@ -1814,7 +1827,7 @@ DatabaseCache::getBlockAtRow(std::vector<ServerObject*>& block, ServerContainer*
     ui4 totalCount = 0;
     if (_totalCountQueryCache.find(whereClause) == _totalCountQueryCache.end()) {
         LOG(upnpav, debug, "database cache execute total count query");
-        *_pSession << "SELECT COUNT(idx) FROM " + _cacheTableName + " WHERE " + whereClause, Poco::Data::into(totalCount), Poco::Data::now;
+        *_pSession << "SELECT COUNT(idx) FROM " + _cacheTableName + " WHERE " + whereClause, into(totalCount), now;
         LOG(upnpav, debug, "database cache total count query executed, number of objects: " + Poco::NumberFormatter::format(totalCount));
         _totalCountQueryCache[whereClause] = totalCount;
     }
@@ -1836,7 +1849,7 @@ DatabaseCache::getBlockAtRow(std::vector<ServerObject*>& block, ServerContainer*
     LOG(upnpav, debug, "database cache parent index: " + Poco::NumberFormatter::format(parentIndex));
     LOG(upnpav, debug, "database cache execute query: " + statement);
     if (useParentIndex) {
-        select << statement, Poco::Data::use(parentIndex);
+        select << statement, use(parentIndex);
     }
     else {
         select << statement;
@@ -1895,8 +1908,8 @@ DatabaseCache::getIndices(std::vector<ui4>& indices, const std::string& sort)
 {
     // TODO: execute same query as in getBlockAtRow(), depending on _layout and sort.
     try {
-//        *_pSession << "SELECT idx FROM " + _cacheTableName + " WHERE class <> \"" + AvClass::className(AvClass::CONTAINER) + "\"", Poco::Data::into(indices), Poco::Data::now;
-        *_pSession << "SELECT idx FROM " + _cacheTableName, Poco::Data::into(indices), Poco::Data::now;
+//        *_pSession << "SELECT idx FROM " + _cacheTableName + " WHERE class <> \"" + AvClass::className(AvClass::CONTAINER) + "\"", into(indices), now;
+        *_pSession << "SELECT idx FROM " + _cacheTableName, into(indices), now;
     }
     catch (Poco::Exception& e) {
         LOG(upnpav, error, "database cache get indices failed: " + e.displayText());
@@ -1909,7 +1922,7 @@ DatabaseCache::getUpdateIds(std::map<ui4, ui4>& updateIds)
 {
     std::vector< Poco::Tuple<ui4, ui4> > ids;
     try {
-        *_pSession << "SELECT idx, updid FROM " + _cacheTableName, Poco::Data::into(ids), Poco::Data::now;
+        *_pSession << "SELECT idx, updid FROM " + _cacheTableName, into(ids), now;
         for (std::vector< Poco::Tuple<ui4, ui4> >::const_iterator it = ids.begin(); it != ids.end(); ++it) {
             updateIds[it->get<0>()] = it->get<1>();
         }
@@ -1951,22 +1964,22 @@ DatabaseCache::insertMediaObject(ServerObject* pObject)
     try {
         switch (props.size()) {
             case 2:
-                *_pSession << insertString, Poco::Data::use(index), Poco::Data::use(parIndex), Poco::Data::use(mod),
-                        Poco::Data::use(props[0]), Poco::Data::use(props[1]), Poco::Data::use(xml), Poco::Data::now;
+                *_pSession << insertString, use(index), use(parIndex), use(mod),
+                        use(props[0]), use(props[1]), use(xml), now;
                 break;
             case 3:
-                *_pSession << insertString, Poco::Data::use(index), Poco::Data::use(parIndex), Poco::Data::use(mod),
-                        Poco::Data::use(props[0]), Poco::Data::use(props[1]), Poco::Data::use(props[2]), Poco::Data::use(xml), Poco::Data::now;
+                *_pSession << insertString, use(index), use(parIndex), use(mod),
+                        use(props[0]), use(props[1]), use(props[2]), use(xml), now;
                 break;
             case 4:
-                *_pSession << insertString, Poco::Data::use(index), Poco::Data::use(parIndex), Poco::Data::use(mod),
-                        Poco::Data::use(props[0]), Poco::Data::use(props[1]), Poco::Data::use(props[2]), Poco::Data::use(props[3]),
-                        Poco::Data::use(xml), Poco::Data::now;
+                *_pSession << insertString, use(index), use(parIndex), use(mod),
+                        use(props[0]), use(props[1]), use(props[2]), use(props[3]),
+                        use(xml), now;
                 break;
             case 5:
-                *_pSession << insertString, Poco::Data::use(index), Poco::Data::use(parIndex), Poco::Data::use(mod),
-                        Poco::Data::use(props[0]), Poco::Data::use(props[1]), Poco::Data::use(props[2]), Poco::Data::use(props[3]),
-                        Poco::Data::use(props[4]), Poco::Data::use(xml), Poco::Data::now;
+                *_pSession << insertString, use(index), use(parIndex), use(mod),
+                        use(props[0]), use(props[1]), use(props[2]), use(props[3]),
+                        use(props[4]), use(xml), now;
                 break;
         }
     }
@@ -1990,7 +2003,7 @@ DatabaseCache::removeMediaObjectForIndex(ui4 index)
 {
     LOG(upnpav, debug, "database cache remove media object with index: " + Poco::NumberFormatter::format(index));
     try {
-        *_pSession << "DELETE FROM " + _cacheTableName + " WHERE idx = " + Poco::NumberFormatter::format(index), Poco::Data::now;
+        *_pSession << "DELETE FROM " + _cacheTableName + " WHERE idx = " + Poco::NumberFormatter::format(index), now;
     }
     catch (Poco::Exception& e) {
         LOG(upnpav, error, "database cache remove media object failed: " + e.displayText());
@@ -2109,8 +2122,8 @@ DatabaseCache::createDatabaseIndices()
     }
     indexedProps += "title";
     try {
-        *_pSession << "CREATE UNIQUE INDEX idx ON " + _cacheTableName + "(idx)", Poco::Data::now;
-        *_pSession << "CREATE INDEX prop_idx ON " + _cacheTableName + "(" + indexedProps + ")", Poco::Data::now;
+        *_pSession << "CREATE UNIQUE INDEX idx ON " + _cacheTableName + "(idx)", now;
+        *_pSession << "CREATE INDEX prop_idx ON " + _cacheTableName + "(" + indexedProps + ")", now;
     }
     catch (Poco::Exception& e) {
         LOG(upnpav, warning, "database cache creating index on object cache table failed: " + e.displayText());

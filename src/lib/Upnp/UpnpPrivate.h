@@ -95,7 +95,8 @@ private:
     void setupSockets();
 //    void resetSockets();
 
-    void onMulticastSsdpMessage(Poco::Net::ReadableNotification* pNotification);
+    void onListenerMulticastSsdpMessage(Poco::Net::ReadableNotification* pNotification);
+    void onSenderMulticastSsdpMessage(Poco::Net::ReadableNotification* pNotification);
     void onLocalSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pMessage);
 
     unsigned int                        _mode;

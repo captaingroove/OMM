@@ -358,8 +358,8 @@ SsdpSocket::startListen()
         LOG(ssdp, information, "starting SSDP multicast listener ...");
         _pMulticastListenerThread = new Poco::Thread;
         _pMulticastReactor = new Poco::Net::SocketReactor;
-        _pMulticastReactor->addEventHandler(*_pSsdpSenderSocket, Poco::Observer<SsdpSocket, Poco::Net::ReadableNotification>(*this, &SsdpSocket::onMulticastSsdpMessage));
-        _pMulticastReactor->addEventHandler(*_pSsdpListenerSocket, Poco::Observer<SsdpSocket, Poco::Net::ReadableNotification>(*this, &SsdpSocket::onMulticastSsdpMessage));
+        _pMulticastReactor->addEventHandler(*_pSsdpListenerSocket, Poco::Observer<SsdpSocket, Poco::Net::ReadableNotification>(*this, &SsdpSocket::onListenerMulticastSsdpMessage));
+        _pMulticastReactor->addEventHandler(*_pSsdpSenderSocket, Poco::Observer<SsdpSocket, Poco::Net::ReadableNotification>(*this, &SsdpSocket::onSenderMulticastSsdpMessage));
         _pMulticastListenerThread->start(*_pMulticastReactor);
     }
 
@@ -519,18 +519,26 @@ SsdpSocket::setMode(unsigned int mode)
 
 
 void
-SsdpSocket::onMulticastSsdpMessage(Poco::Net::ReadableNotification* pNotification)
+SsdpSocket::onListenerMulticastSsdpMessage(Poco::Net::ReadableNotification* pNotification)
 {
     Poco::Net::SocketAddress sender;
-    Poco::Net::Socket* pSocket = &(pNotification->socket());
-    Poco::Net::DatagramSocket* pDatagramSocket = static_cast<Poco::Net::DatagramSocket*>(pSocket);
-    int n = pDatagramSocket->receiveFrom(_pBuffer, BUFFER_SIZE, sender);
+    int n = _pSsdpListenerSocket->receiveFrom(_pBuffer, BUFFER_SIZE, sender);
     if (n > 0) {
         LOG(ssdp, debug, "received message from: " + sender.toString() + "" + Poco::LineEnding::NEWLINE_DEFAULT + std::string(_pBuffer, n));
         _ssdpSocketNotificationCenter.postNotification(new SsdpMessage(std::string(_pBuffer, n), sender));
     }
-    // FIXME: this results in a segfault
-//     delete pNotification;
+}
+
+
+void
+SsdpSocket::onSenderMulticastSsdpMessage(Poco::Net::ReadableNotification* pNotification)
+{
+    Poco::Net::SocketAddress sender;
+    int n = _pSsdpSenderSocket->receiveFrom(_pBuffer, BUFFER_SIZE, sender);
+    if (n > 0) {
+        LOG(ssdp, debug, "received message from: " + sender.toString() + "" + Poco::LineEnding::NEWLINE_DEFAULT + std::string(_pBuffer, n));
+        _ssdpSocketNotificationCenter.postNotification(new SsdpMessage(std::string(_pBuffer, n), sender));
+    }
 }
 
 

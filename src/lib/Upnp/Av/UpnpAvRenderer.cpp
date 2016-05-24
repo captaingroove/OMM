@@ -19,6 +19,8 @@
 |  along with this program.  If not, see <http://www.gnu.org/licenses/>.    |
  ***************************************************************************/
 
+#include <sstream>
+
 #include "UpnpAv.h"
 #include "UpnpAvRenderer.h"
 #include "UpnpAvDescriptions.h"

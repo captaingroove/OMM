@@ -34,6 +34,7 @@
 #include <Poco/TextEncoding.h>
 #include <Poco/UTF8Encoding.h>
 #include <Poco/TextConverter.h>
+#include <Poco/Data/Session.h>
 
 // #include "AvStream.h"
 #include "Upnp.h"

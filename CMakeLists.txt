@@ -53,6 +53,12 @@ add_definitions(-D__IPHONE__)
 #set(CMAKE_RANLIB "arm-apple-darwin11-ranlib")
 endif("${BUILD_TARGET}" MATCHES "iphone")
 
+# android
+if("${BUILD_TARGET}" MATCHES "android")
+set(ANDROID 1)
+add_definitions(-D__ANDROID__)
+endif("${BUILD_TARGET}" MATCHES "android")
+
 message(STATUS "Build target is: " ${BUILD_TARGET})
 
 # iphone only
@@ -102,7 +108,7 @@ include_directories(${POCO_INCLUDE_DIRS})
 
 # build what is available in the source tree (libs, plugins, apps, tests)
 add_subdirectory(src)
-add_subdirectory(binding)
+add_subdirectory(bindings)
 
 # CPack related for creating binary distribution packages
 include(ConfigurePackager)

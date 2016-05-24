@@ -40,6 +40,8 @@ public:
     typedef uint32_t WindowHandle;
 #elif __WINDOWS__
     typedef void* WindowHandle;
+#elif __ANDROID__
+    typedef Poco::UInt32 WindowHandle;
 #endif
 
     Visual();

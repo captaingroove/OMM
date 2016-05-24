@@ -26,7 +26,6 @@
 #include <Poco/Net/MediaType.h>
 #include <Poco/DOM/Document.h>
 #include <Poco/DOM/Element.h>
-#include "Poco/Data/Common.h"
 
 #include "UpnpTypes.h"
 #include "UpnpAv.h"
