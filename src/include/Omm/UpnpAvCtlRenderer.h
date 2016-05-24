@@ -24,6 +24,7 @@
 #include <Poco/Timer.h>
 #include <Poco/DOM/Node.h>
 #include <Poco/Notification.h>
+#include <Poco/Mutex.h>
 
 #include "Upnp.h"
 #include "UpnpInternal.h"
@@ -41,6 +42,19 @@ class CtlMediaObject;
 class MediaItemNotification;
 class MediaObjectSelectedNotification;
 class ConnectionManager;
+
+
+class CtlMediaRendererDelegate
+{
+public:
+    CtlMediaRendererDelegate() {}
+    virtual ~CtlMediaRendererDelegate() {}
+    virtual void newPosition(r8 duration, r8 position) {}
+    virtual void newUri(const std::string& uri) {}
+    virtual void newTrack(const std::string& title, const std::string& artist, const std::string& album, const std::string& objectClass, const std::string& server, const std::string& uri) {}
+    virtual void newVolume(const int volume) {}
+    virtual void newTransportState(const std::string& transportState) {}
+};
 
 
 class CtlMediaRenderer : public Device
@@ -68,22 +82,27 @@ public:
     void startPositionTimer(bool start = true);
     ConnectionManager* getConnectionManager();
 
-    virtual void newPosition(r8 duration, r8 position) {}
-    virtual void newUri(const std::string& uri) {}
-    virtual void newTrack(const std::string& title, const std::string& artist, const std::string& album, const std::string& objectClass, const std::string& server, const std::string& uri) {}
-    virtual void newVolume(const int volume) {}
-    virtual void newTransportState(const std::string& transportState) {}
+    void setDelegate(CtlMediaRendererDelegate* pDelegate);
+    CtlMediaRendererDelegate* getDelegate();
+
+    virtual void newPosition(r8 duration, r8 position);
+    virtual void newUri(const std::string& uri);
+    virtual void newTrack(const std::string& title, const std::string& artist, const std::string& album, const std::string& objectClass, const std::string& server, const std::string& uri);
+    virtual void newVolume(const int volume);
+    virtual void newTransportState(const std::string& transportState);
 
 
 private:
     void pollPositionInfo(Poco::Timer& timer);
 
     // for convenience only, to avoid multiple pointer cast from CtlDeviceCode* to CtlMediaRendererCode*;
-    CtlMediaRendererCode*   _pCtlMediaRendererCode;
-    CtlMediaObject*         _pCurrentMediaObject;
-    bool                    _usePlaylistResource;
-    Poco::Timer*            _pPositionTimer;
-    long                    _positionTimerInterval;
+    CtlMediaRendererCode*       _pCtlMediaRendererCode;
+    CtlMediaObject*             _pCurrentMediaObject;
+    bool                        _usePlaylistResource;
+    Poco::Timer*                _pPositionTimer;
+    long                        _positionTimerInterval;
+    CtlMediaRendererDelegate*   _pDelegate;
+    Poco::FastMutex             _delegateLock;
 };
 
 
@@ -109,6 +128,14 @@ public:
     CtlMediaRenderer* getDevice(const std::string& uuid);
     CtlMediaRenderer* getSelectedDevice() const;
     virtual CtlMediaRenderer* createDevice();
+
+protected:
+    virtual void addCtlMediaRenderer(CtlMediaRenderer* pDevice, int index, bool begin) {}
+    virtual void removeCtlMediaRenderer(CtlMediaRenderer* pDevice, int index, bool begin) {}
+
+private:
+    virtual void addDevice(Device* pDevice, int index, bool begin);
+    virtual void removeDevice(Device* pDevice, int index, bool begin);
 };
 
 } // namespace Av

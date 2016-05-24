@@ -1,3 +1,6 @@
+add_custom_target(bindings
+DEPENDS ommupnpav _upnp
+)
 find_package(SWIG REQUIRED)
 set(SWIG_EXECUTABLE /usr/bin/swig3.0)
 message(STATUS "SWIG executable: " ${SWIG_EXECUTABLE})

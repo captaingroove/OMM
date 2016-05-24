@@ -234,6 +234,19 @@ CtlMediaServerGroup::createDevice()
 }
 
 
+void
+CtlMediaServerGroup::addDevice(Device* pDevice, int index, bool begin)
+{
+    addCtlMediaServer(dynamic_cast<CtlMediaServer*>(pDevice), index, begin);
+}
+
+
+void
+CtlMediaServerGroup::removeDevice(Device* pDevice, int index, bool begin)
+{
+    removeCtlMediaServer(dynamic_cast<CtlMediaServer*>(pDevice), index, begin);
+}
+
 } // namespace Av
 } // namespace Omm
 

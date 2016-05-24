@@ -24,8 +24,10 @@
 
 %feature("director");
 //%feature("director") Controller;
-//%feature("nodirector") Controller::startSsdp;
-//%feature("nodirector") Controller::handleSsdpMessage;
+%feature("nodirector") CtlMediaServerGroup::addDevice;
+%feature("nodirector") CtlMediaServerGroup::removeDevice;
+%feature("nodirector") CtlMediaRendererGroup::addDevice;
+%feature("nodirector") CtlMediaRendererGroup::removeDevice;
 
 %include "std_string.i"
 %include "std_vector.i"
@@ -284,6 +286,7 @@ public:
     /// factory method to create a device of a certain type.
     virtual void showDeviceGroup() {}
 
+protected:
     virtual void addDevice(Device* pDevice, int index, bool begin) {}
     virtual void removeDevice(Device* pDevice, int index, bool begin) {}
     virtual void selectDevice(Device* pDevice, int index) {}
@@ -752,8 +755,24 @@ public:
     CtlMediaServer* getDevice(int index) const;
     CtlMediaServer* getDevice(const std::string& uuid);
     CtlMediaServer* getSelectedDevice() const;
-
     virtual CtlMediaServer* createDevice();
+
+protected:
+    virtual void addCtlMediaServer(CtlMediaServer* pDevice, int index, bool begin) {}
+    virtual void removeCtlMediaServer(CtlMediaServer* pDevice, int index, bool begin) {}
+};
+
+
+class CtlMediaRendererDelegate
+{
+public:
+    CtlMediaRendererDelegate() {}
+    virtual ~CtlMediaRendererDelegate() {}
+    virtual void newPosition(r8 duration, r8 position) {}
+    virtual void newUri(const std::string& uri) {}
+    virtual void newTrack(const std::string& title, const std::string& artist, const std::string& album, const std::string& objectClass, const std::string& server, const std::string& uri) {}
+    virtual void newVolume(const int volume) {}
+    virtual void newTransportState(const std::string& transportState) {}
 };
 
 
@@ -782,11 +801,14 @@ public:
     void startPositionTimer(bool start = true);
     ConnectionManager* getConnectionManager();
 
-    virtual void newPosition(r8 duration, r8 position) {}
-    virtual void newUri(const std::string& uri) {}
-    virtual void newTrack(const std::string& title, const std::string& artist, const std::string& album, const std::string& objectClass, const std::string& server, const std::string& uri) {}
-    virtual void newVolume(const int volume) {}
-    virtual void newTransportState(const std::string& transportState) {}
+    void setDelegate(CtlMediaRendererDelegate* pDelegate);
+    CtlMediaRendererDelegate* getDelegate();
+
+    virtual void newPosition(r8 duration, r8 position);
+    virtual void newUri(const std::string& uri);
+    virtual void newTrack(const std::string& title, const std::string& artist, const std::string& album, const std::string& objectClass, const std::string& server, const std::string& uri);
+    virtual void newVolume(const int volume);
+    virtual void newTransportState(const std::string& transportState);
 };
 
 
@@ -799,6 +821,11 @@ public:
     CtlMediaRenderer* getDevice(const std::string& uuid);
     CtlMediaRenderer* getSelectedDevice() const;
     virtual CtlMediaRenderer* createDevice();
+
+protected:
+    virtual void addCtlMediaRenderer(CtlMediaRenderer* pDevice, int index, bool begin) {}
+    virtual void removeCtlMediaRenderer(CtlMediaRenderer* pDevice, int index, bool begin) {}
+
 };
 
 

@@ -703,13 +703,13 @@ public:
     /// factory method to create a device of a certain type.
     virtual void showDeviceGroup() {}
 
+protected:
     virtual void addDevice(Device* pDevice, int index, bool begin) {}
     virtual void removeDevice(Device* pDevice, int index, bool begin) {}
     virtual void selectDevice(Device* pDevice, int index) {}
     virtual void addDeviceContainer(DeviceContainer* pDeviceContainer, int index, bool begin) {}
     virtual void removeDeviceContainer(DeviceContainer* pDeviceContainer, int index, bool begin) {}
 
-protected:
     virtual void init() {}
 
     void addDevice(Device* pDevice);

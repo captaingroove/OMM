@@ -40,7 +40,8 @@ _pCurrentMediaObject(0),
 //_usePlaylistResource(false)
 _usePlaylistResource(true),
 _pPositionTimer(0),
-_positionTimerInterval(1000)
+_positionTimerInterval(1000),
+_pDelegate(0)
 {
 }
 
@@ -270,6 +271,77 @@ CtlMediaRenderer::getConnectionManager()
 
 
 void
+CtlMediaRenderer::setDelegate(CtlMediaRendererDelegate* pDelegate)
+{
+    Poco::ScopedLock<Poco::FastMutex> lock(_delegateLock);
+    LOG(upnpav, debug, "CtlMediaRenderer set delegate ...")
+    _pDelegate = pDelegate;
+    LOG(upnpav, debug, "RendererDelegate pointer 0x" + Poco::NumberFormatter::format(_pDelegate));
+    LOG(upnpav, debug, "CtlMediaRenderer set delegate finished.")
+}
+
+
+CtlMediaRendererDelegate*
+CtlMediaRenderer::getDelegate()
+{
+    return _pDelegate;
+}
+
+
+void
+CtlMediaRenderer::newPosition(r8 duration, r8 position)
+{
+    Poco::ScopedLock<Poco::FastMutex> lock(_delegateLock);
+    if (_pDelegate) {
+        _pDelegate->newPosition(duration, position);
+    }
+}
+
+
+void
+CtlMediaRenderer::newUri(const std::string& uri)
+{
+    Poco::ScopedLock<Poco::FastMutex> lock(_delegateLock);
+    if (_pDelegate) {
+        _pDelegate->newUri(uri);
+    }
+}
+
+
+void
+CtlMediaRenderer::newTrack(const std::string& title, const std::string& artist, const std::string& album, const std::string& objectClass, const std::string& server, const std::string& uri)
+{
+    Poco::ScopedLock<Poco::FastMutex> lock(_delegateLock);
+    if (_pDelegate) {
+        _pDelegate->newTrack(title, artist, album, objectClass, server, uri);
+    }
+}
+
+
+void
+CtlMediaRenderer::newVolume(const int volume)
+{
+    Poco::ScopedLock<Poco::FastMutex> lock(_delegateLock);
+    if (_pDelegate) {
+        LOG(upnpav, debug, "RendererDelegate newVolume ...")
+        LOG(upnpav, debug, "RendererDelegate pointer 0x" + Poco::NumberFormatter::format(_pDelegate));
+        _pDelegate->newVolume(volume);
+        LOG(upnpav, debug, "RendererDelegate newVolume finished.");
+    }
+}
+
+
+void
+CtlMediaRenderer::newTransportState(const std::string& transportState)
+{
+    Poco::ScopedLock<Poco::FastMutex> lock(_delegateLock);
+    if (_pDelegate) {
+        _pDelegate->newTransportState(transportState);
+    }
+}
+
+
+void
 CtlMediaRenderer::startPositionTimer(bool start)
 {
     if (_pPositionTimer) {
@@ -411,6 +483,20 @@ CtlMediaRenderer*
 CtlMediaRendererGroup::createDevice()
 {
     return new CtlMediaRenderer;
+}
+
+
+void
+CtlMediaRendererGroup::addDevice(Device* pDevice, int index, bool begin)
+{
+    addCtlMediaRenderer(dynamic_cast<CtlMediaRenderer*>(pDevice), index, begin);
+}
+
+
+void
+CtlMediaRendererGroup::removeDevice(Device* pDevice, int index, bool begin)
+{
+    removeCtlMediaRenderer(dynamic_cast<CtlMediaRenderer*>(pDevice), index, begin);
 }
 
 } // namespace Av

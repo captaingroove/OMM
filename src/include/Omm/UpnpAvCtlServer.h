@@ -86,6 +86,14 @@ public:
     CtlMediaServer* getDevice(const std::string& uuid);
     CtlMediaServer* getSelectedDevice() const;
     virtual CtlMediaServer* createDevice();
+
+protected:
+    virtual void addCtlMediaServer(CtlMediaServer* pDevice, int index, bool begin) {}
+    virtual void removeCtlMediaServer(CtlMediaServer* pDevice, int index, bool begin) {}
+
+private:
+    virtual void addDevice(Device* pDevice, int index, bool begin);
+    virtual void removeDevice(Device* pDevice, int index, bool begin);
 };
 
 } // namespace Av
