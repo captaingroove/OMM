@@ -1,3 +1,4 @@
+if(NOT ANDROID)
 add_executable(ommserver
 ServerApplication.cpp
 )
@@ -53,3 +54,4 @@ ${OMMX_INCLUDE_DIRS}
 #endif(OMMX_SERVER_FILE)
 
 endif(OMMX_FOUND)
+endif(NOT ANDROID)

@@ -32,6 +32,8 @@
 #include "Linux/SysImplLinux.h"
 #elif __DARWIN__
 #include "Darwin/SysImplDarwin.h"
+#elif __ANDROID__
+#include "Android/SysImplAndroid.h"
 #elif __WINDOWS__
 #include "Windows/SysImplWindows.h"
 #endif

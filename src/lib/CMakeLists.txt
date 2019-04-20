@@ -90,6 +90,17 @@ Upnp/Upnp.cpp
 #Upnp/UpnpApplication.cpp
 )
 
+if(POCO_JSON)
+target_link_libraries(ommupnp
+ommnet
+${OMM_LOG}
+${POCO_UTIL}
+${POCO_JSON}
+${POCO_XML}
+${POCO_NET}
+${POCO_FOUNDATION}
+)
+else(POCO_JSON)
 target_link_libraries(ommupnp
 ommnet
 ${OMM_LOG}
@@ -98,6 +109,7 @@ ${POCO_XML}
 ${POCO_NET}
 ${POCO_FOUNDATION}
 )
+endif(POCO_JSON)
 
 set(OMM
 ommupnp
@@ -161,6 +173,11 @@ add_subdirectory(Sys/Darwin)
 if(TARGET ommsys-darwin)
 set(LIB_OMMSYS_PLATFORM ommsys-darwin)
 endif(TARGET ommsys-darwin)
+elseif(ANDROID)
+add_subdirectory(Sys/Android)
+if(TARGET ommsys-android)
+set(LIB_OMMSYS_PLATFORM ommsys-android)
+endif(TARGET ommsys-android)
 elseif(WINDOWS)
 add_subdirectory(Sys/Windows)
 if(TARGET ommsys-windows)

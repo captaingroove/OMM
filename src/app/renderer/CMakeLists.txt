@@ -1,3 +1,4 @@
+if(LIB_OMMGUI_PLATFORM)
 add_executable(ommrenderer WIN32
 RendererApplication.cpp
 )
@@ -14,3 +15,4 @@ ${OMMX_ENGINE_VLC}
 install(TARGETS ommrenderer
 RUNTIME DESTINATION bin
 )
+endif(LIB_OMMGUI_PLATFORM)

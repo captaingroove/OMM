@@ -8,11 +8,20 @@ add_executable(resgen
 main.cpp
 )
 
+if(POCO_JSON)
+target_link_libraries(resgen
+${POCO_UTIL}
+${POCO_JSON}
+${POCO_XML}
+${POCO_FOUNDATION}
+)
+else(POCO_JSON)
 target_link_libraries(resgen
 ${POCO_UTIL}
 ${POCO_XML}
 ${POCO_FOUNDATION}
 )
+endif(POCO_JSON)
 
 if(NOT RESGEN)
 set(RESGEN

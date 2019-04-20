@@ -10,14 +10,23 @@ DimmableLightCtrlImpl.cpp
 DimmableLightCtrlAppl.cpp
 )
 
-target_link_libraries(ommlight
+set(OMMLIGHT_LIBS
 ${POCO_UTIL}
 ${OMM}
 )
+if(POCO_JSON)
+set(OMMLIGHT_LIBS
+${OMMLIGHT_LIBS}
+${POCO_JSON}
+)
+endif(POCO_JSON)
+
+target_link_libraries(ommlight
+${OMMLIGHT_LIBS}
+)
 
 target_link_libraries(ommlightctrl
-${POCO_UTIL}
-${OMM}
+${OMMLIGHT_LIBS}
 )
 
 install(TARGETS ommlight ommlightctrl

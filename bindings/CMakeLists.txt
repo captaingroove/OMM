@@ -1,3 +1,4 @@
+if(NOT ANDROID)
 add_custom_target(bindings
 DEPENDS ommupnpav _upnp
 )
@@ -47,3 +48,4 @@ swig_link_libraries(${PY_MOD_UPNP} ${PYTHON_LIBRARIES} ${OMM} ${OMM_AV} ${OMM_LO
 #swig_link_libraries(${PY_MOD_UPNP} ${PYTHON_LIBRARIES} ${OMM} ${OMM_AV} ${OMM_LOG} ${OMM_UTIL} ${OMM_NET} ${OMM_SYS})
 
 endif(SWIG_FOUND)
+endif(NOT ANDROID)

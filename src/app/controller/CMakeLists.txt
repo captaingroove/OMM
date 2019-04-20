@@ -1,3 +1,4 @@
+if(LIB_OMMGUI_PLATFORM)
 add_executable(ommcontroller WIN32
 ControllerApplication.cpp
 )
@@ -15,3 +16,4 @@ install(TARGETS ommcontroller
 RUNTIME DESTINATION bin
 LIBRARY DESTINATION lib
 )
+endif(LIB_OMMGUI_PLATFORM)
