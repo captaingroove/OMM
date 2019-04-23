@@ -311,6 +311,7 @@ UpnpApplication::startApp()
     LOGNS(Av, upnpav, debug, "omm application starting local device server ...");
     if (_enableLocalDeviceServer) {
         _pLocalDeviceServer->setState(config().getString("application.devices", DeviceManager::Public));
+//        _pLocalDeviceServer->setState(config().getString("application.devices", DeviceManager::Local));
     }
     LOGNS(Av, upnpav, debug, "omm application started.");
 }
