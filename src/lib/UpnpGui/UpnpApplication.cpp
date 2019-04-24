@@ -187,7 +187,7 @@ UpnpApplication::defineOptions(Poco::Util::OptionSet& options)
                       .required(false)
                       .repeatable(true)
                       .argument("serverSpec", true));
-   options.addOption(Poco::Util::Option("application", "a", "application config parameters")
+    options.addOption(Poco::Util::Option("application", "a", "application config parameters")
                       .required(false)
                       .repeatable(false)
                       .argument("applicationSpec", true));
