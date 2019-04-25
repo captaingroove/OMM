@@ -550,6 +550,66 @@ SsdpSocket::onLocalSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pMessage)
 }
 
 
+SsdpBus::SsdpBus() :
+_pMessageReactor(0),
+_pMessageListenerThread(0),
+_pSsdpListenerSocket(0),
+_pBuffer(new char[BUFFER_SIZE]),
+_port(7878)
+{
+}
+
+
+SsdpBus::~SsdpBus()
+{
+}
+
+
+void
+SsdpBus::start()
+{
+    if (!_pMessageListenerThread) {
+        LOG(ssdp, information, "starting SSDP bus listener ...");
+        _pSsdpListenerSocket = new Poco::Net::DatagramSocket;
+        _pSsdpListenerSocket->bind(Poco::Net::SocketAddress("0.0.0.0", _port), true);
+        _pMessageListenerThread = new Poco::Thread;
+        _pMessageReactor = new Poco::Net::SocketReactor;
+        _pMessageReactor->addEventHandler(*_pSsdpListenerSocket, Poco::Observer<SsdpBus, Poco::Net::ReadableNotification>(*this, &SsdpBus::onListenerBusMessage));
+//    _pMessageReactor->addEventHandler(*_pSsdpSenderSocket, Poco::Observer<SsdpSocket, Poco::Net::ReadableNotification>(*this, &SsdpSocket::onSenderMulticastSsdpMessage));
+        _pMessageListenerThread->start(*_pMessageReactor);
+    }
+}
+
+
+void
+SsdpBus::stop()
+{
+    if (_pMessageListenerThread) {
+        LOG(ssdp, information, "stopping SSDP bus listener ...");
+        _pMessageReactor->stop();
+        _pMessageListenerThread->join();
+        delete _pMessageReactor;
+        _pMessageReactor = 0;
+        delete _pMessageListenerThread;
+        _pMessageListenerThread = 0;
+    }
+
+    delete _pSsdpListenerSocket;
+}
+
+
+void
+SsdpBus::onListenerBusMessage(Poco::Net::ReadableNotification* pNotification)
+{
+    Poco::Net::SocketAddress sender;
+    int n = _pSsdpListenerSocket->receiveFrom(_pBuffer, BUFFER_SIZE, sender);
+    if (n > 0) {
+        LOG(ssdp, debug, "received message from: " + sender.toString() + "" + Poco::LineEnding::NEWLINE_DEFAULT + std::string(_pBuffer, n));
+//        _ssdpSocketNotificationCenter.postNotification(new SsdpMessage(std::string(_pBuffer, n), sender));
+    }
+}
+
+
 DescriptionReader::DescriptionReader()
 {
 }

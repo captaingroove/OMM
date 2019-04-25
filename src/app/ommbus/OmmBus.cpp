@@ -22,14 +22,14 @@
 #include <iostream>
 
 #include <Poco/String.h>
+#include <Poco/LineEndingConverter.h>
 #include <Poco/Notification.h>
 #include <Poco/Util/ServerApplication.h>
 #include <Poco/Util/Option.h>
 #include <Poco/Util/OptionSet.h>
 #include <Poco/Util/HelpFormatter.h>
-//#include <Poco/Util/XMLConfiguration.h>
-//#include <Poco/Util/PropertyFileConfiguration.h>
-#include <Poco/Net/SocketAddress.h>
+
+#include "Omm/Upnp.h"
 
 
 class OmmBusApplication :  public Poco::Util::ServerApplication
@@ -41,6 +41,8 @@ public:
 private:
     virtual void defineOptions(Poco::Util::OptionSet& options);
     virtual void handleOption(const std::string& name, const std::string& value);
+        
+    virtual int runEventLoop(int argc, char** argv);
     virtual int main(const std::vector<std::string>& args);
     void displayHelp();
     
@@ -48,6 +50,7 @@ private:
     int                                         _argc;
     char**                                      _argv;
 
+    Omm::SsdpBus*                               _pSsdpBus;
 };
 
 
@@ -57,6 +60,7 @@ _argv(argv),
 _helpRequested(false)
 {
     setUnixOptions(true);
+    _pSsdpBus = new Omm::SsdpBus;
 }
 
 
@@ -127,14 +131,28 @@ OmmBusApplication::handleOption(const std::string& name, const std::string& valu
 //    }
 }
 
+
 void
 OmmBusApplication::displayHelp()
 {
     Poco::Util::HelpFormatter helpFormatter(options());
     helpFormatter.setCommand(commandName());
     helpFormatter.setUsage("OPTIONS");
-    helpFormatter.setHeader("OMM application running a UPnP controller, renderer and servers.");
+    helpFormatter.setHeader("OMM SSDP bus server.");
     helpFormatter.format(std::cout);
+}
+
+
+int
+OmmBusApplication::runEventLoop(int argc, char** argv)
+{
+//    initLocalDevices();
+    _pSsdpBus->start();
+//    run(argc, argv);
+    // FIXME: on windows Ctrl-C terminates immediately without shutting down the application
+    waitForTerminationRequest();
+    _pSsdpBus->stop();
+    return Poco::Util::ServerApplication::EXIT_OK;
 }
 
 
@@ -162,7 +180,7 @@ OmmBusApplication::main(const std::vector<std::string>& args)
 ////        loadConfig();
 //        initConfig();
 //
-//        ret = runEventLoop(_argc, _argv);
+        ret = runEventLoop(_argc, _argv);
     }
     return ret;
 }
@@ -171,5 +189,6 @@ OmmBusApplication::main(const std::vector<std::string>& args)
 int main(int argc, char** argv)
 {
     OmmBusApplication app(argc, argv);
+    
     return app.run(argc, argv);
 }

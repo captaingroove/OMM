@@ -22,11 +22,10 @@
 #ifndef UpnpPrivate_INCLUDED
 #define UpnpPrivate_INCLUDED
 
-#include<queue>
+#include <queue>
 
 #include <Poco/Net/MulticastSocket.h>
 #include <Poco/Net/SocketNotification.h>
-#include <Poco/Net/DatagramSocket.h>
 #include <Poco/Net/SocketAddress.h>
 #include <Poco/Net/HTTPRequestHandler.h>
 #include <Poco/Net/HTTPRequestHandlerFactory.h>

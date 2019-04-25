@@ -5,7 +5,7 @@ OmmBus.cpp
 
 target_link_libraries(ommbus
 ${POCO_UTIL}
-${POCO_NET}
+${OMM}
 )
 install(TARGETS ommbus
 RUNTIME DESTINATION bin

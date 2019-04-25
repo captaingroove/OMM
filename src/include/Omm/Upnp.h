@@ -47,6 +47,8 @@
 #include <Poco/Net/HTTPRequestHandler.h>
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
 #include <Poco/Net/HTMLForm.h>
+#include <Poco/Net/DatagramSocket.h>
+#include <Poco/Net/SocketNotification.h>
 #include <Poco/NotificationCenter.h>
 
 #include "Sys/Visual.h"
@@ -377,6 +379,28 @@ private:
     std::map<std::string, E*>   _elementMap;
     std::vector<E*>             _elementVector;
     std::vector<std::string>    _keyVector;
+};
+
+
+class SsdpBus
+{
+public:
+    SsdpBus();
+    ~SsdpBus();
+    
+    void start();
+    void stop();
+
+private:
+    void onListenerBusMessage(Poco::Net::ReadableNotification* pNotification);
+    
+    Poco::Net::SocketReactor*                   _pMessageReactor;
+    Poco::Thread*                               _pMessageListenerThread;
+    Poco::Net::DatagramSocket*                  _pSsdpListenerSocket;
+    char*                                       _pBuffer;
+    // Max UDP Packet size is 64 Kbyte.
+    static const int                            BUFFER_SIZE = 65536;
+    int                                         _port;
 };
 
 
