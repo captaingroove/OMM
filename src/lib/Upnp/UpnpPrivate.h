@@ -50,13 +50,14 @@
 
 namespace Omm {
 
-static const std::string    SSDP_ADDRESS        = "239.255.255.250";
-static const std::string    SSDP_LOOP_ADDRESS   = "127.255.255.255";
-static const Poco::UInt16   SSDP_PORT           = 1900;
-static const Poco::UInt16   SSDP_CACHE_DURATION = 1800;
-static const Poco::UInt16   SSDP_MIN_WAIT_TIME  = 1;
-static const Poco::UInt16   SSDP_MAX_WAIT_TIME  = 120;
+static const std::string    SSDP_ADDRESS            = "239.255.255.250";
+static const std::string    SSDP_LOOP_ADDRESS       = "127.255.255.255";
+static const Poco::UInt16   SSDP_PORT               = 1900;
+static const Poco::UInt16   SSDP_CACHE_DURATION     = 1800;
+static const Poco::UInt16   SSDP_MIN_WAIT_TIME      = 1;
+static const Poco::UInt16   SSDP_MAX_WAIT_TIME      = 120;
 static const Poco::UInt16   SSDP_DEFAULT_WAIT_TIME  = 2;
+static const Poco::UInt16   SSDP_BUS_PORT           = 7878;
 
 static const Poco::UInt16   EVENT_SUBSCRIPTION_DURATION = 1800;
 //static const Poco::UInt16   EVENT_SUBSCRIPTION_DURATION = 90;
@@ -72,7 +73,7 @@ class SsdpSocket
     friend class Socket;
 
 public:
-    enum SocketMode {NotConfigured = 0x0000, Multicast = 0x0001, LocalProcess = 0x0010};
+    enum SocketMode {NotConfigured = 0x0000, Multicast = 0x0001, LocalProcess = 0x0010, Bus = 0x0100};
     /// socket mode LocalProcess broadcasts ssdp messages only within process
 
     SsdpSocket();
@@ -88,7 +89,8 @@ public:
     void setMode(unsigned int mode = NotConfigured);
 
     void sendMessage(const Poco::AutoPtr<SsdpMessage>& pMessage,\
-        const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS)) const;
+        const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS)) const;
+//        const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS)) const;
 
 private:
     void setupSockets();
@@ -101,6 +103,8 @@ private:
     unsigned int                        _mode;
     Poco::Net::MulticastSocket*         _pSsdpListenerSocket;
     Poco::Net::MulticastSocket*         _pSsdpSenderSocket;
+    Poco::Net::DatagramSocket*          _pSsdpBusListenerSocket;
+    Poco::Net::DatagramSocket*          _pSsdpBusSenderSocket;
     char*                               _pBuffer;
 
     static const int BUFFER_SIZE = 65536; // Max UDP Packet size is 64 Kbyte.
@@ -108,6 +112,8 @@ private:
 
     Poco::Net::SocketReactor*           _pMulticastReactor;
     Poco::Thread*                       _pMulticastListenerThread;
+    Poco::Net::SocketReactor*           _pBusMessageReactor;
+    Poco::Thread*                       _pBusMessageListenerThread;
 
     Poco::NotificationCenter            _ssdpSocketNotificationCenter;
 };
@@ -140,6 +146,7 @@ public:
     typedef std::string Mode;
     static const std::string Null;
     static const std::string Local;
+    static const std::string Bus;
     static const std::string Public;
     static const std::string PublicLocal;
 
@@ -158,8 +165,10 @@ public:
     void stopHttp();
 
     std::string getHttpServerUri();
-    void sendSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pSsdpMessage, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
-    void sendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet, int repeat = 1, long delay = 0, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+//    void sendSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pSsdpMessage, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+    void sendSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pSsdpMessage, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS));
+//    void sendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet, int repeat = 1, long delay = 0, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+    void sendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet, int repeat = 1, long delay = 0, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS));
     void startSendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet);
     void stopSendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet);
 
@@ -194,7 +203,8 @@ public:
     /// with all headers that can be filled without knowing context
     /// information like device uuid, service type, device type etc.
 
-    SsdpMessage(const std::string& buf, const Poco::Net::SocketAddress& sender = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+    SsdpMessage(const std::string& buf, const Poco::Net::SocketAddress& sender = Poco::Net::SocketAddress(BUS_FULL_ADDRESS));
+//    SsdpMessage(const std::string& buf, const Poco::Net::SocketAddress& sender = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
     /// map the received HTTP header in buf to an SsdpMessage object in memory
 
 //    void setRequestMethod(TRequestMethod requestMethod);
@@ -271,7 +281,8 @@ public:
     void addMessage(SsdpMessage* pMessage);
 
 private:
-    void send(SsdpSocket& socket, int repeat = 1, long delay = 0, Poco::UInt16 cacheDuration = SSDP_CACHE_DURATION, bool continuous = false, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+//    void send(SsdpSocket& socket, int repeat = 1, long delay = 0, Poco::UInt16 cacheDuration = SSDP_CACHE_DURATION, bool continuous = false, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+    void send(SsdpSocket& socket, int repeat = 1, long delay = 0, Poco::UInt16 cacheDuration = SSDP_CACHE_DURATION, bool continuous = false, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS));
     /// Sends message set "repeat" times delayed for up to "delay" millisecs (actual delay randomly chosen).
     /// If continuous is true, message set is sent out repeatatly with a delay of up to cacheDuration / 2 (actual delay randomly chosen).
     /// Receiver of message set is by default ssdp multicast address, but can be chosen in parameter "receiver".

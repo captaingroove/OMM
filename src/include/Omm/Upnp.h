@@ -61,6 +61,7 @@ namespace Omm {
 static const std::string    OMM_VERSION         = __OMM_VERSION_STRING__;
 static const std::string    UPNP_VERSION        = "1.0";
 static const std::string    SSDP_FULL_ADDRESS   = "239.255.255.250:1900";
+static const std::string    BUS_FULL_ADDRESS   = "127.0.0.1:7878";
 
 class DescriptionProvider;
 class DeviceManager;
@@ -397,6 +398,7 @@ private:
     Poco::Net::SocketReactor*                   _pMessageReactor;
     Poco::Thread*                               _pMessageListenerThread;
     Poco::Net::DatagramSocket*                  _pSsdpListenerSocket;
+    Poco::Net::DatagramSocket*                  _pSsdpSenderSocket;
     char*                                       _pBuffer;
     // Max UDP Packet size is 64 Kbyte.
     static const int                            BUFFER_SIZE = 65536;
@@ -415,6 +417,7 @@ public:
     static const std::string Transitioning;
     static const std::string Stopped;
     static const std::string Local;
+    static const std::string Bus;
     static const std::string Public;
     static const std::string PublicLocal;
 

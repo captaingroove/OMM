@@ -282,7 +282,11 @@ _mode(NotConfigured),
 _pSsdpListenerSocket(0),
 _pSsdpSenderSocket(0),
 _pMulticastReactor(0),
-_pMulticastListenerThread(0)
+_pMulticastListenerThread(0),
+_pSsdpBusListenerSocket(0),
+_pSsdpBusSenderSocket(0),
+_pBusMessageReactor(0),
+_pBusMessageListenerThread(0)
 {
 }
 
@@ -304,6 +308,13 @@ SsdpSocket::init()
     // listen to UDP multicast
     LOG(ssdp, debug, "create listener socket ...");
     _pSsdpListenerSocket = new Poco::Net::MulticastSocket(Poco::Net::SocketAddress("0.0.0.0", SSDP_PORT), true);
+
+    LOG(ssdp, debug, "create bus socket");
+    _pSsdpBusSenderSocket = new Poco::Net::DatagramSocket;
+
+    // listen to UDP connection to ommbus
+    LOG(ssdp, debug, "create bus listener socket ...");
+    _pSsdpBusListenerSocket = new Poco::Net::DatagramSocket(Poco::Net::SocketAddress("0.0.0.0", 0), false);
 
     setupSockets();
 }
@@ -362,7 +373,16 @@ SsdpSocket::startListen()
         _pMulticastReactor->addEventHandler(*_pSsdpSenderSocket, Poco::Observer<SsdpSocket, Poco::Net::ReadableNotification>(*this, &SsdpSocket::onSenderMulticastSsdpMessage));
         _pMulticastListenerThread->start(*_pMulticastReactor);
     }
-
+    
+    if ((_mode & Bus) && !_pBusMessageListenerThread) {
+        LOG(ssdp, information, "starting SSDP bus listener ...");
+        _pBusMessageListenerThread = new Poco::Thread;
+        _pBusMessageReactor = new Poco::Net::SocketReactor;
+        _pBusMessageReactor->addEventHandler(*_pSsdpBusListenerSocket, Poco::Observer<SsdpSocket, Poco::Net::ReadableNotification>(*this, &SsdpSocket::onListenerMulticastSsdpMessage));
+        _pBusMessageReactor->addEventHandler(*_pSsdpBusSenderSocket, Poco::Observer<SsdpSocket, Poco::Net::ReadableNotification>(*this, &SsdpSocket::onSenderMulticastSsdpMessage));
+        _pBusMessageListenerThread->start(*_pBusMessageReactor);
+    }
+    
     if (_mode & LocalProcess) {
         LOG(ssdp, information, "starting SSDP local listener ...");
         Poco::NotificationCenter::defaultCenter().addObserver(Poco::NObserver<SsdpSocket, SsdpMessage>(*this, &SsdpSocket::onLocalSsdpMessage));
@@ -411,6 +431,10 @@ SsdpSocket::sendMessage(const Poco::AutoPtr<SsdpMessage>& pMessage, const Poco::
             LOG(ssdp, debug, "sending SSDP message through multicast socket ...");
             bytesSent = _pSsdpSenderSocket->sendTo(m.c_str(), m.length(), receiver);
         }
+        if (_mode & Bus) {
+            LOG(ssdp, debug, "sending SSDP message through bus socket ...");
+            bytesSent = _pSsdpBusSenderSocket->sendTo(m.c_str(), m.length(), receiver);
+        }
         if (_mode & LocalProcess) {
             LOG(ssdp, debug, "sending SSDP message through default notification center ...");
             Poco::NotificationCenter::defaultCenter().postNotification(pMessage);
@@ -430,6 +454,11 @@ SsdpSocket::setupSockets()
 
     // start with local mode
     setMode(LocalProcess);
+    
+    setMode(Bus);    
+    LOG(ssdp, debug, "setting up SSDP sockets in bus mode finished.");
+    return;
+    
     try {
         _pSsdpListenerSocket->joinGroup(Poco::Net::IPAddress(SSDP_ADDRESS));
     }
@@ -501,6 +530,9 @@ SsdpSocket::setMode(unsigned int mode)
     if (mode == NotConfigured) {
         LOG(ssdp, debug, "set SSDP socket mode to not configured");
     }
+    else if (mode == Bus) {
+        LOG(ssdp, debug, "set SSDP socket mode to bus");
+    }
     else if (mode == LocalProcess) {
         LOG(ssdp, debug, "set SSDP socket mode to local process");
     }
@@ -554,8 +586,9 @@ SsdpBus::SsdpBus() :
 _pMessageReactor(0),
 _pMessageListenerThread(0),
 _pSsdpListenerSocket(0),
+_pSsdpSenderSocket(0),
 _pBuffer(new char[BUFFER_SIZE]),
-_port(7878)
+_port(SSDP_BUS_PORT)
 {
 }
 
@@ -572,6 +605,7 @@ SsdpBus::start()
         LOG(ssdp, information, "starting SSDP bus listener ...");
         _pSsdpListenerSocket = new Poco::Net::DatagramSocket;
         _pSsdpListenerSocket->bind(Poco::Net::SocketAddress("0.0.0.0", _port), true);
+        _pSsdpSenderSocket = new Poco::Net::DatagramSocket;
         _pMessageListenerThread = new Poco::Thread;
         _pMessageReactor = new Poco::Net::SocketReactor;
         _pMessageReactor->addEventHandler(*_pSsdpListenerSocket, Poco::Observer<SsdpBus, Poco::Net::ReadableNotification>(*this, &SsdpBus::onListenerBusMessage));
@@ -604,8 +638,15 @@ SsdpBus::onListenerBusMessage(Poco::Net::ReadableNotification* pNotification)
     Poco::Net::SocketAddress sender;
     int n = _pSsdpListenerSocket->receiveFrom(_pBuffer, BUFFER_SIZE, sender);
     if (n > 0) {
-        LOG(ssdp, debug, "received message from: " + sender.toString() + "" + Poco::LineEnding::NEWLINE_DEFAULT + std::string(_pBuffer, n));
-//        _ssdpSocketNotificationCenter.postNotification(new SsdpMessage(std::string(_pBuffer, n), sender));
+        LOG(ssdp, debug, "received message from: " + sender.toString() + Poco::LineEnding::NEWLINE_DEFAULT + std::string(_pBuffer, n));
+        _pSsdpSenderSocket->connect(sender);
+        LOG(ssdp, debug, "connected to: " + sender.toString());
+//        int bytesSent = _pSsdpSenderSocket->sendTo(_pBuffer, n, sender);
+        int bytesSent = 0;
+        while (bytesSent < n) {
+            bytesSent += _pSsdpSenderSocket->sendBytes(_pBuffer + bytesSent, n - bytesSent);
+        }
+        LOG(ssdp, debug, "sent " + Poco::NumberFormatter::format(bytesSent) + " byte(s) to: " + sender.toString() + Poco::LineEnding::NEWLINE_DEFAULT + std::string(_pBuffer, n));
     }
 }
 
@@ -3098,6 +3139,7 @@ HttpSocket::getServerUri()
 
 const std::string Socket::Null = "null";
 const std::string Socket::Local = "local";
+const std::string Socket::Bus = "bus";
 const std::string Socket::Public = "public";
 const std::string Socket::PublicLocal = "publicLocal";
 
@@ -3146,6 +3188,9 @@ Socket::setMode(const Mode& mode)
 //        _ssdpSocket.setMode(SsdpSocket::Broadcast);
 //        _ssdpSocket.setMode(SsdpSocket::SharedMemory);
         _ssdpSocket.setMode(SsdpSocket::LocalProcess);
+    }
+    else if (mode == Bus) {
+        _ssdpSocket.setMode(SsdpSocket::Bus);
     }
     else if (mode == Public) {
         _ssdpSocket.setMode(SsdpSocket::Multicast);
@@ -3265,6 +3310,7 @@ DescriptionProvider::getServiceDescription(const std::string& path)
 const std::string DeviceManager::Transitioning = "transitioning";
 const std::string DeviceManager::Stopped = "stopped";
 const std::string DeviceManager::Local = "local";
+const std::string DeviceManager::Bus = "bus";
 const std::string DeviceManager::Public = "public";
 const std::string DeviceManager::PublicLocal = "publicLocal";
 
@@ -3405,6 +3451,9 @@ DeviceManager::setState(State newState)
         }
         if (newState == Public) {
             _pSocket->setMode(Socket::Public);
+        }
+        else if (newState == Bus) {
+            _pSocket->setMode(Socket::Bus);
         }
         else if (newState == Local) {
             _pSocket->setMode(Socket::Local);
@@ -4739,6 +4788,9 @@ DeviceServer::setState(State newState)
         }
         if (newState == Public) {
             DeviceManager::setState(Public);
+        }
+        else if (newState == Bus) {
+            DeviceManager::setState(Bus);
         }
         else if (newState == Local) {
             DeviceManager::setState(Local);
