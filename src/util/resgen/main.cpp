@@ -184,7 +184,7 @@ protected:
                 
                 resourceCpp += Poco::LineEnding::NEWLINE_DEFAULT;
                 std::string charStringName = "string" + Poco::NumberFormatter::format(i);
-                resourceCpp += "    char " + charStringName + "[] = {";
+                resourceCpp += "    const unsigned char " + charStringName + "[] = {";
                 const int bufSize = 512;
                 char buf[bufSize];
                 std::streamsize byteCount = 0;
@@ -197,8 +197,8 @@ protected:
                     }
                 }
                 resourceCpp += "};" + Poco::LineEnding::NEWLINE_DEFAULT;
-                resourceCpp += "    _resources[\"" + fileName + "\"] = std::string(";
-                resourceCpp += charStringName +  ", " + Poco::NumberFormatter::format(byteCount);
+                resourceCpp += "    _resources[\"" + fileName + "\"] = std::string(reinterpret_cast<const char*>(";
+                resourceCpp += charStringName +  "), (size_t)" + Poco::NumberFormatter::format(byteCount);
                 resourceCpp += ");" + Poco::LineEnding::NEWLINE_DEFAULT;
             }
             resourceCpp += "}" + Poco::LineEnding::NEWLINE_DEFAULT;

@@ -19,6 +19,8 @@
 |  along with this program.  If not, see <http://www.gnu.org/licenses/>.    |
  ***************************************************************************/
 
+#include <cmath>
+
 #include <Poco/NumberParser.h>
 #include <Poco/NumberFormatter.h>
 #include <Poco/DOM/AbstractContainerNode.h>
@@ -153,7 +155,7 @@ bool
 Transponder::equal(Transponder* pOtherTransponder)
 {
 //    LOG(dvb, trace, "test transponder with freq: " + Poco::NumberFormatter::format(_frequency) + " equals transponder with freq: " + Poco::NumberFormatter::format(pOtherTransponder->_frequency));
-    return (abs(_frequency - pOtherTransponder->_frequency) < 2000);
+    return (std::labs(_frequency - pOtherTransponder->_frequency) < 2000);
 }
 
 

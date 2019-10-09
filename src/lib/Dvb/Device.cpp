@@ -27,6 +27,9 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
+#ifdef POCO_VERSION_HEADER_FOUND
+#include <Poco/Version.h>
+#endif
 #include <Poco/File.h>
 #include <Poco/Glob.h>
 #include <Poco/StreamCopier.h>
