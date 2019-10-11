@@ -30,7 +30,7 @@ class Application : public Omm::Gui::Application
     virtual Omm::Gui::View* createMainView()
     {
         Omm::Gui::Image* pImage = new Omm::Gui::Image;
-        pImage->setData(std::string(ImageData, ImageSize));
+        pImage->setData(std::string(reinterpret_cast<const char*>(ImageData), (size_t)ImageSize));
         return pImage;
     }
 };

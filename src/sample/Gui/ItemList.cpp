@@ -59,7 +59,7 @@ _viewCount(0)
 {
     // same image for all list items
     Omm::Gui::ImageModel* pImageModel = new Omm::Gui::ImageModel;
-    pImageModel->setData(std::string(ImageData, ImageSize));
+    pImageModel->setData(std::string(reinterpret_cast<const char*>(ImageData), (size_t)ImageSize));
 
     for (int i = 0; i < itemCount; i++) {
         Omm::Gui::ListItemModel* pItemModel = new Omm::Gui::ListItemModel;
