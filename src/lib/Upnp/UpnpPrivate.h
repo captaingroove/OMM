@@ -89,8 +89,8 @@ public:
     void setMode(unsigned int mode = NotConfigured);
 
     void sendMessage(const Poco::AutoPtr<SsdpMessage>& pMessage,\
-        const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS)) const;
-//        const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS)) const;
+//        const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS)) const;
+        const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS)) const;
 
 private:
     void setupSockets();
@@ -165,10 +165,10 @@ public:
     void stopHttp();
 
     std::string getHttpServerUri();
-//    void sendSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pSsdpMessage, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
-    void sendSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pSsdpMessage, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS));
-//    void sendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet, int repeat = 1, long delay = 0, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
-    void sendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet, int repeat = 1, long delay = 0, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS));
+    void sendSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pSsdpMessage, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+//    void sendSsdpMessage(const Poco::AutoPtr<SsdpMessage>& pSsdpMessage, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS));
+    void sendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet, int repeat = 1, long delay = 0, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+//    void sendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet, int repeat = 1, long delay = 0, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS));
     void startSendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet);
     void stopSendSsdpMessageSet(SsdpMessageSet& ssdpMessageSet);
 
@@ -203,8 +203,8 @@ public:
     /// with all headers that can be filled without knowing context
     /// information like device uuid, service type, device type etc.
 
-    SsdpMessage(const std::string& buf, const Poco::Net::SocketAddress& sender = Poco::Net::SocketAddress(BUS_FULL_ADDRESS));
-//    SsdpMessage(const std::string& buf, const Poco::Net::SocketAddress& sender = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+//    SsdpMessage(const std::string& buf, const Poco::Net::SocketAddress& sender = Poco::Net::SocketAddress(BUS_FULL_ADDRESS));
+    SsdpMessage(const std::string& buf, const Poco::Net::SocketAddress& sender = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
     /// map the received HTTP header in buf to an SsdpMessage object in memory
 
 //    void setRequestMethod(TRequestMethod requestMethod);
@@ -281,8 +281,8 @@ public:
     void addMessage(SsdpMessage* pMessage);
 
 private:
-//    void send(SsdpSocket& socket, int repeat = 1, long delay = 0, Poco::UInt16 cacheDuration = SSDP_CACHE_DURATION, bool continuous = false, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
-    void send(SsdpSocket& socket, int repeat = 1, long delay = 0, Poco::UInt16 cacheDuration = SSDP_CACHE_DURATION, bool continuous = false, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS));
+    void send(SsdpSocket& socket, int repeat = 1, long delay = 0, Poco::UInt16 cacheDuration = SSDP_CACHE_DURATION, bool continuous = false, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+//    void send(SsdpSocket& socket, int repeat = 1, long delay = 0, Poco::UInt16 cacheDuration = SSDP_CACHE_DURATION, bool continuous = false, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS));
     /// Sends message set "repeat" times delayed for up to "delay" millisecs (actual delay randomly chosen).
     /// If continuous is true, message set is sent out repeatatly with a delay of up to cacheDuration / 2 (actual delay randomly chosen).
     /// Receiver of message set is by default ssdp multicast address, but can be chosen in parameter "receiver".

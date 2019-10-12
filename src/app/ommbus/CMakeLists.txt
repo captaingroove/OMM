@@ -1,3 +1,5 @@
+return()
+
 if(NOT ANDROID)
 add_executable(ommbus
 OmmBus.cpp

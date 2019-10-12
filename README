@@ -83,9 +83,9 @@ libxine, so this should be done first do reactivate it for Omm.
 
 So, currently I recommend the VLC engine.
 
-Update of dependencies (2014-04-22):
+Update of dependencies (2019-10-11):
 libommnet on Linux: libudev, libdbus, libdbus-c++, network-manager-dev
-libommgui on Linux: Qt4
+libommgui on Linux: Qt4 including webkit
 
 Packaging dependencies (2014-04-22):
 target mingw-linux: NSIS

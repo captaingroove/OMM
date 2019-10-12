@@ -383,27 +383,27 @@ private:
 };
 
 
-class SsdpBus
-{
-public:
-    SsdpBus();
-    ~SsdpBus();
+//class SsdpBus
+//{
+//public:
+//    SsdpBus();
+//    ~SsdpBus();
     
-    void start();
-    void stop();
+//    void start();
+//    void stop();
 
-private:
-    void onListenerBusMessage(Poco::Net::ReadableNotification* pNotification);
+//private:
+//    void onListenerBusMessage(Poco::Net::ReadableNotification* pNotification);
     
-    Poco::Net::SocketReactor*                   _pMessageReactor;
-    Poco::Thread*                               _pMessageListenerThread;
-    Poco::Net::DatagramSocket*                  _pSsdpListenerSocket;
-    Poco::Net::DatagramSocket*                  _pSsdpSenderSocket;
-    char*                                       _pBuffer;
-    // Max UDP Packet size is 64 Kbyte.
-    static const int                            BUFFER_SIZE = 65536;
-    int                                         _port;
-};
+//    Poco::Net::SocketReactor*                   _pMessageReactor;
+//    Poco::Thread*                               _pMessageListenerThread;
+//    Poco::Net::DatagramSocket*                  _pSsdpListenerSocket;
+//    Poco::Net::DatagramSocket*                  _pSsdpSenderSocket;
+//    char*                                       _pBuffer;
+//    // Max UDP Packet size is 64 Kbyte.
+//    static const int                            BUFFER_SIZE = 65536;
+//    int                                         _port;
+//};
 
 
 class DeviceManager //: public Util::Startable
