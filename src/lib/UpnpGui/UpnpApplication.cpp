@@ -310,9 +310,9 @@ UpnpApplication::startApp()
     startAppHttpServer();
     LOGNS(Av, upnpav, debug, "omm application starting local device server ...");
     if (_enableLocalDeviceServer) {
-//        _pLocalDeviceServer->setState(config().getString("application.devices", DeviceManager::Public));
+        _pLocalDeviceServer->setState(config().getString("application.devices", DeviceManager::Public));
 //        _pLocalDeviceServer->setState(config().getString("application.devices", DeviceManager::Bus));
-        _pLocalDeviceServer->setState(config().getString("application.devices", DeviceManager::Local));
+//        _pLocalDeviceServer->setState(config().getString("application.devices", DeviceManager::Local));
     }
     LOGNS(Av, upnpav, debug, "omm application started.");
 }
@@ -594,9 +594,11 @@ UpnpApplication::restartLocalDeviceContainer()
 //    _pWebSetup = new WebSetup(this);  // only code in initConfig() before COMMIT 20150311.0
 
     initLocalDevices();
-    _pLocalDeviceServer->setState(DeviceManager::Public);
+//    _pLocalDeviceServer->setState(DeviceManager::Public);
 //    _pLocalDeviceServer->setState(DeviceManager::Bus);
 //    _pLocalDeviceServer->setState(DeviceManager::Local);
+    _pLocalDeviceServer->setState(config().getString("application.devices", DeviceManager::Public));
+//    _pLocalDeviceServer->setState(config().getString("application.devices", DeviceManager::Local));
 }
 
 
