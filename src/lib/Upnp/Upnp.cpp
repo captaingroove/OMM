@@ -303,7 +303,7 @@ SsdpSocket::init()
     _pBuffer = new char[BUFFER_SIZE];
     // listen to UDP unicast and send out to multicast
     LOG(ssdp, debug, "create multicast socket");
-    _pSsdpSenderSocket = new Poco::Net::MulticastSocket;
+    _pSsdpSenderSocket = new Poco::Net::MulticastSocket(Poco::Net::SocketAddress("0.0.0.0", SSDP_PORT), true);
 
     // listen to UDP multicast
     LOG(ssdp, debug, "create listener socket ...");
@@ -369,8 +369,10 @@ SsdpSocket::startListen()
         LOG(ssdp, information, "starting SSDP multicast listener ...");
         _pMulticastListenerThread = new Poco::Thread;
         _pMulticastReactor = new Poco::Net::SocketReactor;
-        _pMulticastReactor->addEventHandler(*_pSsdpListenerSocket, Poco::Observer<SsdpSocket, Poco::Net::ReadableNotification>(*this, &SsdpSocket::onListenerMulticastSsdpMessage));
-        _pMulticastReactor->addEventHandler(*_pSsdpSenderSocket, Poco::Observer<SsdpSocket, Poco::Net::ReadableNotification>(*this, &SsdpSocket::onSenderMulticastSsdpMessage));
+        _pMulticastReactor->addEventHandler(*_pSsdpListenerSocket, Poco::Observer<SsdpSocket, 
+                Poco::Net::ReadableNotification>(*this, &SsdpSocket::onListenerMulticastSsdpMessage));
+        _pMulticastReactor->addEventHandler(*_pSsdpSenderSocket, Poco::Observer<SsdpSocket, 
+                Poco::Net::ReadableNotification>(*this, &SsdpSocket::onSenderMulticastSsdpMessage));
         _pMulticastListenerThread->start(*_pMulticastReactor);
     }
     
@@ -430,6 +432,8 @@ SsdpSocket::sendMessage(const Poco::AutoPtr<SsdpMessage>& pMessage, const Poco::
         if (_mode & Multicast) {
             LOG(ssdp, debug, "sending SSDP message through multicast socket ...");
             bytesSent = _pSsdpSenderSocket->sendTo(m.c_str(), m.length(), receiver);
+            LOG(ssdp, debug, "SSDP message with " + Poco::NumberFormatter::format(bytesSent) + 
+                    " bytes sent through multicast socket.");
         }
 //        if (_mode & Bus) {
 //            LOG(ssdp, debug, "sending SSDP message through bus socket ...");
@@ -438,12 +442,12 @@ SsdpSocket::sendMessage(const Poco::AutoPtr<SsdpMessage>& pMessage, const Poco::
         if (_mode & LocalProcess) {
             LOG(ssdp, debug, "sending SSDP message through default notification center ...");
             Poco::NotificationCenter::defaultCenter().postNotification(pMessage);
+            LOG(ssdp, debug, "SSDP message sent through default notification center.");
         }
     }
     catch(Poco::Net::NetException& e) {
         LOG(ssdp, error, "sending SSDP message failed: " + e.message());
     }
-    LOG(ssdp, debug, "SSDP message sent.");
 }
 
 
@@ -1019,7 +1023,7 @@ UriDescriptionReader::retrieveDescription(const std::string& relativeUri)
     else if (targetUri.getScheme() == "http") {
         targetUri.resolve(relativeUri);
         LOG(desc, information, "retrieving description from: " + targetUri.toString());
-        LOG(desc, information, "downloading description from host: " + targetUri.getHost()\
+        LOG(desc, information, "downloading description from host: " + targetUri.getHost()
              + ", port: " + Poco::NumberFormatter::format(targetUri.getPort()) + ", path: " + targetUri.getPathEtc());
         Poco::Net::HTTPClientSession session(targetUri.getHost(), targetUri.getPort());
         Poco::Net::HTTPRequest request("GET", targetUri.getPathEtc());

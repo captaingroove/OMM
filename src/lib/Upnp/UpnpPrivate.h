@@ -88,7 +88,7 @@ public:
     void stopListen();
     void setMode(unsigned int mode = NotConfigured);
 
-    void sendMessage(const Poco::AutoPtr<SsdpMessage>& pMessage,\
+    void sendMessage(const Poco::AutoPtr<SsdpMessage>& pMessage,
 //        const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS)) const;
         const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS)) const;
 
@@ -103,6 +103,7 @@ private:
     unsigned int                        _mode;
     Poco::Net::MulticastSocket*         _pSsdpListenerSocket;
     Poco::Net::MulticastSocket*         _pSsdpSenderSocket;
+    /* Poco::Net::DatagramSocket*         _pSsdpSenderSocket; */
     Poco::Net::DatagramSocket*          _pSsdpBusListenerSocket;
     Poco::Net::DatagramSocket*          _pSsdpBusSenderSocket;
     char*                               _pBuffer;
@@ -281,7 +282,8 @@ public:
     void addMessage(SsdpMessage* pMessage);
 
 private:
-    void send(SsdpSocket& socket, int repeat = 1, long delay = 0, Poco::UInt16 cacheDuration = SSDP_CACHE_DURATION, bool continuous = false, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
+    void send(SsdpSocket& socket, int repeat = 1, long delay = 0, Poco::UInt16 cacheDuration = SSDP_CACHE_DURATION, 
+            bool continuous = false, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(SSDP_FULL_ADDRESS));
 //    void send(SsdpSocket& socket, int repeat = 1, long delay = 0, Poco::UInt16 cacheDuration = SSDP_CACHE_DURATION, bool continuous = false, const Poco::Net::SocketAddress& receiver = Poco::Net::SocketAddress(BUS_FULL_ADDRESS));
     /// Sends message set "repeat" times delayed for up to "delay" millisecs (actual delay randomly chosen).
     /// If continuous is true, message set is sent out repeatatly with a delay of up to cacheDuration / 2 (actual delay randomly chosen).

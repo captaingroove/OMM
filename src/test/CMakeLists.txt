@@ -27,9 +27,13 @@ include_directories(
 # HttpFileServerTest.cpp
 # )
 
- add_executable(ssdplistener
- Ssdp.cpp
- )
+add_executable(ssdplistener
+Ssdp.cpp
+)
+
+add_executable(ssdpsend
+    SsdpSend.cpp
+)
 
 # add_executable(device_test
 # ${OMMTEST_DEVICE_SRCS}
@@ -52,10 +56,15 @@ include_directories(
 # )
 
 
- target_link_libraries(ssdplistener
- ${OMM}
- ${POCO_UTIL}
- )
+target_link_libraries(ssdplistener
+${OMM}
+${POCO_UTIL}
+)
+
+target_link_libraries(ssdpsend
+${OMM}
+${POCO_UTIL}
+)
 
 # target_link_libraries(device_test
 # ${OMM}
@@ -162,7 +171,7 @@ ${OMM_AV}
 )
 
 
-install(TARGETS ssdplistener upnpavstress tagtest
+install(TARGETS ssdplistener ssdpsend upnpavstress tagtest
 RUNTIME DESTINATION bin
 LIBRARY DESTINATION lib
 )

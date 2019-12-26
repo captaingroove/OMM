@@ -178,16 +178,19 @@ NetworkInterfaceManager::scanInterfaces()
         Poco::Net::IPAddress address = (*it).address();
         if (address.family() == Poco::Net::IPAddress::IPv4) {
             if (isLoopback(*it)) {
-                LOG(net, debug, "found loopback interface: " + interfaceName + ", (index " + Poco::NumberFormatter::format((*it).index()) + ")");
+                LOG(net, debug, "found loopback interface: " + interfaceName + ", (index " + 
+                        Poco::NumberFormatter::format((*it).index()) + ")");
                 _loopbackInterfaceName = interfaceName;
             }
             else {
-                LOG(net, information, "found network interface: " + interfaceName + ", (index: " + Poco::NumberFormatter::format((*it).index()) + ")");
+                LOG(net, information, "found network interface: " + interfaceName + ", (index: " + 
+                        Poco::NumberFormatter::format((*it).index()) + ")");
             }
             _interfaceList.push_back(*it);
         }
         else {
-            LOG(net, debug, "interface "  + interfaceName + " (index " + Poco::NumberFormatter::format((*it).index()) + ") is not IP4, ignoring.");
+            LOG(net, debug, "interface "  + interfaceName + " (index " + Poco::NumberFormatter::format((*it).index()) + 
+                    ") is not IP4, ignoring.");
         }
     }
 }

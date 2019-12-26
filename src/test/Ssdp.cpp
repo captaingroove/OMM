@@ -106,6 +106,7 @@ protected:
             Omm::SsdpSocket s;
             s.addObserver(Poco::NObserver<SsdpListener, Omm::SsdpMessage>(*this, &SsdpListener::handleSsdpMessage));
             s.init();
+            s.setMode(Omm::SsdpSocket::Multicast);
             s.startListen();
             waitForTerminationRequest();
         }
