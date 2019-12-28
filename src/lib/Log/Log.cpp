@@ -40,7 +40,7 @@ Log* Log::_pInstance = 0;
 
 Log::Log()
 {
-    _pChannel = new Poco::FormattingChannel(new Poco::PatternFormatter("%H:%M:%S.%i %N[%P,%I] %q %s %t"));
+    _pChannel = new Poco::FormattingChannel(new Poco::PatternFormatter("%H:%M:%S.%i %N [%P,%I] %q %s %t"));
     Poco::SplitterChannel* pSplitterChannel = new Poco::SplitterChannel;
 #ifdef __IPHONE__
     Util::TCPChannel* pTCPChannel = new Util::TCPChannel;
