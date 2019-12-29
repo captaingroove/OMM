@@ -25,6 +25,7 @@
 #include <Poco/PatternFormatter.h>
 #include <Poco/SplitterChannel.h>
 #include <Poco/ConsoleChannel.h>
+#include <Poco/FileChannel.h>
 #include <Poco/LineEndingConverter.h>
 #include <Poco/Logger.h>
 
@@ -35,10 +36,12 @@ namespace Util {
 
 
 Log* Log::_pInstance = 0;
+/* const std::string Log::FILE_LOGGER = "FILE_LOGGER"; */
+/* const std::string Log::CONSOLE_LOGGER = "CONSOLE_LOGGER"; */
 
 // possible log levels: trace, debug, information, notice, warning, error, critical, fatal
 
-Log::Log()
+Log::Log(Poco::Channel* pChannel)
 {
     _pChannel = new Poco::FormattingChannel(new Poco::PatternFormatter("%H:%M:%S.%i %N [%P,%I] %q %s %t"));
     Poco::SplitterChannel* pSplitterChannel = new Poco::SplitterChannel;
@@ -46,8 +49,10 @@ Log::Log()
     Util::TCPChannel* pTCPChannel = new Util::TCPChannel;
     pSplitterChannel->addChannel(pTCPChannel);
 #else
-    Poco::ConsoleChannel* pConsoleChannel = new Poco::ConsoleChannel;
-    pSplitterChannel->addChannel(pConsoleChannel);
+    if (!pChannel) {
+        pChannel = new Poco::ConsoleChannel;
+    }
+    pSplitterChannel->addChannel(pChannel);
 #endif
     _pChannel->setChannel(pSplitterChannel);
     _pChannel->open();
@@ -71,6 +76,14 @@ Log::instance()
         _pInstance = new Log;
     }
     return _pInstance;
+}
+
+
+void
+Log::createFileLogger(const std::string& fileName)
+{
+    Poco::Channel* pFileChannel = new Poco::FileChannel(fileName);
+    _pInstance = new Log(pFileChannel);
 }
 
 

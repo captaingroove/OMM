@@ -46,14 +46,18 @@ namespace Util {
 class Log
 {
 public:
+    /* static const std::string CONSOLE_LOGGER; */
+    /* static const std::string FILE_LOGGER; */
+
     static Log* instance();
+    static void createFileLogger(const std::string& fileName);
     Poco::Channel* channel();
 
     Poco::Logger& util();
     Poco::Logger& plugin();
 
 private:
-    Log();
+    Log(Poco::Channel* pChannel = 0);
 
     static Log*                         _pInstance;
     Poco::FormattingChannel*            _pChannel;

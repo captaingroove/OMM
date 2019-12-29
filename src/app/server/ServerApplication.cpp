@@ -19,11 +19,14 @@
 |  along with this program.  If not, see <http://www.gnu.org/licenses/>.    |
  ***************************************************************************/
 
+#include <Omm/Log.h>
 #include <Omm/UpnpGui/UpnpApplication.h>
 
 
 int main(int argc, char** argv)
 {
+    Omm::Util::Log::Log::createFileLogger("/tmp/ommserver.log");
+
     Omm::UpnpApplication app(argc, argv);
     app.setLockInstance(false);
     app.setIgnoreConfigFile(true);
