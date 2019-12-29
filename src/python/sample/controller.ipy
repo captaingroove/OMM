@@ -22,7 +22,13 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.    #
 #***************************************************************************#
 
+# renderer dependencies:
+# mplayer
+# mplayer.py
+
 import time
+import mplayer
+
 import upnp
 
 class TestController(upnp.Controller):
@@ -109,6 +115,29 @@ class TestController(upnp.Controller):
                 # check if child is an audio or video media object
                 # if upnp.AvClass.matchClass(child.getClass(), upnp.AvClass.ITEM, upnp.AvClass.AUDIO_ITEM) or \
                 # upnp.AvClass.matchClass(child.getClass(), upnp.AvClass.ITEM, upnp.AvClass.VIDEO_ITEM):
+
+    def item(self, server_idx=0, child_idx=0):
+        server = self.server_group.getDevice(server_idx)
+        server.browseRootObject()
+        root = server.getRootObject()
+        return root.getChildForRow(child_idx)
+
+    def uri(self, server_idx=0, child_idx=0):
+        child = self.item(server_idx, child_idx)
+        return child.getResource(0).getUri()
+
+    def load_uri(self, server_idx=0, child_idx=0):
+        self._uri = self.uri(server_idx, child_idx)
+
+    def play_uri(self, server_idx=0, child_idx=0):
+        self._player = mplayer.Player()
+        self._player.loadfile(self._uri)
+
+    def pause_uri(self):
+        self._player.pause()
+
+    def stop_uri(self):
+        self._player.quit()
 
 
 if __name__ == "__main__":
