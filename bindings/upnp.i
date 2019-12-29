@@ -38,6 +38,7 @@
 #include <Poco/Types.h>
 #include <Poco/URI.h>
 #include <Poco/Timestamp.h>
+#include "../src/include/Omm/Log.h"
 #include "../src/include/Omm/Upnp.h"
 #include "../src/include/Omm/UpnpInternal.h"
 #include "../src/include/Omm/UpnpAv.h"
@@ -53,7 +54,12 @@ using namespace Omm::Av;
 using namespace Poco;
 %}
 
+%rename(Log_Util) Omm::Util::Log;
+%rename(Log_Av) Omm::Av::Log;
+%rename(Log_Omm) Omm::Log;
+
 /* Parse the header file to generate wrappers */
+//%include "../src/include/Omm/Log.h"
 //%include "../src/include/Omm/Upnp.h"
 //%include "../src/include/Omm/UpnpInternal.h"
 //%include "../src/include/Omm/UpnpAv.h"
@@ -99,6 +105,38 @@ typedef int             i4;
 typedef float           r4;
 typedef double          r8;
 typedef double          number;
+
+
+//////////////////////////////////// Log ////////////////////////////////////
+
+
+namespace Omm {
+namespace Util {
+
+class Log
+{
+public:
+    static Log* instance();
+    static void createFileLogger(const std::string& fileName);
+    Poco::Channel* channel();
+
+    Poco::Logger& util();
+    Poco::Logger& plugin();
+
+private:
+    Log(Poco::Channel* pChannel = 0);
+
+    static Log*                         _pInstance;
+    Poco::FormattingChannel*            _pChannel;
+    Poco::Logger*                       _pUtilLogger;
+    Poco::Logger*                       _pPluginLogger;
+};
+
+}
+}
+
+
+//////////////////////////////////// Upnp ////////////////////////////////////
 
 
 template<class E>
