@@ -28,11 +28,13 @@ import upnp
 class TestController(upnp.Controller):
     # implement callback for device container add events
     def addDeviceContainer(self, device_container, index, begin):
-        if not begin: print("TestController device container added, root device uuid: " + device_container.getRootDevice().getUuid())
+        if not begin: print("TestController device container added, root device uuid: " +
+                            device_container.getRootDevice().getUuid())
 
     # implement callback for device container remove events
     def removeDeviceContainer(self, device_container, index, begin):
-        if not begin: print("TestController device container removed, root device uuid: " + device_container.getRootDevice().getUuid())
+        if not begin: print("TestController device container removed, root device uuid: " +
+                            device_container.getRootDevice().getUuid())
 
     def start(self):
         self.server_group = upnp.CtlMediaServerGroup()
@@ -84,11 +86,29 @@ class TestController(upnp.Controller):
                 # play the child object
                 renderer.playPressed()
 
-    def ls(self):
-        for server_idx in range(self.server_group.getDeviceCount()):
-            server = self.server_group.getDevice(0)
-            print(server.getFriendlyName()) + "/"
-
+    def ls(self, path="/"):
+        if path == "/":
+            for server_idx in range(self.server_group.getDeviceCount()):
+                server = self.server_group.getDevice(server_idx)
+                print(server_idx, server.getFriendlyName() + "/")
+        else:
+            server_idx = int(path.lstrip("/"))
+            server = self.server_group.getDevice(server_idx)
+            server.browseRootObject()
+            root = server.getRootObject()
+            # print("root object title: ", root.getTitle())
+            # print("root object class: ", root.getClass())
+            if upnp.AvClass.matchClass(root.getClass(),  upnp.AvClass.CONTAINER):
+                for child_idx in range(root.getChildCount()):
+                    child = root.getChildForRow(child_idx)
+                    if upnp.AvClass.matchClass(child.getClass(),
+                                               upnp.AvClass.CONTAINER):
+                        print(child_idx, child.getClass(), child.getTitle() + "/")
+                    else:
+                        print(child_idx, child.getClass(), child.getTitle())
+                # check if child is an audio or video media object
+                # if upnp.AvClass.matchClass(child.getClass(), upnp.AvClass.ITEM, upnp.AvClass.AUDIO_ITEM) or \
+                # upnp.AvClass.matchClass(child.getClass(), upnp.AvClass.ITEM, upnp.AvClass.VIDEO_ITEM):
 
 
 if __name__ == "__main__":
