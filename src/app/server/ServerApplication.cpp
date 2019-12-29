@@ -25,8 +25,7 @@
 
 int main(int argc, char** argv)
 {
-    Omm::Util::Log::Log::createFileLogger("/tmp/ommserver.log");
-
+    /* Omm::Util::Log::Log::logToFile("/tmp/ommserver.log"); */
     Omm::UpnpApplication app(argc, argv);
     app.setLockInstance(false);
     app.setIgnoreConfigFile(true);

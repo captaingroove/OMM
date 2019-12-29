@@ -54,7 +54,7 @@ using namespace Omm::Av;
 using namespace Poco;
 %}
 
-%rename(Log_Util) Omm::Util::Log;
+%rename(Log) Omm::Util::Log;
 %rename(Log_Av) Omm::Av::Log;
 %rename(Log_Omm) Omm::Log;
 
@@ -117,7 +117,7 @@ class Log
 {
 public:
     static Log* instance();
-    static void createFileLogger(const std::string& fileName);
+    static void logToFile(const std::string& fileName);
     Poco::Channel* channel();
 
     Poco::Logger& util();

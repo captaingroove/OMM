@@ -92,6 +92,6 @@ class TestController(upnp.Controller):
 
 
 if __name__ == "__main__":
-    upnp.Log_Util.createFileLogger("/tmp/ommcontroller.log")
+    upnp.Log.logToFile("/tmp/ommcontroller.log")
     c = TestController()
     c.start()

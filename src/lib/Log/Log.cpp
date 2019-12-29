@@ -36,8 +36,6 @@ namespace Util {
 
 
 Log* Log::_pInstance = 0;
-/* const std::string Log::FILE_LOGGER = "FILE_LOGGER"; */
-/* const std::string Log::CONSOLE_LOGGER = "CONSOLE_LOGGER"; */
 
 // possible log levels: trace, debug, information, notice, warning, error, critical, fatal
 
@@ -80,7 +78,7 @@ Log::instance()
 
 
 void
-Log::createFileLogger(const std::string& fileName)
+Log::logToFile(const std::string& fileName)
 {
     Poco::Channel* pFileChannel = new Poco::FileChannel(fileName);
     _pInstance = new Log(pFileChannel);
