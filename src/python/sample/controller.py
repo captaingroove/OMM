@@ -41,19 +41,33 @@ from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.layout.screen import Point
 
 # import mplayer
-
+import os
+import sys
+# FIXME: hack to add the upnp python module
+sys.path.append(os.path.join(os.environ.get("OMM") + "bin", "bindings"))
 import upnp
 
 class TestController(upnp.Controller):
+
+    def __init__(self):
+        super(TestController, self).__init__()
+        window = Window(content=ListControl(self, kb_list))
+        layout = Layout(window)
+        self.app = Application(layout=layout, full_screen=True, key_bindings=kb_global)
+
     # implement callback for device container add events
     def addDeviceContainer(self, device_container, index, begin):
-        if not begin: print("TestController device container added, root device uuid: " +
+        if not begin:
+            print("TestController device container added, root device uuid: " +
                             device_container.getRootDevice().getUuid())
+            self.app.invalidate()
 
     # implement callback for device container remove events
     def removeDeviceContainer(self, device_container, index, begin):
-        if not begin: print("TestController device container removed, root device uuid: " +
+        if not begin:
+            print("TestController device container removed, root device uuid: " +
                             device_container.getRootDevice().getUuid())
+            self.app.invalidate()
 
     def start(self):
         self.server_group = upnp.CtlMediaServerGroup()
@@ -64,6 +78,7 @@ class TestController(upnp.Controller):
         self.init()
         # start the controller
         self.setState(upnp.Controller.Public)
+        self.app.run()
 
     def stop(self):
         # stop the controller and leave the renderer playing the child object
@@ -218,15 +233,17 @@ class ListControl(UIControl):
 
 if __name__ == "__main__":
     upnp.Log.logToFile("/tmp/ommcontroller.log")
-    c = TestController()
-    c.start()
 
-    root_container = HSplit([
-        Window(content=ListControl(c, kb_list)),
-    ])
+    controller = TestController()
+    # c = TestController(app)
+    # root_container = HSplit([
+    #     Window(content=ListControl(c, kb_list)),
+    # ])
+    # layout = Layout(root_container)
+    # window = Window(content=ListControl(controller, kb_list))
+    # layout = Layout(window)
+    # app = Application(layout=layout, full_screen=True, key_bindings=kb_global)
 
-    layout = Layout(root_container)
-    app = Application(layout=layout, full_screen=True, key_bindings=kb_global)
-    app.run()
-
-    c.stop()
+    controller.start()
+    # app.run()
+    controller.stop()
