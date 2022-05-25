@@ -1,3 +1,5 @@
+return()
+
 find_package(GLFW)
 find_package(OpenGL)
 
