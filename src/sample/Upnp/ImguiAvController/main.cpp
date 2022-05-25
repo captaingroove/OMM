@@ -3,6 +3,9 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 
+// Removed the original Dear ImGui v1.70 WIP sources from this repo in order not to clutter
+// the source code.
+
 // About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually.
 // Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad.
 // You may use another loader/header of your choice (glext, glLoadGen, etc.), or chose to manually implement your own.
