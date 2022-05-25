@@ -1,4 +1,6 @@
 TODO
+.*
 *.swp
 **/.ropeproject/
+**/compile_commands.json
 

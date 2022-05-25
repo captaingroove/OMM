@@ -53,20 +53,42 @@ class TestController(upnp.Controller):
         super(TestController, self).__init__()
         window = Window(content=ListControl(self, kb_list))
         layout = Layout(window)
+        # from the ptk reference manual:
+        #
+        # prompt_toolkit.application.get_app() → Application[Any]
+        # Get the current active (running) Application. An Application is active during the Application.run_async() call.
+        # We assume that there can only be one Application active at the same time.
+        # There is only one terminal window, with only one stdin and stdout.
+        # This makes the code significantly easier than passing around the Application everywhere.
+        # If no Application is running, then return by default a DummyApplication.
+        # For practical reasons, we prefer to not raise an exception.
+        # This way, we don’t have to check all over the place whether an actual Application was returned.
+        # (For applications like pymux where we can have more than one Application, we’ll use a work-around to handle that.)
+        #
+        # prompt_toolkit.application.set_app(app: Application[Any]) → Generator[None, None, None]
+        # Context manager that sets the given Application active in an AppSession.
+        # This should only be called by the Application itself.
+        # The application will automatically be active while its running.
+        # If you want the application to be active in other threads/coroutines, where that’s not the case,
+        # use contextvars.copy_context(), or use Application.context to run it in the appropriate context.
+        #
+        #
+        # NOTE: could also use get_app() to invalidate the Application from
+        # outside of TestController
         self.app = Application(layout=layout, full_screen=True, key_bindings=kb_global)
 
     # implement callback for device container add events
     def addDeviceContainer(self, device_container, index, begin):
         if not begin:
-            print("TestController device container added, root device uuid: " +
-                            device_container.getRootDevice().getUuid())
+            # print("TestController device container added, root device uuid: " +
+            #                 device_container.getRootDevice().getUuid())
             self.app.invalidate()
 
     # implement callback for device container remove events
     def removeDeviceContainer(self, device_container, index, begin):
         if not begin:
-            print("TestController device container removed, root device uuid: " +
-                            device_container.getRootDevice().getUuid())
+            # print("TestController device container removed, root device uuid: " +
+            #                 device_container.getRootDevice().getUuid())
             self.app.invalidate()
 
     def start(self):
@@ -187,7 +209,8 @@ cursor_position = Point(x=0, y=0)
 @kb_list.add('down')
 def key_down_(event):
     global cursor_position
-    cursor_position = Point(cursor_position.x, cursor_position.y+1)
+    if cursor_position.y > 1:
+        cursor_position = Point(cursor_position.x, cursor_position.y+1)
 
 
 @kb_list.add('up')
@@ -217,7 +240,10 @@ class ListControl(UIControl):
         return str(self.get_item_count())
 
     def get_item(self, item_idx):
-        return [("", self.controller.server_group.getDevice(item_idx).getFriendlyName() + "/")]
+        device = self.controller.server_group.getDevice(item_idx)
+        if device:
+            return [("", device.getFriendlyName() + "/")]
+        return None
 
     def create_content(self, width, height, preview_search=False):
         global cursor_position
