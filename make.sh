@@ -21,11 +21,11 @@ fi
 while getopts :hvrs:t: opt
 do
     case "$opt" in
-	h) PRINT_USAGE=1;;
+        h) PRINT_USAGE=1;;
         v) VERBOSE="VERBOSE=1";;
         r) RELEASE=1;;
         s) STAGING_DIR="${OPTARG}";;
-	t) BUILD_TARGET="${OPTARG}";;
+        t) BUILD_TARGET="${OPTARG}";;
         \?) PRINT_USAGE=1;;    # unknown flag
     esac
 done
