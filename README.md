@@ -2,10 +2,10 @@
 
 # Contents
 
-- [1. Introduction](#introduction)
-- [2. Building from Source](#building-from-source)
-- [3. Dependencies](#dependencies)
-- [4. Running the Applications](#running-the-application)
+- [1. Introduction](https://github.com/captaingroove/omm-upnp#introduction)
+- [2. Building from Source](https://github.com/captaingroove/omm-upnp#building-from-source)
+- [3. Dependencies](https://github.com/captaingroove/omm-upnp#dependencies)
+- [4. Running the Applications](https://github.com/captaingroove/omm-upnp#running-the-application)
 
 ## 1. Introduction
 
