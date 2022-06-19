@@ -5,7 +5,7 @@
 - [Introduction](https://github.com/captaingroove/omm-upnp#introduction)
 - [Building from Source](https://github.com/captaingroove/omm-upnp#building-from-source)
 - [Dependencies](https://github.com/captaingroove/omm-upnp#dependencies)
-- [Running the Applications](https://github.com/captaingroove/omm-upnp#running-the-application)
+- [Running the Applications](https://github.com/captaingroove/omm-upnp#running-the-applications)
 
 ## Introduction
 
