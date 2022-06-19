@@ -2,12 +2,12 @@
 
 # Contents
 
-- [1. Introduction](https://github.com/captaingroove/omm-upnp#introduction)
-- [2. Building from Source](https://github.com/captaingroove/omm-upnp#building-from-source)
-- [3. Dependencies](https://github.com/captaingroove/omm-upnp#dependencies)
-- [4. Running the Applications](https://github.com/captaingroove/omm-upnp#running-the-application)
+- [Introduction](https://github.com/captaingroove/omm-upnp#introduction)
+- [Building from Source](https://github.com/captaingroove/omm-upnp#building-from-source)
+- [Dependencies](https://github.com/captaingroove/omm-upnp#dependencies)
+- [Running the Applications](https://github.com/captaingroove/omm-upnp#running-the-application)
 
-## 1. Introduction
+## Introduction
 
 Omm is a set of applications and libraries for easily making your multimedia content available
 to your local network. It aims to be compatible to the UPnP V1.0 and UPnP-AV V1.0 specification.
@@ -54,7 +54,7 @@ UPnP AV 1.0 implementation
 
 A stub generator using UPnP device descriptions to generate C++ interfaces for libommupnp
 
-## 2. Building from Source
+## Building from Source
 
 **outdated**
 
@@ -72,7 +72,7 @@ $ sudo ./make.sh install
 or create packages:
 $ ./make.sh package
 
-## 3. Dependencies
+## Dependencies
 
 **outdated**
 
@@ -104,7 +104,7 @@ libommgui on Linux: Qt4 including webkit
 Packaging dependencies (2014-04-22):
 target mingw-linux: NSIS
 
-## 4. Running the Applications
+## Running the Applications
 
 **outdated**
 
