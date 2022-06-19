@@ -1,32 +1,40 @@
-Contents
+**Further development of OMM as a distributed multi-media solution takes place in the omm-9p repository.**
 
-1. Introduction
-2. Building from Source
-3. Dependencies
-4. Running the Applications
+# Contents
 
--------------------------------------------------------------------------------------------------------
+- [1. Introduction](#intro)
+- [2. Building from Source](#build)
+- [3. Dependencies](#depend)
+- [4. Running the Applications](#run)
 
-1. Introduction (outdated, incomplete)
+## 1. Introduction (outdated, incomplete) {#intro}
 
 Omm is a set of applications and libraries for easily making your multimedia content available
 to your local network. It aims to be compatible to the UPnP V1.0 and UPnP-AV V1.0 specification.
 
 Omm currently includes the following components:
 
-omm - the main application, providing a sensible mix of Omm components.
+### omm
 
-ommcontroller - a UPnP-AV Media Controller
+The main application, providing a sensible mix of Omm components.
+
+### ommcontroller 
+
+a UPnP-AV Media Controller
 ommcontroller is the "remote control" of your multimedia system.
 It lets you select your media source (UPnP-AV Server), browse the content of the server, select a media object
 (song, video, tv-channel, ...), select a media output (UPnP-AV Renderer) and control the transport of the media
 from Server to Renderer (start, stop, seek, ...).
 
-ommrenderer - a UPnP-AV Media Renderer
+### ommrenderer
+
+a UPnP-AV Media Renderer
 ommrenderer is the "set-top box" for you TV. It renders the media streams
 coming from the UPnP-AV Server to a screen and a sound system.
 
-ommserver - a set of UPnP-AV Media Servers
+### ommserver
+
+a set of UPnP-AV Media Servers
 Currently only a plugin for VDR (Video Disc Recorder - http://www.cadsoft.de/vdr/) is available.
 It gives you access to digital television provided by VDR (DVB-S, DVB-C or DVB-T). The plugin
 exposes the TV channels, you can watch live-TV and the recordings. Seeking in recordings is
@@ -34,15 +42,19 @@ supported. For browsing the EPG or setting timers you need a web based interface
 For delivering other content, such as music and video files (mp3, avi, ...) you can use one
 of the UPnP-AV servers out there (see compatibility list below).
 
-libommupnp
+### libommupnp
+
 UPnP 1.0 implementation
 
-libommupnpav
+### libommupnpav
+
 UPnP AV 1.0 implementation
 
--------------------------------------------------------------------------------------------------------
+### ommgen
 
-2. Building from Source
+A stub generator using UPnP device descriptions to generate C++ interfaces for libommupnp
+
+## 2. Building from Source {#build}
 
 To build Omm from source you need CMake as of version 2.6 or later. In the top-level directory
 just run:
@@ -58,9 +70,7 @@ $ sudo ./make.sh install
 or create packages:
 $ ./make.sh package
 
--------------------------------------------------------------------------------------------------------
-
-3. Dependencies (somewhat outdated)
+## 3. Dependencies (somewhat outdated) {#depend}
 
 All Omm components depend on the Poco libraries (http://pocoproject.org/).
 Further dependencies are:
@@ -90,9 +100,7 @@ libommgui on Linux: Qt4 including webkit
 Packaging dependencies (2014-04-22):
 target mingw-linux: NSIS
 
--------------------------------------------------------------------------------------------------------
-
-4. Running the Applications (outdated)
+## 4. Running the Applications (outdated) {#run}
 
 This is pretty straight forward: just run ommcontroller or ommrenderer on a single or on several different machines.
 No configuration is needed, in the first place. All UPnP-AV Servers and UPnP-AV Renderers announce
@@ -108,13 +116,3 @@ streamdev-server.AllowSuspend = 1
 streamdev-server.SuspendMode = 1
 
 to vdr's setup.conf, to enable changing of transponders on the stream's request.
-
--------------------------------------------------------------------------------------------------------
-
-5. Compatibility (outdated)
-
-Currently, only Mediatomb (http://mediatomb.cc) has been tested to work nicely with the Omm applications. Please give
-feedback, if you have tested others.
-
-I hope you enjoy Omm as much as I enjoy hacking on it
-Joerg Bakker
