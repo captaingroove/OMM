@@ -2,12 +2,12 @@
 
 # Contents
 
-- [1. Introduction](#intro)
-- [2. Building from Source](#build)
-- [3. Dependencies](#depend)
-- [4. Running the Applications](#run)
+- [1. Introduction](#introduction)
+- [2. Building from Source](#building-from-source)
+- [3. Dependencies](#dependencies)
+- [4. Running the Applications](#running-the-application)
 
-## 1. Introduction (outdated, incomplete) {#intro}
+## 1. Introduction
 
 Omm is a set of applications and libraries for easily making your multimedia content available
 to your local network. It aims to be compatible to the UPnP V1.0 and UPnP-AV V1.0 specification.
@@ -54,7 +54,9 @@ UPnP AV 1.0 implementation
 
 A stub generator using UPnP device descriptions to generate C++ interfaces for libommupnp
 
-## 2. Building from Source {#build}
+## 2. Building from Source
+
+**outdated**
 
 To build Omm from source you need CMake as of version 2.6 or later. In the top-level directory
 just run:
@@ -70,7 +72,9 @@ $ sudo ./make.sh install
 or create packages:
 $ ./make.sh package
 
-## 3. Dependencies (somewhat outdated) {#depend}
+## 3. Dependencies
+
+**outdated**
 
 All Omm components depend on the Poco libraries (http://pocoproject.org/).
 Further dependencies are:
@@ -100,7 +104,9 @@ libommgui on Linux: Qt4 including webkit
 Packaging dependencies (2014-04-22):
 target mingw-linux: NSIS
 
-## 4. Running the Applications (outdated) {#run}
+## 4. Running the Applications
+
+**outdated**
 
 This is pretty straight forward: just run ommcontroller or ommrenderer on a single or on several different machines.
 No configuration is needed, in the first place. All UPnP-AV Servers and UPnP-AV Renderers announce
