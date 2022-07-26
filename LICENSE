@@ -6,4 +6,5 @@ All source code of omm-upnp is distributed under the
                        Version 3, 29 June 2007
 
 except for all files of libommdvb in src/lib/Dvb, include/Omm/Dvb and src/sample/Dvb
-which are released under the MIT LICENCSE.
+and libavstream in src/lib/AvStream and include/Omm/AvStream.h
+and the tool resgen in src/util/resgen which are released under the MIT LICENCSE.
