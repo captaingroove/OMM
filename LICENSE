@@ -1,0 +1,10 @@
+Copyright 2009 - 2021, 2022 Jörg Bakker
+
+All source code of omm-upnp is distributed under the
+
+                    GNU GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+except for libommdvb in src/lib/Dvb which is released under the
+
+                           MIT LICENCSE
