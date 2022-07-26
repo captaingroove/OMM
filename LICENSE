@@ -5,6 +5,6 @@ All source code of omm-upnp is distributed under the
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
-except for libommdvb in src/lib/Dvb which is released under the
+except for all files of libommdvb in src/lib/Dvb and include/Omm/Dvb which are released under the
 
                            MIT LICENCSE
